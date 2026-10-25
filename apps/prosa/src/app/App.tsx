@@ -85,11 +85,23 @@ export function App() {
 
   const openManuscript = useCallback(async (id: string) => {
     setError(null);
-    const loaded = await loadManuscript(id);
-    const recovery = await loadRecoverySnapshot(id);
-    setActiveId(id);
-    setDocument(recovery ?? loaded.document);
-    setSaveState("idle");
+    try {
+      const loaded = await loadManuscript(id);
+      let resolved = loaded.document;
+      try {
+        const recovery = await loadRecoverySnapshot(id);
+        if (recovery) {
+          resolved = recovery;
+        }
+      } catch {
+        // Recovery snapshot can be corrupt; fall back to last saved document.
+      }
+      setActiveId(id);
+      setDocument(resolved);
+      setSaveState("idle");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Failed to open manuscript");
+    }
   }, []);
 
   const handleCreate = useCallback(async () => {

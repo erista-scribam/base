@@ -25,7 +25,6 @@ export function EditorWorkspace({
   onEditorReady,
 }: EditorWorkspaceProps) {
   const [markdown, setMarkdown] = useState(() => prosaDocumentToMarkdown(document));
-  const [parseError, setParseError] = useState<string | null>(null);
   const documentRef = useRef(document);
 
   useEffect(() => {
@@ -35,13 +34,7 @@ export function EditorWorkspace({
   const handleMarkdownChange = useCallback(
     (value: string) => {
       setMarkdown(value);
-      try {
-        const next = markdownToProsaDocument(documentRef.current, value);
-        setParseError(null);
-        onDocumentChange(next);
-      } catch (cause) {
-        setParseError(cause instanceof Error ? cause.message : "Invalid markdown");
-      }
+      onDocumentChange(markdownToProsaDocument(documentRef.current, value));
     },
     [onDocumentChange],
   );
@@ -67,7 +60,6 @@ export function EditorWorkspace({
           onChange={handleMarkdownChange}
           aria-label="Markdown source"
         />
-        {parseError ? <div className="markdown-parse-error">{parseError}</div> : null}
       </div>
       <div className="editor-split-pane editor-split-preview">
         <div className="editor-split-label">Preview</div>

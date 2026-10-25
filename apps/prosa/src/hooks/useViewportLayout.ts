@@ -1,6 +1,15 @@
 import { useEffect, useRef } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
+function isTauriRuntime(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  const internals = (window as unknown as { __TAURI_INTERNALS__?: { metadata?: unknown } })
+    .__TAURI_INTERNALS__;
+  return Boolean(internals?.metadata);
+}
+
 function syncViewportSize() {
   const height = window.innerHeight;
   const width = window.innerWidth;
@@ -30,6 +39,9 @@ export function useViewportLayout(options?: ViewportLayoutOptions) {
 
     const checkWindowMode = async () => {
       scheduleSync();
+      if (!isTauriRuntime()) {
+        return;
+      }
       try {
         const win = getCurrentWindow();
         const [fullscreen, maximized] = await Promise.all([win.isFullscreen(), win.isMaximized()]);
@@ -55,14 +67,20 @@ export function useViewportLayout(options?: ViewportLayoutOptions) {
     window.visualViewport?.addEventListener("resize", checkWindowMode);
 
     let unlisten: (() => void) | undefined;
-    void getCurrentWindow()
-      .onResized(() => {
-        void checkWindowMode();
-      })
-      .then((dispose) => {
-        unlisten = dispose;
-      })
-      .catch(() => undefined);
+    if (isTauriRuntime()) {
+      try {
+        void getCurrentWindow()
+          .onResized(() => {
+            void checkWindowMode();
+          })
+          .then((dispose) => {
+            unlisten = dispose;
+          })
+          .catch(() => undefined);
+      } catch {
+        // Tauri window API unavailable in plain browser dev.
+      }
+    }
 
     return () => {
       window.removeEventListener("resize", checkWindowMode);

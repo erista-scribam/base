@@ -62,6 +62,23 @@ export const prosaBlockSchema = z.discriminatedUnion("type", [
       id: z.string().min(1),
     })
     .strict(),
+  z
+    .object({
+      type: z.literal("list"),
+      id: z.string().min(1),
+      ordered: z.boolean(),
+      items: z
+        .array(
+          z
+            .object({
+              id: z.string().min(1),
+              content: inlineContentSchema,
+            })
+            .strict(),
+        )
+        .min(1),
+    })
+    .strict(),
 ]);
 
 export const prosaDocumentSchema = z

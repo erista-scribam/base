@@ -7,7 +7,7 @@ import { RangeSetBuilder } from "@codemirror/state";
 /** Width of the left marker column (`##### `). Body text starts here. */
 export const MARKDOWN_BODY_COLUMN_CH = 6;
 
-type LineKind = "heading" | "quote" | "break" | "body";
+type LineKind = "heading" | "quote" | "list" | "break" | "body";
 
 function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number } {
   const heading = /^(#{1,5}) /.exec(text);
@@ -17,6 +17,14 @@ function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number } {
   const quote = /^> ?/.exec(text);
   if (quote) {
     return { kind: "quote", markerCh: quote[0].length };
+  }
+  const ordered = /^(\d+\.\s)/.exec(text);
+  if (ordered?.[1]) {
+    return { kind: "list", markerCh: ordered[1].length };
+  }
+  const bullet = /^([-*+]\s)/.exec(text);
+  if (bullet?.[1]) {
+    return { kind: "list", markerCh: bullet[1].length };
   }
   const trimmed = text.trim();
   if (trimmed === "* * *" || trimmed === "***") {
@@ -112,7 +120,7 @@ const markdownSourceEditorTheme = EditorView.theme({
   ".cm-md-line": {
     paddingLeft: "calc(var(--md-body-ch) * 1ch)",
   },
-  ".cm-md-line.cm-md-heading, .cm-md-line.cm-md-quote": {
+  ".cm-md-line.cm-md-heading, .cm-md-line.cm-md-quote, .cm-md-line.cm-md-list": {
     textIndent: "calc(var(--md-marker-ch) * -1ch)",
   },
   ".cm-md-line.cm-md-break": {

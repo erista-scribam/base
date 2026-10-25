@@ -36,8 +36,24 @@ export interface ProsaSceneBreakBlock {
   id: string;
 }
 
+export interface ProsaListItem {
+  id: string;
+  content: ProsaInlineNode[];
+}
+
+export interface ProsaListBlock {
+  type: "list";
+  id: string;
+  ordered: boolean;
+  items: ProsaListItem[];
+}
+
 export type ProsaBlock =
-  ProsaHeadingBlock | ProsaParagraphBlock | ProsaBlockquoteBlock | ProsaSceneBreakBlock;
+  | ProsaHeadingBlock
+  | ProsaParagraphBlock
+  | ProsaBlockquoteBlock
+  | ProsaSceneBreakBlock
+  | ProsaListBlock;
 
 export interface ProsaDocument {
   schemaVersion: ProsaSchemaVersion;

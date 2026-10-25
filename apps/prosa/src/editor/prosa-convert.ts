@@ -10,7 +10,16 @@ function blockId(): string {
   return `blk_${crypto.randomUUID()}`;
 }
 
-function marksFromTiptap(marks: JSONContent["marks"]): ProsaInlineNode["marks"] | undefined {
+function linkHrefFromMarks(marks: JSONContent["marks"]): string | undefined {
+  const linkMark = marks?.find((mark) => mark.type === "link");
+  const href = linkMark?.attrs?.href;
+  return typeof href === "string" && href.length > 0 ? href : undefined;
+}
+
+function marksFromTiptap(
+  marks: JSONContent["marks"],
+  href: string | undefined,
+): ProsaInlineNode["marks"] | undefined {
   if (!marks?.length) {
     return undefined;
   }
@@ -19,7 +28,7 @@ function marksFromTiptap(marks: JSONContent["marks"]): ProsaInlineNode["marks"] 
     if (mark.type === "bold") result.push("bold");
     if (mark.type === "italic") result.push("italic");
     if (mark.type === "underline") result.push("underline");
-    if (mark.type === "link") result.push("link");
+    if (mark.type === "link" && href) result.push("link");
   }
   return result.length ? result : undefined;
 }
@@ -28,10 +37,8 @@ function inlineFromTextNode(node: JSONContent): ProsaInlineNode[] {
   if (node.type !== "text" || typeof node.text !== "string") {
     return [];
   }
-  const marks = marksFromTiptap(node.marks);
-  const linkMark = node.marks?.find((mark) => mark.type === "link");
-  const href =
-    linkMark && typeof linkMark.attrs?.href === "string" ? linkMark.attrs.href : undefined;
+  const href = linkHrefFromMarks(node.marks);
+  const marks = marksFromTiptap(node.marks, href);
   return [
     {
       type: "text",
@@ -91,6 +98,30 @@ function blockFromTiptap(node: JSONContent): ProsaBlock | null {
     }
     case "sceneBreak":
       return { type: "scene_break", id: blockId() };
+    case "bulletList":
+    case "orderedList": {
+      const ordered = node.type === "orderedList";
+      const items: { id: string; content: ProsaInlineNode[] }[] = [];
+      for (const child of node.content ?? []) {
+        if (child.type !== "listItem") {
+          continue;
+        }
+        const merged: ProsaInlineNode[] = [];
+        for (const itemChild of child.content ?? []) {
+          if (itemChild.type === "paragraph") {
+            merged.push(...inlineFromBlockContent(itemChild.content));
+          }
+        }
+        items.push({
+          id: blockId(),
+          content: merged.length ? merged : [{ type: "text", id: inlineId(), text: "" }],
+        });
+      }
+      if (!items.length) {
+        return null;
+      }
+      return { type: "list", id: blockId(), ordered, items };
+    }
     default:
       return null;
   }
@@ -152,6 +183,14 @@ function blockToTiptap(block: ProsaBlock): JSONContent {
       };
     case "scene_break":
       return { type: "sceneBreak" };
+    case "list":
+      return {
+        type: block.ordered ? "orderedList" : "bulletList",
+        content: block.items.map((item) => ({
+          type: "listItem",
+          content: [{ type: "paragraph", content: inlineToTiptap(item.content) }],
+        })),
+      };
     default: {
       const _exhaustive: never = block;
       return _exhaustive;

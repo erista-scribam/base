@@ -4,7 +4,7 @@ import type {
   ProsaInlineNode,
   ProsaInlineMark,
 } from "@scribo/document-model";
-import { PROSA_SCHEMA_VERSION, validateProsaDocument } from "@scribo/document-model";
+import { PROSA_SCHEMA_VERSION, tryValidateProsaDocument } from "@scribo/document-model";
 import { isSceneBreakLineRaw, stripLegacySourceIndent } from "./markdown-source-layout";
 
 function blockId(): string {
@@ -13,6 +13,32 @@ function blockId(): string {
 
 function inlineId(): string {
   return `inl_${crypto.randomUUID()}`;
+}
+
+function listItemId(): string {
+  return `itm_${crypto.randomUUID()}`;
+}
+
+function emptyParagraphBlock(): ProsaBlock {
+  return {
+    type: "paragraph",
+    id: blockId(),
+    content: [{ type: "text", id: inlineId(), text: "" }],
+  };
+}
+
+function coerceMarkdownDocument(base: ProsaDocument, blocks: ProsaBlock[]): ProsaDocument {
+  const candidate = {
+    schemaVersion: PROSA_SCHEMA_VERSION,
+    id: base.id,
+    title: base.title,
+    blocks: blocks.length ? blocks : [emptyParagraphBlock()],
+  };
+  const parsed = tryValidateProsaDocument(candidate);
+  if (parsed.success) {
+    return parsed.data;
+  }
+  return base;
 }
 
 function serializeInline(nodes: ProsaInlineNode[]): string {
@@ -58,6 +84,12 @@ export function prosaDocumentToMarkdown(document: ProsaDocument): string {
         break;
       case "scene_break":
         lines.push("* * *");
+        break;
+      case "list":
+        block.items.forEach((item, itemIndex) => {
+          const text = serializeInline(item.content);
+          lines.push(block.ordered ? `${itemIndex + 1}. ${text}` : `- ${text}`);
+        });
         break;
       default:
         break;
@@ -109,6 +141,20 @@ function parseInlineMarkdown(text: string): ProsaInlineNode[] {
     ...(token.marks.length ? { marks: token.marks } : {}),
     ...(token.href ? { href: token.href } : {}),
   }));
+}
+
+function parseOrderedListItem(line: string): string | null {
+  const match = /^\d+\.\s+(.+)$/.exec(line.trim());
+  return match?.[1] ?? null;
+}
+
+function parseBulletListItem(line: string): string | null {
+  const match = /^[-*+]\s+(.+)$/.exec(line.trim());
+  return match?.[1] ?? null;
+}
+
+function isListLine(line: string): boolean {
+  return parseOrderedListItem(line) !== null || parseBulletListItem(line) !== null;
 }
 
 function parseHeadingLine(line: string): { level: 1 | 2 | 3 | 4 | 5; text: string } | null {
@@ -173,6 +219,38 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
       continue;
     }
 
+    const orderedText = parseOrderedListItem(line);
+    if (orderedText !== null) {
+      const items: { id: string; content: ProsaInlineNode[] }[] = [];
+      while (index < lines.length) {
+        const itemLine = lines[index] ?? "";
+        const itemText = parseOrderedListItem(itemLine);
+        if (itemText === null) {
+          break;
+        }
+        items.push({ id: listItemId(), content: parseInlineMarkdown(itemText) });
+        index += 1;
+      }
+      blocks.push({ type: "list", id: blockId(), ordered: true, items });
+      continue;
+    }
+
+    const bulletText = parseBulletListItem(line);
+    if (bulletText !== null) {
+      const items: { id: string; content: ProsaInlineNode[] }[] = [];
+      while (index < lines.length) {
+        const itemLine = lines[index] ?? "";
+        const itemText = parseBulletListItem(itemLine);
+        if (itemText === null) {
+          break;
+        }
+        items.push({ id: listItemId(), content: parseInlineMarkdown(itemText) });
+        index += 1;
+      }
+      blocks.push({ type: "list", id: blockId(), ordered: false, items });
+      continue;
+    }
+
     const paragraphLines: string[] = [];
     while (index < lines.length) {
       const paragraphLine = lines[index] ?? "";
@@ -182,7 +260,8 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
       if (
         isSceneBreakLineRaw(paragraphLine) ||
         parseHeadingLine(paragraphLine) ||
-        paragraphLine.trimStart().startsWith(">")
+        paragraphLine.trimStart().startsWith(">") ||
+        isListLine(paragraphLine)
       ) {
         break;
       }
@@ -197,18 +276,5 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
     });
   }
 
-  if (!blocks.length) {
-    blocks.push({
-      type: "paragraph",
-      id: blockId(),
-      content: [{ type: "text", id: inlineId(), text: "" }],
-    });
-  }
-
-  return validateProsaDocument({
-    schemaVersion: PROSA_SCHEMA_VERSION,
-    id: base.id,
-    title: base.title,
-    blocks,
-  });
+  return coerceMarkdownDocument(base, blocks);
 }

@@ -37,6 +37,16 @@ function renderBlock(block: ProsaBlock) {
       return <blockquote key={block.id}>{renderInline(block.content)}</blockquote>;
     case "scene_break":
       return <hr key={block.id} data-scene-break="true" />;
+    case "list": {
+      const Tag = block.ordered ? "ol" : "ul";
+      return (
+        <Tag key={block.id}>
+          {block.items.map((item) => (
+            <li key={item.id}>{renderInline(item.content)}</li>
+          ))}
+        </Tag>
+      );
+    }
     default:
       return null;
   }

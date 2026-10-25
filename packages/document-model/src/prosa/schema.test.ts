@@ -22,28 +22,69 @@ describe("Prosa document model", () => {
     ).toThrow();
   });
 
-  it("requires href when link mark is present", () => {
-    expect(() =>
-      validateProsaDocument({
-        schemaVersion: PROSA_SCHEMA_VERSION,
-        id: createDocumentId(),
-        title: "Links",
-        blocks: [
-          {
-            type: "paragraph",
-            id: "blk_1",
-            content: [
-              {
-                type: "text",
-                id: "inl_1",
-                text: "read more",
-                marks: ["link"],
-              },
-            ],
-          },
-        ],
-      }),
-    ).toThrow();
+  it("repairs link marks that are missing href", () => {
+    const doc = validateProsaDocument({
+      schemaVersion: PROSA_SCHEMA_VERSION,
+      id: createDocumentId(),
+      title: "Links",
+      blocks: [
+        {
+          type: "paragraph",
+          id: "blk_1",
+          content: [
+            {
+              type: "text",
+              id: "inl_1",
+              text: "read more",
+              marks: ["link"],
+            },
+          ],
+        },
+      ],
+    });
+    expect(doc.blocks[0]?.type).toBe("paragraph");
+    if (doc.blocks[0]?.type === "paragraph") {
+      expect(doc.blocks[0].content[0]?.marks).toBeUndefined();
+    }
+  });
+
+  it("repairs list blocks missing ordered flag", () => {
+    const doc = validateProsaDocument({
+      schemaVersion: PROSA_SCHEMA_VERSION,
+      id: createDocumentId(),
+      title: "Lists",
+      blocks: [
+        {
+          type: "list",
+          id: "blk_list",
+          items: [{ id: "item_1", content: [{ type: "text", id: "inl_1", text: "One" }] }],
+        },
+      ],
+    });
+    expect(doc.blocks[0]?.type).toBe("list");
+    if (doc.blocks[0]?.type === "list") {
+      expect(doc.blocks[0].ordered).toBe(true);
+    }
+  });
+
+  it("accepts ordered and bullet lists", () => {
+    const doc = validateProsaDocument({
+      schemaVersion: PROSA_SCHEMA_VERSION,
+      id: createDocumentId(),
+      title: "Lists",
+      blocks: [
+        {
+          type: "list",
+          id: "blk_list",
+          ordered: true,
+          items: [
+            { id: "item_1", content: [{ type: "text", id: "inl_1", text: "One" }] },
+            { id: "item_2", content: [{ type: "text", id: "inl_2", text: "Two" }] },
+          ],
+        },
+      ],
+    });
+    expect(doc.blocks[0]?.type).toBe("list");
   });
 
   it("round-trips through JSON serialization", () => {

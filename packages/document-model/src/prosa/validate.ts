@@ -1,9 +1,14 @@
 import { ValidationError } from "@scribo/core";
 import type { ProsaDocument } from "./types";
 import { prosaDocumentSchema } from "./schema";
+import { repairProsaDocumentInput } from "./repair";
+
+export function tryValidateProsaDocument(input: unknown) {
+  return prosaDocumentSchema.safeParse(repairProsaDocumentInput(input));
+}
 
 export function validateProsaDocument(input: unknown): ProsaDocument {
-  const result = prosaDocumentSchema.safeParse(input);
+  const result = tryValidateProsaDocument(input);
   if (!result.success) {
     throw new ValidationError("Prosa document validation failed", result.error.flatten());
   }

@@ -136,3 +136,21 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+.manuscript-root .ProseMirror ol,
+.manuscript-root .ProseMirror ul,
+.manuscript-root.manuscript-preview ol,
+.manuscript-root.manuscript-preview ul {
+  margin: 0 0 var(--ms-paragraph-spacing);
+  padding-left: 1.35rem;
+}
+
+.manuscript-root .ProseMirror li,
+.manuscript-root.manuscript-preview li {
+  margin: 0.25em 0;
+}
+
+.manuscript-root .ProseMirror li p,
+.manuscript-root.manuscript-preview li p {
+  margin: 0;
+}
