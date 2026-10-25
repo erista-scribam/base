@@ -61,6 +61,10 @@ Optional on macOS: `pnpm tauri:build`
 | **Version packages** | Push → `main`                   | Changesets version PR + tag publish |
 | **Desktop release**  | Push tag `v*.*.*`               | Tauri artifact builds               |
 
+### Changesets action vs CLI
+
+This repo uses **`@changesets/cli` v2** and **`changesets/action@v1`** (`version` / `publish` inputs). Do not bump the action to **v2** without upgrading the CLI to **v3** and switching to `version-script` / `publish-script`. Dependabot is configured to ignore `changesets/action` updates until that migration is done intentionally.
+
 ## Code signing (future)
 
 macOS notarization and Windows signing are not configured. Artifacts are unsigned until signing secrets are added.
