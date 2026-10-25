@@ -7,6 +7,9 @@ updates:
     groups:
       github-actions:
         patterns: ["*"]
+    ignore:
+      # v2 needs Changesets CLI v3 + new workflow inputs; we use CLI v2 + action v1.
+      - dependency-name: "changesets/action"
 
   - package-ecosystem: npm
     directory: /
