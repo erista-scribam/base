@@ -333,7 +333,8 @@
 .editor-canvas-wrap {
   display: flex;
   justify-content: center;
-  padding: var(--scribo-space-8) var(--scribo-space-6) var(--scribo-space-10);
+  padding: var(--scribo-ms-pad-y) var(--scribo-ms-pad-x) var(--scribo-space-6);
+  background: var(--scribo-ui-canvas);
 }
 
 .app-shell[data-focus="true"] .editor-canvas-wrap {
@@ -407,17 +408,19 @@
 
 .editor-split-preview {
   background: var(--scribo-ui-canvas);
+  border-left: 1px solid var(--scribo-ui-border-subtle);
 }
 
 .editor-split-label {
   flex-shrink: 0;
-  padding: var(--scribo-space-2) var(--scribo-space-4);
+  padding: var(--scribo-space-1) var(--scribo-ms-pad-x);
   border-bottom: 1px solid var(--scribo-ui-border-subtle);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--scribo-ui-muted);
-  background: color-mix(in srgb, var(--scribo-ui-border-subtle) 35%, transparent);
+  background: color-mix(in srgb, var(--scribo-ui-border-subtle) 28%, transparent);
 }
 
 .markdown-source-stack {
@@ -452,13 +455,13 @@
   min-height: 0;
   flex: 1;
   overflow-y: auto;
-  padding: var(--scribo-space-8) var(--scribo-space-6) var(--scribo-space-10);
+  padding: var(--scribo-ms-pad-y) var(--scribo-ms-pad-x) var(--scribo-space-6);
 }
 
 .editor-split-preview-scroll .manuscript-root.manuscript-preview {
   font-family: var(--scribo-font-ms);
-  font-size: 1.0625rem;
-  line-height: 1.72;
+  font-size: var(--scribo-ms-font-size);
+  line-height: var(--scribo-ms-line-height);
 }
 
 .markdown-parse-error {

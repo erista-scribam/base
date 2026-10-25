@@ -21,6 +21,7 @@
     "@tauri-apps/plugin-opener": "^2",
     "@tiptap/core": "^3.10.2",
     "@tiptap/extension-blockquote": "^3.10.2",
+    "@tiptap/extension-code": "^3.10.2",
     "@tiptap/extension-code-block": "^3.32.0",
     "@tiptap/extension-heading": "^3.10.2",
     "@tiptap/extension-link": "^3.10.2",

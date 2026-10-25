@@ -2,7 +2,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Heading from "@tiptap/extension-heading";
 import Blockquote from "@tiptap/extension-blockquote";
-import CodeBlock from "@tiptap/extension-code-block";
+import Code from "@tiptap/extension-code";
 import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
 import TaskList from "@tiptap/extension-task-list";
@@ -11,6 +11,8 @@ import Placeholder from "@tiptap/extension-placeholder";
 import type { Editor } from "@tiptap/core";
 import { serializeProsaDocument, type ProsaDocument } from "@scribo/document-model";
 import { useEffect, useRef } from "react";
+import { ProsaCodeBlock } from "./prosa-code-block";
+import { ProsaEditingRules } from "./prosa-editing-rules";
 import { SceneBreak } from "./scene-break";
 import { prosaDocumentFromTiptapJson, tiptapJsonFromProsaDocument } from "./prosa-convert";
 
@@ -43,7 +45,13 @@ export function ProsaEditor({ document, onDocumentChange, onEditorReady }: Prosa
       }),
       Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
       Blockquote,
-      CodeBlock,
+      Code.configure({
+        HTMLAttributes: {
+          spellcheck: "false",
+        },
+      }),
+      ProsaCodeBlock,
+      ProsaEditingRules,
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
       TaskList,

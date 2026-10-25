@@ -5,9 +5,6 @@ function renderInline(nodes: ProsaInlineNode[]) {
   return nodes.map((node) => {
     const marks = node.marks ?? [];
     let element: ReactNode = node.text;
-    if (marks.includes("code")) {
-      element = <code>{element}</code>;
-    }
     if (marks.includes("strike")) {
       element = <del>{element}</del>;
     }
@@ -26,6 +23,9 @@ function renderInline(nodes: ProsaInlineNode[]) {
           {element}
         </a>
       );
+    }
+    if (marks.includes("code")) {
+      element = <code>{element}</code>;
     }
     return <span key={node.id}>{element}</span>;
   });

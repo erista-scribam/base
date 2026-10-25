@@ -13,6 +13,11 @@
   --scribo-space-8: 2rem;
   --scribo-space-10: 2.5rem;
   --scribo-ms-max-width: 40.5rem;
+  --scribo-ms-font-size: 1.0625rem;
+  --scribo-ms-line-height: 1.68;
+  --scribo-ms-paragraph-gap: 0.55em;
+  --scribo-ms-pad-x: 1.25rem;
+  --scribo-ms-pad-y: 1.5rem;
   --scribo-radius-sm: 4px;
   --scribo-radius-md: 6px;
 

@@ -175,11 +175,18 @@ function blockFromTiptap(node: JSONContent): ProsaBlock | null {
   }
 }
 
+function isEmptyParagraphBlock(block: ProsaBlock): boolean {
+  if (block.type !== "paragraph") {
+    return false;
+  }
+  return !block.content.some((node) => node.text.trim().length > 0);
+}
+
 export function prosaDocumentFromTiptapJson(base: ProsaDocument, doc: JSONContent): ProsaDocument {
   const blocks: ProsaBlock[] = [];
   for (const node of doc.content ?? []) {
     const block = blockFromTiptap(node);
-    if (block) {
+    if (block && !isEmptyParagraphBlock(block)) {
       blocks.push(block);
     }
   }

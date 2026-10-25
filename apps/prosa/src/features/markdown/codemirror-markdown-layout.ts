@@ -106,13 +106,13 @@ const markdownSourceEditorTheme = EditorView.theme({
   },
   ".cm-scroller": {
     fontFamily: "var(--scribo-font-mono)",
-    fontSize: "0.875rem",
-    lineHeight: "1.65",
+    fontSize: "var(--scribo-ms-font-size)",
+    lineHeight: "var(--scribo-ms-line-height)",
     color: "var(--scribo-ui-text)",
   },
   ".cm-content": {
     caretColor: "var(--scribo-ui-caret)",
-    padding: "var(--scribo-space-8) var(--scribo-space-6)",
+    padding: "var(--scribo-ms-pad-y) var(--scribo-ms-pad-x)",
     maxWidth: "var(--scribo-ms-max-width)",
     margin: "0 auto",
   },
