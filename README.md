@@ -16,7 +16,7 @@ Scribo owns the **structure** of the writing; the application owns **presentatio
 
 - **Node.js** 22 or newer
 - **pnpm** 10.x (`corepack enable && corepack prepare pnpm@10.33.0 --activate`)
-- **Rust** stable and [Tauri system dependencies](https://v2.tauri.app/start/prerequisites/) (for desktop run/build)
+- **Rust** stable and [Tauri system dependencies](https://v2.tauri.app/start/prerequisites/) (for desktop run/build). After installing via [rustup](https://rustup.rs/), ensure `~/.cargo/bin` is on your `PATH` (or run `source "$HOME/.cargo/env"` in each new shell).
 
 ## Quick start
 
