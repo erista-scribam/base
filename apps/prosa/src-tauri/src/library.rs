@@ -244,33 +244,90 @@ pub fn read_library_markdown(app: &AppHandle, path_key: String) -> Result<String
     fs::read_to_string(path).map_err(|error| error.to_string())
 }
 
+fn sanitize_title_for_filename(title: &str) -> String {
+    let base_name = title
+        .chars()
+        .map(|ch| {
+            if ch.is_ascii_alphanumeric() || ch == ' ' || ch == '-' || ch == '_' {
+                ch
+            } else {
+                ' '
+            }
+        })
+        .collect::<String>()
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ");
+    if base_name.is_empty() {
+        "Untitled".to_string()
+    } else {
+        base_name
+    }
+}
+
+/// Pick `{sanitized title}.md` in `parent`, avoiding collisions except `current`.
+fn sibling_markdown_path(parent: &Path, title: &str, current: &Path) -> PathBuf {
+    let base_name = sanitize_title_for_filename(title);
+    let mut candidate = parent.join(format!("{base_name}.md"));
+    if candidate == current {
+        return candidate;
+    }
+    let mut counter = 2;
+    while candidate.exists() && candidate != current {
+        candidate = parent.join(format!("{base_name} {counter}.md"));
+        counter += 1;
+    }
+    candidate
+}
+
 pub fn write_library_markdown(
     app: &AppHandle,
     path_key: String,
+    title: Option<String>,
     markdown: String,
 ) -> Result<ManuscriptSummary, String> {
     let config = read_config(app)?.ok_or("Library is not configured")?;
-    let path = resolve_library_path(&config.root_path, &path_key)?;
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).map_err(|error| error.to_string())?;
+    let current_path = resolve_library_path(&config.root_path, &path_key)?;
+    let parent = current_path
+        .parent()
+        .ok_or("Invalid manuscript path")?
+        .to_path_buf();
+    fs::create_dir_all(&parent).map_err(|error| error.to_string())?;
+
+    let display_title = title
+        .as_deref()
+        .filter(|t| !t.trim().is_empty())
+        .map(str::trim)
+        .unwrap_or_else(|| {
+            current_path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or("Untitled")
+        });
+
+    let target_path = sibling_markdown_path(&parent, display_title, &current_path);
+    atomic_write(&target_path, &markdown)?;
+    if target_path != current_path && current_path.exists() {
+        fs::remove_file(&current_path).map_err(|error| error.to_string())?;
     }
-    atomic_write(&path, &markdown)?;
-    let rel = if path.starts_with(&config.root_path) {
-        path.strip_prefix(&config.root_path)
+
+    let rel = if target_path.starts_with(&config.root_path) {
+        target_path
+            .strip_prefix(&config.root_path)
             .map_err(|error| error.to_string())?
             .to_string_lossy()
             .into_owned()
     } else {
-        path.to_string_lossy().into_owned()
+        target_path.to_string_lossy().into_owned()
     };
-    let modified = fs::metadata(&path)
+    let modified = fs::metadata(&target_path)
         .ok()
         .and_then(|meta| meta.modified().ok())
         .map(|time| chrono::DateTime::<Utc>::from(time).to_rfc3339())
         .unwrap_or_else(|| Utc::now().to_rfc3339());
     Ok(ManuscriptSummary {
         id: manuscript_id_for_path(&rel),
-        title: title_from_path(&path),
+        title: display_title.to_string(),
         updated_at: modified,
         file_path: Some(rel),
         source: Some("library".into()),
@@ -294,24 +351,7 @@ pub fn clear_library_recovery(app: &AppHandle, path_key: &str) -> Result<(), Str
 }
 
 fn unique_markdown_path(root: &Path, title: &str) -> Result<(PathBuf, String), String> {
-    let base_name = title
-        .chars()
-        .map(|ch| {
-            if ch.is_ascii_alphanumeric() || ch == ' ' || ch == '-' || ch == '_' {
-                ch
-            } else {
-                ' '
-            }
-        })
-        .collect::<String>()
-        .split_whitespace()
-        .collect::<Vec<_>>()
-        .join(" ");
-    let base_name = if base_name.is_empty() {
-        "Untitled".to_string()
-    } else {
-        base_name
-    };
+    let base_name = sanitize_title_for_filename(title);
 
     let mut candidate = root.join(format!("{base_name}.md"));
     let mut counter = 2;
@@ -398,4 +438,32 @@ pub fn absolute_path_for_entry(app: &AppHandle, path_key: &str) -> Result<PathBu
     }
     let config = read_config(app)?.ok_or("Library is not configured")?;
     Ok(config.root_path.join(path_key))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    #[test]
+    fn sanitize_title_for_filename_strips_unsafe_chars() {
+        assert_eq!(
+            sanitize_title_for_filename("  Hello: World!!  "),
+            "Hello World"
+        );
+        assert_eq!(sanitize_title_for_filename("   "), "Untitled");
+    }
+
+    #[test]
+    fn sibling_markdown_path_renames_without_collision() {
+        let dir = std::env::temp_dir().join(format!("scribo-lib-test-{}", uuid::Uuid::new_v4()));
+        fs::create_dir_all(&dir).unwrap();
+        let current = dir.join("Old Name.md");
+        fs::write(&current, "# old").unwrap();
+
+        let next = sibling_markdown_path(&dir, "New Name", &current);
+        assert_eq!(next, dir.join("New Name.md"));
+
+        fs::remove_dir_all(&dir).ok();
+    }
 }

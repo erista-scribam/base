@@ -13,7 +13,7 @@ const MAX_WAIT_MS = 3000;
 
 export interface PersistCallbacks {
   onStateChange: (state: PersistSaveState) => void;
-  onSaved: (summary: ManuscriptSummary) => void;
+  onSaved: (summary: ManuscriptSummary, savedFromManuscriptId: string) => void;
   onError: (message: string) => void;
 }
 
@@ -117,7 +117,7 @@ export class ManuscriptPersistence {
       }
       this.lastPersistedRevision = revision;
       this.callbacks.onStateChange("saved");
-      this.callbacks.onSaved(saved);
+      this.callbacks.onSaved(saved, manuscriptId);
     } catch (cause) {
       if (revision >= this.revision) {
         this.callbacks.onStateChange("error");

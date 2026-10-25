@@ -8,7 +8,7 @@ export function useManuscriptPersistence(
   manuscriptId: string | null,
   summary: ManuscriptSummary | null,
   onSaveState: (state: "idle" | "dirty" | "saving" | "saved" | "error") => void,
-  onSaved: (summary: ManuscriptSummary) => void,
+  onSaved: (summary: ManuscriptSummary, savedFromManuscriptId: string) => void,
   onError: (message: string) => void,
 ) {
   const documentRef = useRef<ProsaDocument | null>(null);
@@ -24,7 +24,8 @@ export function useManuscriptPersistence(
     if (engineRef.current == null) {
       engineRef.current = new ManuscriptPersistence({
         onStateChange: (state) => callbacksRef.current.onSaveState(state),
-        onSaved: (saved) => callbacksRef.current.onSaved(saved),
+        onSaved: (saved, savedFromManuscriptId) =>
+          callbacksRef.current.onSaved(saved, savedFromManuscriptId),
         onError: (message) => callbacksRef.current.onError(message),
       });
     }

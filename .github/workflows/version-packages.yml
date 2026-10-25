@@ -36,7 +36,7 @@ jobs:
       # action@v2 requires @changesets/cli v3 and version-script/publish-script inputs.
       # Stay on v1 until the workspace upgrades Changesets CLI (see docs/RELEASE.md).
       - name: Create release pull request or publish
-        uses: changesets/action@v2
+        uses: changesets/action@v1
         with:
           version: pnpm version-packages
           publish: pnpm release:publish

@@ -152,13 +152,21 @@ fn load_manuscript(app: tauri::AppHandle, id: String) -> Result<LoadedManuscript
 fn save_manuscript(
     app: tauri::AppHandle,
     id: String,
-    _document_json: String,
+    document_json: String,
     markdown: Option<String>,
 ) -> Result<ManuscriptSummary, String> {
     if is_library_manuscript_id(&id) {
         let path_key = path_key_for_manuscript_id(&id).ok_or("Invalid library manuscript id")?;
         let markdown = markdown.ok_or("Markdown is required for library manuscripts")?;
-        return write_library_markdown(&app, path_key, markdown);
+        let title = serde_json::from_str::<serde_json::Value>(&document_json)
+            .ok()
+            .and_then(|value| {
+                value
+                    .get("title")
+                    .and_then(|t| t.as_str())
+                    .map(str::to_string)
+            });
+        return write_library_markdown(&app, path_key, title, markdown);
     }
     Err("Legacy app-storage manuscripts are read-only. Move them to the library.".into())
 }
