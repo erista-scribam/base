@@ -8,6 +8,7 @@ import {
   markdownToProsaDocument,
   prosaDocumentToMarkdown,
 } from "../features/markdown/prosa-markdown";
+import { useMarkdownRuler } from "../hooks/useMarkdownRuler";
 
 export type EditorViewMode = "classic" | "split";
 
@@ -31,6 +32,7 @@ export function EditorWorkspace({
   const [markdown, setMarkdown] = useState(() => prosaDocumentToMarkdown(document));
   const documentRef = useRef(document);
   const markdownRef = useRef(markdown);
+  const { rulerMode, setRulerColumns, setRulerFullWidth } = useMarkdownRuler();
 
   useEffect(() => {
     documentRef.current = document;
@@ -100,6 +102,9 @@ export function EditorWorkspace({
         <MarkdownSourceEditor
           value={markdown}
           onChange={handleMarkdownChange}
+          rulerMode={rulerMode}
+          onRulerSelectColumns={setRulerColumns}
+          onRulerSelectFullWidth={setRulerFullWidth}
           aria-label="Markdown source"
         />
       </div>
