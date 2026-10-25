@@ -3,6 +3,7 @@ import type { Editor } from "@tiptap/core";
 import type { ProsaDocument } from "@scribo/document-model";
 import { ProsaEditor } from "../editor/ProsaEditor";
 import { ManuscriptPreview } from "./ManuscriptPreview";
+import { MarkdownSourceEditor } from "./MarkdownSourceEditor";
 import {
   markdownToProsaDocument,
   prosaDocumentToMarkdown,
@@ -61,11 +62,9 @@ export function EditorWorkspace({
     <div className="editor-split">
       <div className="editor-split-pane editor-split-source">
         <div className="editor-split-label">Markdown source</div>
-        <textarea
-          className="markdown-source"
+        <MarkdownSourceEditor
           value={markdown}
-          onChange={(event) => handleMarkdownChange(event.target.value)}
-          spellCheck={false}
+          onChange={handleMarkdownChange}
           aria-label="Markdown source"
         />
         {parseError ? <div className="markdown-parse-error">{parseError}</div> : null}

@@ -5,6 +5,7 @@ import type {
   ProsaInlineMark,
 } from "@scribo/document-model";
 import { PROSA_SCHEMA_VERSION, validateProsaDocument } from "@scribo/document-model";
+import { isSceneBreakLineRaw, stripLegacySourceIndent } from "./markdown-source-layout";
 
 function blockId(): string {
   return `blk_${crypto.randomUUID()}`;
@@ -45,16 +46,15 @@ export function prosaDocumentToMarkdown(document: ProsaDocument): string {
         break;
       case "paragraph": {
         const text = serializeInline(block.content);
-        lines.push(text.length ? text : "");
+        if (text.length) {
+          lines.push(text);
+        }
         break;
       }
       case "blockquote":
-        lines.push(
-          serializeInline(block.content)
-            .split("\n")
-            .map((line) => `> ${line}`)
-            .join("\n"),
-        );
+        for (const line of serializeInline(block.content).split("\n")) {
+          lines.push(`> ${line}`);
+        }
         break;
       case "scene_break":
         lines.push("* * *");
@@ -62,9 +62,8 @@ export function prosaDocumentToMarkdown(document: ProsaDocument): string {
       default:
         break;
     }
-    lines.push("");
   }
-  return lines.join("\n").trimEnd();
+  return lines.join("\n");
 }
 
 function parseInlineMarkdown(text: string): ProsaInlineNode[] {
@@ -112,11 +111,6 @@ function parseInlineMarkdown(text: string): ProsaInlineNode[] {
   }));
 }
 
-function isSceneBreakLine(line: string): boolean {
-  const trimmed = line.trim();
-  return trimmed === "* * *" || trimmed === "***";
-}
-
 function parseHeadingLine(line: string): { level: 1 | 2 | 3 | 4 | 5; text: string } | null {
   const match = /^(#{1,5})\s+(.+)$/.exec(line.trim());
   if (!match?.[1] || !match[2]) {
@@ -130,7 +124,7 @@ function parseHeadingLine(line: string): { level: 1 | 2 | 3 | 4 | 5; text: strin
 
 export function markdownToProsaDocument(base: ProsaDocument, markdown: string): ProsaDocument {
   const blocks: ProsaBlock[] = [];
-  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  const lines = stripLegacySourceIndent(markdown.replace(/\r\n/g, "\n")).split("\n");
   let index = 0;
 
   while (index < lines.length) {
@@ -140,7 +134,7 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
       continue;
     }
 
-    if (isSceneBreakLine(line)) {
+    if (isSceneBreakLineRaw(line)) {
       blocks.push({ type: "scene_break", id: blockId() });
       index += 1;
       continue;
@@ -168,7 +162,7 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
         if (!quoteLine.trimStart().startsWith(">")) {
           break;
         }
-        quoteLines.push(quoteLine.replace(/^>\s?/, ""));
+        quoteLines.push(quoteLine.trimStart().replace(/^>\s?/, ""));
         index += 1;
       }
       blocks.push({
@@ -186,13 +180,13 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
         break;
       }
       if (
-        isSceneBreakLine(paragraphLine) ||
+        isSceneBreakLineRaw(paragraphLine) ||
         parseHeadingLine(paragraphLine) ||
         paragraphLine.trimStart().startsWith(">")
       ) {
         break;
       }
-      paragraphLines.push(paragraphLine);
+      paragraphLines.push(paragraphLine.trim());
       index += 1;
     }
 

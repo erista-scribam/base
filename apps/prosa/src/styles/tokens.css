@@ -55,6 +55,10 @@
   --scribo-ui-danger-text: #991b1b;
 
   --scribo-ui-focus-ring: 0 0 0 2px var(--scribo-ui-bg), 0 0 0 4px var(--scribo-ui-accent);
+
+  /* Markdown source (iA-style: body text full contrast, markers subdued) */
+  --scribo-md-marker: #9a9488;
+  --scribo-md-source-bg: var(--scribo-ui-surface);
 }
 
 [data-theme="dark"] {
@@ -86,6 +90,9 @@
   --scribo-ui-danger-text: #fecaca;
 
   --scribo-ui-focus-ring: 0 0 0 2px var(--scribo-ui-bg), 0 0 0 4px var(--scribo-ui-accent);
+
+  --scribo-md-marker: #6f6a61;
+  --scribo-md-source-bg: var(--scribo-ui-surface);
 }
 
 @media (prefers-reduced-motion: reduce) {

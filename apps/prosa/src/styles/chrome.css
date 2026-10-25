@@ -349,7 +349,7 @@
 
 .editor-split-source {
   border-right: 1px solid var(--scribo-ui-border-subtle);
-  background: var(--scribo-ui-surface);
+  background: var(--scribo-md-source-bg);
 }
 
 .editor-split-preview {
@@ -361,37 +361,51 @@
   padding: var(--scribo-space-2) var(--scribo-space-4);
   border-bottom: 1px solid var(--scribo-ui-border-subtle);
   font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   color: var(--scribo-ui-muted);
+  background: color-mix(in srgb, var(--scribo-ui-border-subtle) 35%, transparent);
 }
 
-.markdown-source {
+.markdown-source-stack {
+  position: relative;
   min-height: 0;
   flex: 1;
-  width: 100%;
-  padding: var(--scribo-space-4);
-  border: none;
-  background: transparent;
-  color: var(--scribo-ui-text);
-  font-family: var(--scribo-font-mono);
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  tab-size: 2;
-  resize: none;
-  outline: none;
+  overflow: hidden;
 }
 
-.markdown-source:focus-visible {
-  box-shadow: inset 0 0 0 1px var(--scribo-ui-accent);
+.markdown-source-stack .cm-editor,
+.markdown-codemirror {
+  height: 100%;
+  background: transparent !important;
+}
+
+.markdown-source-stack .cm-editor .cm-scroller {
+  overflow: auto;
+}
+
+/* iA-style: `#`, `>`, `**` muted; body copy uses full theme text color */
+.markdown-source-stack .cm-md-line.cm-md-heading .tok-meta,
+.markdown-source-stack .cm-md-line.cm-md-quote .tok-meta,
+.markdown-source-stack .tok-processingInstruction {
+  color: var(--scribo-md-marker);
+}
+
+.editor-split-source:focus-within {
+  box-shadow: inset 0 0 0 1px var(--scribo-ui-border-subtle);
 }
 
 .editor-split-preview-scroll {
   min-height: 0;
   flex: 1;
   overflow-y: auto;
-  padding: var(--scribo-space-6);
+  padding: var(--scribo-space-8) var(--scribo-space-6) var(--scribo-space-10);
+}
+
+.editor-split-preview-scroll .manuscript-root.manuscript-preview {
+  font-family: var(--scribo-font-ms);
+  font-size: 1.0625rem;
+  line-height: 1.72;
 }
 
 .markdown-parse-error {
