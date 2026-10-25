@@ -14,6 +14,7 @@ import {
 } from "../features/persistence/document-revision";
 import { resolveRecoveryOnOpen } from "../features/persistence/recovery-policy";
 import { useAppShortcuts } from "../hooks/useAppShortcuts";
+import { useEditorZoom } from "../hooks/useEditorZoom";
 import { useTheme } from "../hooks/useTheme";
 import { useViewportLayout } from "../hooks/useViewportLayout";
 import { open } from "@tauri-apps/plugin-dialog";
@@ -54,6 +55,7 @@ export function App() {
   const [libraryPath, setLibraryPath] = useState<string | null>(null);
   const { theme, toggleTheme } = useTheme();
   const { markdownPreviewVisible, toggleMarkdownPreview } = useMarkdownPreviewVisible();
+  const { zoom, zoomIn, zoomOut, resetZoom, canZoomIn, canZoomOut } = useEditorZoom();
 
   const activeSummary = manuscripts.find((item) => item.id === activeId) ?? null;
   const editorDocumentRef = useRef(document);
@@ -182,7 +184,13 @@ export function App() {
     });
   }, []);
 
-  useAppShortcuts({ onToggleSidebar: toggleSidebar, onToggleFocusMode: toggleFocusMode });
+  useAppShortcuts({
+    onToggleSidebar: toggleSidebar,
+    onToggleFocusMode: toggleFocusMode,
+    onZoomIn: zoomIn,
+    onZoomOut: zoomOut,
+    onZoomReset: resetZoom,
+  });
 
   const openManuscript = useCallback(async (id: string) => {
     setError(null);
@@ -408,6 +416,12 @@ export function App() {
                 onToggleMarkdownPreview={toggleMarkdownPreview}
                 theme={theme}
                 onToggleTheme={toggleTheme}
+                editorZoom={zoom}
+                canZoomIn={canZoomIn}
+                canZoomOut={canZoomOut}
+                onZoomIn={zoomIn}
+                onZoomOut={zoomOut}
+                onZoomReset={resetZoom}
               />
               <div
                 className="editor-scroll"

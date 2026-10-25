@@ -111,7 +111,7 @@ const markdownSourceEditorTheme = EditorView.theme({
   },
   ".cm-scroller": {
     fontFamily: "var(--scribo-font-mono)",
-    fontSize: "0.9375rem",
+    fontSize: "var(--scribo-md-editor-font-size)",
     lineHeight: "var(--scribo-ms-line-height)",
     color: "var(--scribo-ui-text)",
     overflowX: "hidden",

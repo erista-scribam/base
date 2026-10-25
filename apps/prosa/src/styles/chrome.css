@@ -247,6 +247,53 @@
   color: var(--scribo-ui-accent);
 }
 
+.editor-zoom {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: stretch;
+  padding: 2px;
+  border: 1px solid var(--scribo-ui-border-subtle);
+  border-radius: var(--scribo-radius-sm);
+  background: color-mix(in srgb, var(--scribo-ui-surface) 80%, transparent);
+}
+
+.editor-zoom-btn,
+.editor-zoom-level {
+  border: none;
+  background: transparent;
+  font-family: var(--scribo-font-ui);
+  color: var(--scribo-ui-text-secondary);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.editor-zoom-btn {
+  width: 1.625rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border-radius: calc(var(--scribo-radius-sm) - 2px);
+}
+
+.editor-zoom-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.editor-zoom-btn:not(:disabled):hover,
+.editor-zoom-level:hover {
+  background: var(--scribo-ui-hover);
+  color: var(--scribo-ui-text);
+}
+
+.editor-zoom-level {
+  min-width: 2.75rem;
+  padding: 0 var(--scribo-space-1);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border-radius: calc(var(--scribo-radius-sm) - 2px);
+}
+
 .app-main[data-editor-view="markdown"] .editor-scroll {
   background: var(--scribo-md-source-bg);
 }
@@ -675,7 +722,7 @@
   margin: 0 auto;
   width: fit-content;
   font-family: var(--scribo-font-mono);
-  font-size: 0.9375rem;
+  font-size: var(--scribo-md-editor-font-size);
   line-height: 1;
 }
 

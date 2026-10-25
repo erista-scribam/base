@@ -1,6 +1,7 @@
 import type { Editor } from "@tiptap/core";
 import type { ThemeMode } from "../hooks/useTheme";
 import type { EditorViewMode } from "./EditorWorkspace";
+import { editorZoomLabel } from "../hooks/useEditorZoom";
 import { FormatToolbar, MarkdownFormatReferenceBar } from "./FormatToolbar";
 import { IconButton } from "./IconButton";
 
@@ -19,6 +20,12 @@ export interface EditorToolbarProps {
   onToggleMarkdownPreview: () => void;
   theme: ThemeMode;
   onToggleTheme: () => void;
+  editorZoom: number;
+  canZoomIn: boolean;
+  canZoomOut: boolean;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onZoomReset: () => void;
 }
 
 function IconSidebar() {
@@ -108,6 +115,12 @@ export function EditorToolbar({
   onToggleMarkdownPreview,
   theme,
   onToggleTheme,
+  editorZoom,
+  canZoomIn,
+  canZoomOut,
+  onZoomIn,
+  onZoomOut,
+  onZoomReset,
 }: EditorToolbarProps) {
   const isMarkdown = viewMode === "split";
   const statusLabel =
@@ -173,6 +186,37 @@ export function EditorToolbar({
             <IconPreviewPane />
           </IconButton>
         ) : null}
+        <div className="editor-zoom" role="group" aria-label="Editor zoom">
+          <button
+            type="button"
+            className="editor-zoom-btn"
+            aria-label="Zoom out"
+            title="Zoom out (⌘−)"
+            disabled={!canZoomOut}
+            onClick={onZoomOut}
+          >
+            −
+          </button>
+          <button
+            type="button"
+            className="editor-zoom-level"
+            aria-label={`Reset zoom (${editorZoomLabel(editorZoom)})`}
+            title={`Reset zoom to 100% (⌘0) — ${editorZoomLabel(editorZoom)}`}
+            onClick={onZoomReset}
+          >
+            {editorZoomLabel(editorZoom)}
+          </button>
+          <button
+            type="button"
+            className="editor-zoom-btn"
+            aria-label="Zoom in"
+            title="Zoom in (⌘+)"
+            disabled={!canZoomIn}
+            onClick={onZoomIn}
+          >
+            +
+          </button>
+        </div>
         <IconButton label={themeLabel(theme)} active={theme === "dark"} onClick={onToggleTheme}>
           <IconTheme />
         </IconButton>

@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- Markdown writing mode: split source editor with CodeMirror, live preview toggle, column ruler, and Classic ↔ Markdown sync. Library manuscripts save as `.md` under Documents/Scribo Prosa with Finder reveal, legacy app-data migration, debounced autosave, recovery snapshots, and fewer false “changed on disk” / recovery prompts.
+- Markdown writing mode: split source editor with CodeMirror, live preview toggle, column ruler, and Classic ↔ Markdown sync. Library manuscripts save as `.md` under Documents/Scribo Prosa with Finder reveal, legacy app-data migration, debounced autosave, recovery snapshots, and fewer false “changed on disk” / recovery prompts. Editor zoom (85–135%, toolbar and ⌘+/⌘−/⌘0) for Classic and Markdown, persisted locally.
 
 ### Patch Changes
 

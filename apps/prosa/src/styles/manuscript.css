@@ -3,12 +3,12 @@
   --ms-font-size: var(--scribo-ms-font-size);
   --ms-line-height: var(--scribo-ms-line-height);
   --ms-paragraph-spacing: var(--scribo-ms-paragraph-gap);
-  --ms-heading-1-size: 1.75rem;
-  --ms-heading-2-size: 1.375rem;
-  --ms-heading-3-size: 1.125rem;
-  --ms-heading-4-size: 1.0625rem;
-  --ms-heading-5-size: 1rem;
-  --ms-heading-6-size: 0.9375rem;
+  --ms-heading-1-size: calc(1.75rem * var(--scribo-editor-zoom, 1));
+  --ms-heading-2-size: calc(1.375rem * var(--scribo-editor-zoom, 1));
+  --ms-heading-3-size: calc(1.125rem * var(--scribo-editor-zoom, 1));
+  --ms-heading-4-size: calc(1.0625rem * var(--scribo-editor-zoom, 1));
+  --ms-heading-5-size: calc(1rem * var(--scribo-editor-zoom, 1));
+  --ms-heading-6-size: calc(0.9375rem * var(--scribo-editor-zoom, 1));
   --ms-quote-indent: 1.125rem;
   --ms-code-bg: color-mix(in srgb, var(--scribo-ui-border-subtle) 65%, transparent);
   --ms-scene-break-gap: 1.75rem;
