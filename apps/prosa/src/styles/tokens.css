@@ -1,7 +1,32 @@
 :root {
-  color-scheme: light dark;
+  --scribo-sidebar-width: 15.5rem;
+  --scribo-toolbar-height: 2.75rem;
+  --scribo-format-bar-height: 2.25rem;
+  --scribo-space-1: 0.25rem;
+  --scribo-space-2: 0.5rem;
+  --scribo-space-3: 0.75rem;
+  --scribo-space-4: 1rem;
+  --scribo-space-5: 1.25rem;
+  --scribo-space-6: 1.5rem;
+  --scribo-space-8: 2rem;
+  --scribo-space-10: 2.5rem;
+  --scribo-ms-max-width: 40.5rem;
+  --scribo-radius-sm: 4px;
+  --scribo-radius-md: 6px;
 
-  /* Surfaces — warm neutral light / charcoal dark */
+  --scribo-font-ui:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --scribo-font-ms:
+    "Literata", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --scribo-font-mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+
+  --scribo-transition-fast: 120ms ease;
+}
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
   --scribo-ui-bg: #f7f5f0;
   --scribo-ui-canvas: #fdfcf9;
   --scribo-ui-surface: #f0ede6;
@@ -28,60 +53,37 @@
   --scribo-ui-danger-text: #991b1b;
 
   --scribo-ui-focus-ring: 0 0 0 2px var(--scribo-ui-bg), 0 0 0 4px var(--scribo-ui-accent);
-
-  /* Layout */
-  --scribo-sidebar-width: 15.5rem;
-  --scribo-toolbar-height: 2.75rem;
-  --scribo-format-bar-height: 2.25rem;
-  --scribo-space-1: 0.25rem;
-  --scribo-space-2: 0.5rem;
-  --scribo-space-3: 0.75rem;
-  --scribo-space-4: 1rem;
-  --scribo-space-5: 1.25rem;
-  --scribo-space-6: 1.5rem;
-  --scribo-space-8: 2rem;
-  --scribo-space-10: 2.5rem;
-  --scribo-ms-max-width: 40.5rem;
-  --scribo-radius-sm: 4px;
-  --scribo-radius-md: 6px;
-
-  --scribo-font-ui:
-    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
-  --scribo-font-ms:
-    "Literata", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-
-  --scribo-transition-fast: 120ms ease;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --scribo-ui-bg: #1a1917;
-    --scribo-ui-canvas: #21201d;
-    --scribo-ui-surface: #262522;
-    --scribo-ui-border: #3a3834;
-    --scribo-ui-border-subtle: #2e2c28;
+[data-theme="dark"] {
+  color-scheme: dark;
 
-    --scribo-ui-text: #eceae4;
-    --scribo-ui-text-secondary: #b5b0a6;
-    --scribo-ui-muted: #8a857c;
+  --scribo-ui-bg: #1a1917;
+  --scribo-ui-canvas: #21201d;
+  --scribo-ui-surface: #262522;
+  --scribo-ui-border: #3a3834;
+  --scribo-ui-border-subtle: #2e2c28;
 
-    --scribo-ui-accent: #7a9bb8;
-    --scribo-ui-accent-hover: #94b3cc;
-    --scribo-ui-on-accent: #1a1917;
+  --scribo-ui-text: #eceae4;
+  --scribo-ui-text-secondary: #b5b0a6;
+  --scribo-ui-muted: #8a857c;
 
-    --scribo-ui-hover: rgba(255, 255, 255, 0.05);
-    --scribo-ui-active: rgba(255, 255, 255, 0.08);
-    --scribo-ui-selected: rgba(122, 155, 184, 0.15);
+  --scribo-ui-accent: #7a9bb8;
+  --scribo-ui-accent-hover: #94b3cc;
+  --scribo-ui-on-accent: #1a1917;
 
-    --scribo-ui-selection-bg: rgba(122, 155, 184, 0.35);
-    --scribo-ui-selection-fg: var(--scribo-ui-text);
-    --scribo-ui-caret: #eceae4;
+  --scribo-ui-hover: rgba(255, 255, 255, 0.05);
+  --scribo-ui-active: rgba(255, 255, 255, 0.08);
+  --scribo-ui-selected: rgba(122, 155, 184, 0.15);
 
-    --scribo-ui-danger-bg: #3f1d1d;
-    --scribo-ui-danger-text: #fecaca;
+  --scribo-ui-selection-bg: rgba(122, 155, 184, 0.35);
+  --scribo-ui-selection-fg: var(--scribo-ui-text);
+  --scribo-ui-caret: #eceae4;
 
-    --scribo-ui-focus-ring: 0 0 0 2px var(--scribo-ui-bg), 0 0 0 4px var(--scribo-ui-accent);
-  }
+  --scribo-ui-danger-bg: #3f1d1d;
+  --scribo-ui-danger-text: #fecaca;
+
+  --scribo-ui-focus-ring: 0 0 0 2px var(--scribo-ui-bg), 0 0 0 4px var(--scribo-ui-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -5,9 +5,10 @@ import type { ProsaDocument } from "@scribo/document-model";
 import { ManuscriptNav } from "../components/ManuscriptNav";
 import { EditorToolbar } from "../components/EditorToolbar";
 import { EmptyWorkspace } from "../components/EmptyWorkspace";
-import { ProsaEditor } from "../editor/ProsaEditor";
+import { EditorWorkspace, type EditorViewMode } from "../components/EditorWorkspace";
 import { useAutosave } from "../hooks/useAutosave";
 import { useAppShortcuts } from "../hooks/useAppShortcuts";
+import { useTheme } from "../hooks/useTheme";
 import {
   createManuscript,
   listManuscripts,
@@ -24,7 +25,9 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
+  const [viewMode, setViewMode] = useState<EditorViewMode>("classic");
   const [editor, setEditor] = useState<Editor | null>(null);
+  const { preference: themePreference, cyclePreference: cycleTheme } = useTheme();
 
   const refreshList = useCallback(async () => {
     const items = await listManuscripts();
@@ -63,6 +66,16 @@ export function App() {
     });
   }, []);
 
+  const toggleViewMode = useCallback(() => {
+    setViewMode((mode) => {
+      const next = mode === "classic" ? "split" : "classic";
+      if (next === "split") {
+        setEditor(null);
+      }
+      return next;
+    });
+  }, []);
+
   useAppShortcuts({ onToggleSidebar: toggleSidebar, onToggleFocusMode: toggleFocusMode });
 
   const openManuscript = useCallback(async (id: string) => {
@@ -83,6 +96,7 @@ export function App() {
     setSaveState("idle");
     setSidebarCollapsed(false);
     setFocusMode(false);
+    setViewMode("classic");
   }, [refreshList]);
 
   const handleDocumentChange = useCallback(
@@ -125,7 +139,6 @@ export function App() {
       data-sidebar-collapsed={sidebarCollapsed ? "true" : "false"}
       data-focus={focusMode ? "true" : "false"}
     >
-      <div className="titlebar-drag" data-tauri-drag-region aria-hidden />
       {error ? <div className="app-error">{error}</div> : null}
       <div className="app-body">
         <ManuscriptNav
@@ -146,11 +159,17 @@ export function App() {
                 focusMode={focusMode}
                 onToggleFocusMode={toggleFocusMode}
                 editor={editor}
+                viewMode={viewMode}
+                onToggleViewMode={toggleViewMode}
+                themePreference={themePreference}
+                onCycleTheme={cycleTheme}
               />
-              <div className="editor-scroll">
-                <div className="editor-canvas-wrap">
-                  <ProsaEditor
+              <div className="editor-scroll" data-view={viewMode}>
+                <div className="editor-scroll-inner" data-view={viewMode}>
+                  <EditorWorkspace
+                    key={`${document.id}:${viewMode}`}
                     document={document}
+                    viewMode={viewMode}
                     onDocumentChange={handleDocumentChange}
                     onEditorReady={handleEditorReady}
                   />

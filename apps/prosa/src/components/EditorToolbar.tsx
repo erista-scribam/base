@@ -1,4 +1,6 @@
 import type { Editor } from "@tiptap/core";
+import type { ThemePreference } from "../hooks/useTheme";
+import type { EditorViewMode } from "./EditorWorkspace";
 import { FormatToolbar } from "./FormatToolbar";
 import { IconButton } from "./IconButton";
 
@@ -11,6 +13,10 @@ export interface EditorToolbarProps {
   focusMode: boolean;
   onToggleFocusMode: () => void;
   editor: Editor | null;
+  viewMode: EditorViewMode;
+  onToggleViewMode: () => void;
+  themePreference: ThemePreference;
+  onCycleTheme: () => void;
 }
 
 function IconSidebar() {
@@ -47,6 +53,50 @@ function IconFocus() {
   );
 }
 
+function IconSplit() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      aria-hidden
+    >
+      <rect x="3" y="4" width="18" height="16" rx="1" />
+      <path d="M12 4v16" />
+    </svg>
+  );
+}
+
+function IconTheme() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      aria-hidden
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+    </svg>
+  );
+}
+
+function themeLabel(preference: ThemePreference): string {
+  if (preference === "dark") {
+    return "Theme: dark";
+  }
+  if (preference === "light") {
+    return "Theme: light";
+  }
+  return "Theme: system";
+}
+
 export function EditorToolbar({
   title,
   onTitleChange,
@@ -56,6 +106,10 @@ export function EditorToolbar({
   focusMode,
   onToggleFocusMode,
   editor,
+  viewMode,
+  onToggleViewMode,
+  themePreference,
+  onCycleTheme,
 }: EditorToolbarProps) {
   const statusLabel =
     saveState === "saving"
@@ -92,6 +146,16 @@ export function EditorToolbar({
           {statusLabel}
         </span>
         <IconButton
+          label={viewMode === "split" ? "Classic editor" : "Markdown split view"}
+          active={viewMode === "split"}
+          onClick={onToggleViewMode}
+        >
+          <IconSplit />
+        </IconButton>
+        <IconButton label={themeLabel(themePreference)} onClick={onCycleTheme}>
+          <IconTheme />
+        </IconButton>
+        <IconButton
           label={focusMode ? "Exit focus mode" : "Focus mode"}
           active={focusMode}
           onClick={onToggleFocusMode}
@@ -99,7 +163,7 @@ export function EditorToolbar({
           <IconFocus />
         </IconButton>
       </header>
-      <FormatToolbar editor={editor} />
+      {viewMode === "classic" ? <FormatToolbar editor={editor} /> : null}
     </div>
   );
 }
