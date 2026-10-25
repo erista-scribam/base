@@ -34,7 +34,8 @@
   font-style: italic;
 }
 
-.manuscript-root .ProseMirror p {
+.manuscript-root .ProseMirror p,
+.manuscript-root.manuscript-preview p {
   margin: 0 0 var(--ms-paragraph-spacing);
 }
 
@@ -42,7 +43,12 @@
 .manuscript-root .ProseMirror h2,
 .manuscript-root .ProseMirror h3,
 .manuscript-root .ProseMirror h4,
-.manuscript-root .ProseMirror h5 {
+.manuscript-root .ProseMirror h5,
+.manuscript-root.manuscript-preview h1,
+.manuscript-root.manuscript-preview h2,
+.manuscript-root.manuscript-preview h3,
+.manuscript-root.manuscript-preview h4,
+.manuscript-root.manuscript-preview h5 {
   font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 1.28;
@@ -54,56 +60,79 @@
 .manuscript-root .ProseMirror h3:first-child,
 .manuscript-root .ProseMirror h4:first-child,
 .manuscript-root .ProseMirror h5:first-child,
-.manuscript-root .ProseMirror p:first-child {
+.manuscript-root .ProseMirror p:first-child,
+.manuscript-root.manuscript-preview h1:first-child,
+.manuscript-root.manuscript-preview h2:first-child,
+.manuscript-root.manuscript-preview h3:first-child,
+.manuscript-root.manuscript-preview h4:first-child,
+.manuscript-root.manuscript-preview h5:first-child,
+.manuscript-root.manuscript-preview p:first-child {
   margin-top: 0;
 }
 
-.manuscript-root .ProseMirror h1 {
+.manuscript-root .ProseMirror h1,
+.manuscript-root.manuscript-preview h1 {
   font-size: var(--ms-heading-1-size);
 }
-.manuscript-root .ProseMirror h2 {
+.manuscript-root .ProseMirror h2,
+.manuscript-root.manuscript-preview h2 {
   font-size: var(--ms-heading-2-size);
 }
-.manuscript-root .ProseMirror h3 {
+.manuscript-root .ProseMirror h3,
+.manuscript-root.manuscript-preview h3 {
   font-size: var(--ms-heading-3-size);
 }
-.manuscript-root .ProseMirror h4 {
+.manuscript-root .ProseMirror h4,
+.manuscript-root.manuscript-preview h4 {
   font-size: var(--ms-heading-4-size);
 }
-.manuscript-root .ProseMirror h5 {
+.manuscript-root .ProseMirror h5,
+.manuscript-root.manuscript-preview h5 {
   font-size: var(--ms-heading-5-size);
 }
 
-.manuscript-root .ProseMirror blockquote {
+.manuscript-root .ProseMirror blockquote,
+.manuscript-root.manuscript-preview blockquote {
   margin: 0 0 var(--ms-paragraph-spacing);
   padding-left: var(--ms-quote-indent);
   border-left: 2px solid var(--scribo-ui-border);
   color: var(--scribo-ui-text-secondary);
 }
 
-.manuscript-root .ProseMirror hr[data-scene-break] {
+.manuscript-root .ProseMirror hr[data-scene-break],
+.manuscript-root.manuscript-preview hr[data-scene-break] {
   border: none;
   text-align: center;
   margin: var(--ms-scene-break-gap) 0;
 }
 
-.manuscript-root .ProseMirror hr[data-scene-break]::before {
+.manuscript-root .ProseMirror hr[data-scene-break]::before,
+.manuscript-root.manuscript-preview hr[data-scene-break]::before {
   content: "* * *";
   letter-spacing: 0.4em;
   font-size: 0.875rem;
   color: var(--scribo-ui-muted);
 }
 
-.manuscript-root .ProseMirror a {
+.manuscript-root .ProseMirror a,
+.manuscript-root.manuscript-preview a {
   color: var(--scribo-ui-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.manuscript-root .ProseMirror strong {
+.manuscript-root .ProseMirror strong,
+.manuscript-root.manuscript-preview strong {
   font-weight: 600;
 }
 
-.manuscript-root .ProseMirror em {
+.manuscript-root .ProseMirror em,
+.manuscript-root.manuscript-preview em {
   font-style: italic;
+}
+
+.manuscript-root .ProseMirror u,
+.manuscript-root.manuscript-preview u {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }

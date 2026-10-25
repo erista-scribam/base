@@ -112,50 +112,94 @@ function parseInlineMarkdown(text: string): ProsaInlineNode[] {
   }));
 }
 
+function isSceneBreakLine(line: string): boolean {
+  const trimmed = line.trim();
+  return trimmed === "* * *" || trimmed === "***";
+}
+
+function parseHeadingLine(line: string): { level: 1 | 2 | 3 | 4 | 5; text: string } | null {
+  const match = /^(#{1,5})\s+(.+)$/.exec(line.trim());
+  if (!match?.[1] || !match[2]) {
+    return null;
+  }
+  return {
+    level: match[1].length as 1 | 2 | 3 | 4 | 5,
+    text: match[2].trim(),
+  };
+}
+
 export function markdownToProsaDocument(base: ProsaDocument, markdown: string): ProsaDocument {
   const blocks: ProsaBlock[] = [];
-  const chunks = markdown.replace(/\r\n/g, "\n").split(/\n\n+/);
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  let index = 0;
 
-  for (const chunk of chunks) {
-    const trimmed = chunk.trim();
-    if (!trimmed) {
+  while (index < lines.length) {
+    const line = lines[index] ?? "";
+    if (!line.trim()) {
+      index += 1;
       continue;
     }
 
-    if (trimmed === "* * *" || trimmed === "***") {
+    if (isSceneBreakLine(line)) {
       blocks.push({ type: "scene_break", id: blockId() });
+      index += 1;
       continue;
     }
 
-    const headingMatch = /^(#{1,5})\s+(.+)$/s.exec(trimmed);
-    if (headingMatch?.[1] && headingMatch[2]) {
-      const level = headingMatch[1].length as 1 | 2 | 3 | 4 | 5;
+    const heading = parseHeadingLine(line);
+    if (heading) {
       blocks.push({
         type: "heading",
         id: blockId(),
-        level,
-        content: parseInlineMarkdown(headingMatch[2].trim()),
+        level: heading.level,
+        content: parseInlineMarkdown(heading.text),
+      });
+      index += 1;
+      continue;
+    }
+
+    if (line.trimStart().startsWith(">")) {
+      const quoteLines: string[] = [];
+      while (index < lines.length) {
+        const quoteLine = lines[index] ?? "";
+        if (!quoteLine.trim()) {
+          break;
+        }
+        if (!quoteLine.trimStart().startsWith(">")) {
+          break;
+        }
+        quoteLines.push(quoteLine.replace(/^>\s?/, ""));
+        index += 1;
+      }
+      blocks.push({
+        type: "blockquote",
+        id: blockId(),
+        content: parseInlineMarkdown(quoteLines.join("\n")),
       });
       continue;
     }
 
-    if (trimmed.split("\n").every((line) => line.startsWith("> "))) {
-      const quote = trimmed
-        .split("\n")
-        .map((line) => line.replace(/^>\s?/, ""))
-        .join("\n");
-      blocks.push({
-        type: "blockquote",
-        id: blockId(),
-        content: parseInlineMarkdown(quote),
-      });
-      continue;
+    const paragraphLines: string[] = [];
+    while (index < lines.length) {
+      const paragraphLine = lines[index] ?? "";
+      if (!paragraphLine.trim()) {
+        break;
+      }
+      if (
+        isSceneBreakLine(paragraphLine) ||
+        parseHeadingLine(paragraphLine) ||
+        paragraphLine.trimStart().startsWith(">")
+      ) {
+        break;
+      }
+      paragraphLines.push(paragraphLine);
+      index += 1;
     }
 
     blocks.push({
       type: "paragraph",
       id: blockId(),
-      content: parseInlineMarkdown(trimmed.replace(/\n/g, " ")),
+      content: parseInlineMarkdown(paragraphLines.join(" ")),
     });
   }
 
