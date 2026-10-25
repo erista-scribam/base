@@ -49,12 +49,17 @@ function buildLineDecorations(view: EditorView): DecorationSet {
   for (let lineNumber = 1; lineNumber <= view.state.doc.lines; lineNumber += 1) {
     const line = view.state.doc.line(lineNumber);
     const meta = lineMarkerMeta(line.text);
+    const classes = [`cm-md-line`, `cm-md-${meta.kind}`];
+    if (meta.kind === "body") {
+      classes.push("cm-md-paragraph");
+    }
+
     builder.add(
       line.from,
       line.from,
       Decoration.line({
         attributes: {
-          class: `cm-md-line cm-md-${meta.kind}`,
+          class: classes.join(" "),
           style: `--md-marker-ch:${meta.markerCh};--md-body-ch:${MARKDOWN_BODY_COLUMN_CH}`,
         },
       }),

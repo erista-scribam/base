@@ -46,6 +46,12 @@ Meh`;
     ).toBe(true);
   });
 
+  it("treats each body line as its own paragraph", () => {
+    const base = createEmptyProsaDocument("Test");
+    const doc = markdownToProsaDocument(base, "First line\nSecond line\nThird");
+    expect(doc.blocks.filter((block) => block.type === "paragraph")).toHaveLength(3);
+  });
+
   it("does not treat scene breaks as bullet lists", () => {
     const base = createEmptyProsaDocument("Test");
     const doc = markdownToProsaDocument(base, "Before\n* * *\nAfter");

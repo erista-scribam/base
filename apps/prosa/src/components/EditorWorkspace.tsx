@@ -97,7 +97,7 @@ export function EditorWorkspace({
       <div className="editor-split-pane editor-split-source">
         <div className="editor-split-label editor-split-label-row">
           <span className="editor-split-label-title">Markdown source</span>
-          <span className="editor-split-label-hint">Plain text · saved to .md</span>
+          <span className="editor-split-label-hint">One line = one paragraph · Enter for next</span>
         </div>
         <MarkdownSourceEditor
           value={markdown}

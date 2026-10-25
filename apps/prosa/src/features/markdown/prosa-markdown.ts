@@ -178,28 +178,6 @@ function parseHeadingLine(line: string): { level: 1 | 2 | 3 | 4 | 5 | 6; text: s
   };
 }
 
-function isStructuralLine(line: string): boolean {
-  if (!line.trim()) {
-    return false;
-  }
-  if (isSceneBreakLineRaw(line)) {
-    return true;
-  }
-  if (parseHeadingLine(line)) {
-    return true;
-  }
-  if (line.trimStart().startsWith(">")) {
-    return true;
-  }
-  if (parseListLine(line)) {
-    return true;
-  }
-  if (line.trimStart().startsWith("```")) {
-    return true;
-  }
-  return false;
-}
-
 export function prosaDocumentToMarkdown(document: ProsaDocument): string {
   const lines: string[] = [];
   for (const block of document.blocks) {
@@ -357,24 +335,12 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
       continue;
     }
 
-    const paragraphLines: string[] = [];
-    while (index < lines.length) {
-      const paragraphLine = lines[index] ?? "";
-      if (!paragraphLine.trim()) {
-        break;
-      }
-      if (isStructuralLine(paragraphLine)) {
-        break;
-      }
-      paragraphLines.push(paragraphLine.trim());
-      index += 1;
-    }
-
     blocks.push({
       type: "paragraph",
       id: blockId(),
-      content: parseInlineMarkdown(paragraphLines.join(" ")),
+      content: parseInlineMarkdown(line.trim()),
     });
+    index += 1;
   }
 
   return coerceMarkdownDocument(base, blocks);
