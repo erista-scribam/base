@@ -1,17 +1,37 @@
-import { useMemo, type CSSProperties } from "react";
+import { Compartment } from "@codemirror/state";
+import type { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
-import { MARKDOWN_BODY_COLUMN_CH, markdownSourceExtensions } from "../features/markdown/codemirror-markdown-layout";
+import { useEffect, useMemo, useRef } from "react";
+import {
+  markdownGuideExtension,
+  relayoutMarkdownColumnGuide,
+} from "../features/markdown/markdown-column-guide";
+import { markdownSourceExtensions } from "../features/markdown/codemirror-markdown-layout";
 import { useTheme } from "../hooks/useTheme";
-import type { MarkdownRulerMode, MarkdownRulerPreset } from "../hooks/useMarkdownRuler";
-import { totalRulerCh } from "../hooks/useMarkdownRuler";
+import {
+  columnsForWrapMode,
+  type IaLineLength,
+  type MarkdownWrapMode,
+} from "../hooks/useMarkdownRuler";
 import { MarkdownRuler } from "./MarkdownRuler";
+
+const guideCompartment = new Compartment();
+
+function bodyColumnLimit(mode: MarkdownWrapMode): number | null {
+  return columnsForWrapMode(mode);
+}
+
+function guideExtensionFor(mode: MarkdownWrapMode, editorZoom: number) {
+  return markdownGuideExtension(bodyColumnLimit(mode), editorZoom);
+}
 
 export interface MarkdownSourceEditorProps {
   value: string;
   onChange: (value: string) => void;
-  rulerMode: MarkdownRulerMode;
-  onRulerSelectColumns: (columns: MarkdownRulerPreset) => void;
+  rulerMode: MarkdownWrapMode;
+  onSelectLineLength: (columns: IaLineLength) => void;
   onRulerSelectFullWidth: () => void;
+  editorZoom: number;
   "aria-label"?: string;
 }
 
@@ -19,29 +39,37 @@ export function MarkdownSourceEditor({
   value,
   onChange,
   rulerMode,
-  onRulerSelectColumns,
+  onSelectLineLength,
   onRulerSelectFullWidth,
+  editorZoom,
   "aria-label": ariaLabel,
 }: MarkdownSourceEditorProps) {
   const { theme } = useTheme();
-  const extensions = useMemo(() => markdownSourceExtensions(), []);
-  const totalCh = totalRulerCh(rulerMode);
+  const editorViewRef = useRef<EditorView | null>(null);
 
-  const stackStyle = {
-    "--md-marker-ch": MARKDOWN_BODY_COLUMN_CH,
-    "--md-ruler-body-ch": rulerMode.kind === "columns" ? rulerMode.columns : 72,
-    "--md-ruler-total-ch": totalCh ?? MARKDOWN_BODY_COLUMN_CH + 72,
-  } as CSSProperties;
+  const extensions = useMemo(
+    () => [
+      ...markdownSourceExtensions(),
+      guideCompartment.of(guideExtensionFor(rulerMode, editorZoom)),
+    ],
+    [],
+  );
+
+  useEffect(() => {
+    const view = editorViewRef.current;
+    if (!view) {
+      return;
+    }
+    view.dispatch({
+      effects: guideCompartment.reconfigure(guideExtensionFor(rulerMode, editorZoom)),
+    });
+  }, [rulerMode, editorZoom]);
 
   return (
-    <div
-      className="markdown-source-stack"
-      data-ruler={rulerMode.kind === "full" ? "full" : "columns"}
-      style={stackStyle}
-    >
+    <div className="markdown-source-stack">
       <MarkdownRuler
         mode={rulerMode}
-        onSelectColumns={onRulerSelectColumns}
+        onSelectLineLength={onSelectLineLength}
         onSelectFullWidth={onRulerSelectFullWidth}
       />
       <CodeMirror
@@ -52,6 +80,10 @@ export function MarkdownSourceEditor({
         className="markdown-codemirror"
         extensions={extensions}
         onChange={onChange}
+        onCreateEditor={(view) => {
+          editorViewRef.current = view;
+          relayoutMarkdownColumnGuide(view);
+        }}
         basicSetup={{
           lineNumbers: false,
           foldGutter: false,

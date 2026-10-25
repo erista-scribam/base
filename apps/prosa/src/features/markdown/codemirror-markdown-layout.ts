@@ -3,13 +3,18 @@ import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 import { EditorView, ViewPlugin, Decoration, type DecorationSet } from "@codemirror/view";
 import { RangeSetBuilder } from "@codemirror/state";
+import { prosaMarkdownNavigationExtensions } from "./markdown-source-arrows";
+import { prosaMarkdownShiftEnterKeymap } from "./markdown-source-enter";
 
-/** Width of the left marker column (`##### `). Body text starts here. */
-export const MARKDOWN_BODY_COLUMN_CH = 6;
+/** Fixed marker column width (`##### `). Body text starts after this. */
+export const MARKDOWN_MARKER_COLUMNS = 6;
+
+/** @deprecated use MARKDOWN_MARKER_COLUMNS */
+export const MARKDOWN_BODY_COLUMN_CH = MARKDOWN_MARKER_COLUMNS;
 
 type LineKind = "heading" | "quote" | "list" | "break" | "body";
 
-function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number } {
+export function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number } {
   const heading = /^(#{1,5}) /.exec(text);
   if (heading) {
     return { kind: "heading", markerCh: heading[0].length };
@@ -60,7 +65,7 @@ function buildLineDecorations(view: EditorView): DecorationSet {
       Decoration.line({
         attributes: {
           class: classes.join(" "),
-          style: `--md-marker-ch:${meta.markerCh};--md-body-ch:${MARKDOWN_BODY_COLUMN_CH}`,
+          style: `--md-marker-ch:${meta.markerCh}`,
         },
       }),
     );
@@ -141,10 +146,10 @@ const markdownSourceEditorTheme = EditorView.theme({
     borderLeftColor: "var(--scribo-ui-caret)",
   },
   ".cm-md-line": {
-    paddingLeft: "calc(var(--md-body-ch) * 1ch)",
+    paddingLeft: "var(--md-marker-width, calc(6 * 0.6em))",
   },
   ".cm-md-line.cm-md-heading, .cm-md-line.cm-md-quote, .cm-md-line.cm-md-list": {
-    textIndent: "calc(var(--md-marker-ch) * -1ch)",
+    textIndent: "calc(-1 * var(--md-marker-ch) * var(--md-char-width, 0.6em))",
   },
   ".cm-md-line.cm-md-break": {
     paddingLeft: "0",
@@ -160,5 +165,7 @@ export function markdownSourceExtensions() {
     markdownSourceEditorTheme,
     syntaxHighlighting(prosaMarkdownHighlight, { fallback: true }),
     EditorView.lineWrapping,
+    ...prosaMarkdownNavigationExtensions,
+    prosaMarkdownShiftEnterKeymap,
   ];
 }

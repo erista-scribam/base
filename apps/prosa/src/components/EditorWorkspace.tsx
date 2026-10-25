@@ -19,6 +19,7 @@ export interface EditorWorkspaceProps {
   onToggleMarkdownPreview: () => void;
   onDocumentChange: (document: ProsaDocument) => void;
   onEditorReady: (editor: Editor | null) => void;
+  editorZoom: number;
 }
 
 export function EditorWorkspace({
@@ -28,11 +29,12 @@ export function EditorWorkspace({
   onToggleMarkdownPreview,
   onDocumentChange,
   onEditorReady,
+  editorZoom,
 }: EditorWorkspaceProps) {
   const [markdown, setMarkdown] = useState(() => prosaDocumentToMarkdown(document));
   const documentRef = useRef(document);
   const markdownRef = useRef(markdown);
-  const { rulerMode, setRulerColumns, setRulerFullWidth } = useMarkdownRuler();
+  const { rulerMode, setLineLength, setRulerFullWidth } = useMarkdownRuler();
 
   useEffect(() => {
     documentRef.current = document;
@@ -97,14 +99,17 @@ export function EditorWorkspace({
       <div className="editor-split-pane editor-split-source">
         <div className="editor-split-label editor-split-label-row">
           <span className="editor-split-label-title">Markdown source</span>
-          <span className="editor-split-label-hint">One line = one paragraph · Enter for next</span>
+          <span className="editor-split-label-hint">
+            Enter new paragraph · Shift+Enter line break · Ctrl+↑/↓ paragraph · ⌘↑/↓ scene
+          </span>
         </div>
         <MarkdownSourceEditor
           value={markdown}
           onChange={handleMarkdownChange}
           rulerMode={rulerMode}
-          onRulerSelectColumns={setRulerColumns}
+          onSelectLineLength={setLineLength}
           onRulerSelectFullWidth={setRulerFullWidth}
+          editorZoom={editorZoom}
           aria-label="Markdown source"
         />
       </div>

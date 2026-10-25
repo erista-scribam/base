@@ -1,39 +1,61 @@
 import { useCallback, useEffect, useState } from "react";
-import { MARKDOWN_BODY_COLUMN_CH } from "../features/markdown/codemirror-markdown-layout";
 
-const STORAGE_KEY = "prosa-markdown-ruler-ch";
+const STORAGE_KEY = "prosa-markdown-wrap-size";
 
-export const MARKDOWN_RULER_PRESETS = [64, 72, 80, 100] as const;
-export type MarkdownRulerPreset = (typeof MARKDOWN_RULER_PRESETS)[number];
+/** iA Writer line length limits (screen wrap only). */
+export const IA_LINE_LENGTHS = [64, 72, 80] as const;
+export type IaLineLength = (typeof IA_LINE_LENGTHS)[number];
 
-export type MarkdownRulerMode =
-  | { kind: "columns"; columns: MarkdownRulerPreset }
-  | { kind: "full" };
+export const IA_LINE_LENGTH_DEFAULT: IaLineLength = 72;
 
-export function totalRulerCh(mode: MarkdownRulerMode): number | null {
-  if (mode.kind === "full") {
-    return null;
-  }
-  return MARKDOWN_BODY_COLUMN_CH + mode.columns;
+export function columnsForWrapMode(mode: MarkdownWrapMode): number | null {
+  return mode.kind === "length" ? mode.columns : null;
 }
 
-function readStored(): MarkdownRulerMode {
-  if (typeof window === "undefined") {
-    return { kind: "columns", columns: 72 };
+export type MarkdownWrapMode =
+  | { kind: "length"; columns: IaLineLength }
+  | { kind: "full" };
+
+/** @deprecated alias for editor code */
+export type MarkdownRulerMode = MarkdownWrapMode;
+
+const LEGACY_SIZE: Record<string, IaLineLength> = {
+  small: 64,
+  medium: 72,
+  large: 80,
+  wide: 80,
+};
+
+function parseStoredLength(raw: string): IaLineLength | null {
+  const n = Number(raw);
+  if (IA_LINE_LENGTHS.includes(n as IaLineLength)) {
+    return n as IaLineLength;
   }
-  const raw = window.localStorage.getItem(STORAGE_KEY);
+  if (raw in LEGACY_SIZE) {
+    return LEGACY_SIZE[raw]!;
+  }
+  return null;
+}
+
+function readStored(): MarkdownWrapMode {
+  if (typeof window === "undefined") {
+    return { kind: "length", columns: IA_LINE_LENGTH_DEFAULT };
+  }
+  const raw =
+    window.localStorage.getItem(STORAGE_KEY) ??
+    window.localStorage.getItem("prosa-markdown-ruler-ch");
   if (raw === "full") {
     return { kind: "full" };
   }
-  const parsed = Number(raw);
-  if (MARKDOWN_RULER_PRESETS.includes(parsed as MarkdownRulerPreset)) {
-    return { kind: "columns", columns: parsed as MarkdownRulerPreset };
+  const columns = raw ? parseStoredLength(raw) : null;
+  if (columns != null) {
+    return { kind: "length", columns };
   }
-  return { kind: "columns", columns: 72 };
+  return { kind: "length", columns: IA_LINE_LENGTH_DEFAULT };
 }
 
 export function useMarkdownRuler() {
-  const [mode, setMode] = useState<MarkdownRulerMode>(readStored);
+  const [mode, setMode] = useState<MarkdownWrapMode>(readStored);
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -42,13 +64,13 @@ export function useMarkdownRuler() {
     );
   }, [mode]);
 
-  const setColumns = useCallback((columns: MarkdownRulerPreset) => {
-    setMode({ kind: "columns", columns });
+  const setLineLength = useCallback((columns: IaLineLength) => {
+    setMode({ kind: "length", columns });
   }, []);
 
   const setFullWidth = useCallback(() => {
     setMode({ kind: "full" });
   }, []);
 
-  return { rulerMode: mode, setRulerColumns: setColumns, setRulerFullWidth: setFullWidth };
+  return { rulerMode: mode, setLineLength, setRulerFullWidth: setFullWidth };
 }

@@ -439,6 +439,7 @@ export function App() {
                     onToggleMarkdownPreview={toggleMarkdownPreview}
                     onDocumentChange={handleDocumentChange}
                     onEditorReady={handleEditorReady}
+                    editorZoom={zoom}
                   />
                 </div>
               </div>
