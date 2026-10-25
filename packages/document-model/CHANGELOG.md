@@ -1,5 +1,11 @@
 # @scribo/document-model
 
+## 0.2.0
+
+### Patch Changes
+
+- @scribo/core@0.2.0
+
 ## 0.1.0
 
 ### Patch Changes
