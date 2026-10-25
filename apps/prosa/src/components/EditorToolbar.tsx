@@ -1,5 +1,5 @@
 import type { Editor } from "@tiptap/core";
-import type { ThemePreference } from "../hooks/useTheme";
+import type { ThemeMode } from "../hooks/useTheme";
 import type { EditorViewMode } from "./EditorWorkspace";
 import { FormatToolbar } from "./FormatToolbar";
 import { IconButton } from "./IconButton";
@@ -15,8 +15,8 @@ export interface EditorToolbarProps {
   editor: Editor | null;
   viewMode: EditorViewMode;
   onToggleViewMode: () => void;
-  themePreference: ThemePreference;
-  onCycleTheme: () => void;
+  theme: ThemeMode;
+  onToggleTheme: () => void;
 }
 
 function IconSidebar() {
@@ -87,14 +87,8 @@ function IconTheme() {
   );
 }
 
-function themeLabel(preference: ThemePreference): string {
-  if (preference === "dark") {
-    return "Theme: dark";
-  }
-  if (preference === "light") {
-    return "Theme: light";
-  }
-  return "Theme: system";
+function themeLabel(mode: ThemeMode): string {
+  return mode === "dark" ? "Switch to light mode" : "Switch to dark mode";
 }
 
 export function EditorToolbar({
@@ -108,8 +102,8 @@ export function EditorToolbar({
   editor,
   viewMode,
   onToggleViewMode,
-  themePreference,
-  onCycleTheme,
+  theme,
+  onToggleTheme,
 }: EditorToolbarProps) {
   const statusLabel =
     saveState === "saving"
@@ -124,8 +118,8 @@ export function EditorToolbar({
     <div className="editor-chrome">
       <header className="editor-header">
         <IconButton
-          label={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
-          active={!sidebarCollapsed}
+          label={sidebarCollapsed || focusMode ? "Show sidebar" : "Hide sidebar"}
+          active={!sidebarCollapsed && !focusMode}
           onClick={onToggleSidebar}
         >
           <IconSidebar />
@@ -152,7 +146,7 @@ export function EditorToolbar({
         >
           <IconSplit />
         </IconButton>
-        <IconButton label={themeLabel(themePreference)} onClick={onCycleTheme}>
+        <IconButton label={themeLabel(theme)} active={theme === "dark"} onClick={onToggleTheme}>
           <IconTheme />
         </IconButton>
         <IconButton

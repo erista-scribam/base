@@ -9,17 +9,24 @@
   box-sizing: border-box;
 }
 
-html,
-body,
-#root {
-  height: 100%;
+html {
   margin: 0;
-  overflow: hidden;
+  height: 100%;
 }
 
 body {
+  margin: 0;
+  height: var(--scribo-app-height, 100%);
+  min-height: 0;
+  overflow: hidden;
   background: var(--scribo-ui-bg);
   color: var(--scribo-ui-text);
+}
+
+#root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
 }
 
 ::selection {

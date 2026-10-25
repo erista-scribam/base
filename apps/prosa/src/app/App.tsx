@@ -9,6 +9,7 @@ import { EditorWorkspace, type EditorViewMode } from "../components/EditorWorksp
 import { useAutosave } from "../hooks/useAutosave";
 import { useAppShortcuts } from "../hooks/useAppShortcuts";
 import { useTheme } from "../hooks/useTheme";
+import { useViewportLayout } from "../hooks/useViewportLayout";
 import {
   createManuscript,
   listManuscripts,
@@ -27,7 +28,16 @@ export function App() {
   const [focusMode, setFocusMode] = useState(false);
   const [viewMode, setViewMode] = useState<EditorViewMode>("classic");
   const [editor, setEditor] = useState<Editor | null>(null);
-  const { preference: themePreference, cyclePreference: cycleTheme } = useTheme();
+  const [layoutKey, setLayoutKey] = useState(0);
+  const { theme, toggleTheme } = useTheme();
+
+  const restoreChromeAfterWindowChange = useCallback(() => {
+    setLayoutKey((value) => value + 1);
+    setFocusMode(false);
+    setSidebarCollapsed(false);
+  }, []);
+
+  useViewportLayout({ onWindowRestored: restoreChromeAfterWindowChange });
 
   const refreshList = useCallback(async () => {
     const items = await listManuscripts();
@@ -53,17 +63,12 @@ export function App() {
   }, []);
 
   const toggleSidebar = useCallback(() => {
+    setFocusMode(false);
     setSidebarCollapsed((value) => !value);
   }, []);
 
   const toggleFocusMode = useCallback(() => {
-    setFocusMode((value) => {
-      const next = !value;
-      if (next) {
-        setSidebarCollapsed(true);
-      }
-      return next;
-    });
+    setFocusMode((value) => !value);
   }, []);
 
   const toggleViewMode = useCallback(() => {
@@ -140,7 +145,7 @@ export function App() {
       data-focus={focusMode ? "true" : "false"}
     >
       {error ? <div className="app-error">{error}</div> : null}
-      <div className="app-body">
+      <div className="app-body" key={layoutKey}>
         <ManuscriptNav
           manuscripts={manuscripts}
           activeId={activeId}
@@ -161,8 +166,8 @@ export function App() {
                 editor={editor}
                 viewMode={viewMode}
                 onToggleViewMode={toggleViewMode}
-                themePreference={themePreference}
-                onCycleTheme={cycleTheme}
+                theme={theme}
+                onToggleTheme={toggleTheme}
               />
               <div className="editor-scroll" data-view={viewMode}>
                 <div className="editor-scroll-inner" data-view={viewMode}>

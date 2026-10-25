@@ -1,4 +1,6 @@
 :root {
+  --scribo-app-height: 100vh;
+  --scribo-app-width: 100vw;
   --scribo-sidebar-width: 15.5rem;
   --scribo-toolbar-height: 2.75rem;
   --scribo-format-bar-height: 2.25rem;

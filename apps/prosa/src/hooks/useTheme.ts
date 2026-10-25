@@ -1,68 +1,45 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
-export type ThemePreference = "light" | "dark" | "system";
+export type ThemeMode = "light" | "dark";
 
 const STORAGE_KEY = "scribo-prosa-theme";
 
-function resolveTheme(preference: ThemePreference): "light" | "dark" {
-  if (preference === "light" || preference === "dark") {
-    return preference;
+function readStoredTheme(): ThemeMode {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === "light" || stored === "dark") {
+    return stored;
   }
+  // Legacy "system" or missing: pick from OS once, then persist explicit choice on toggle.
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-function applyTheme(preference: ThemePreference) {
-  const resolved = resolveTheme(preference);
-  document.documentElement.dataset.theme = resolved;
-  document.documentElement.dataset.themePreference = preference;
-  document.documentElement.style.colorScheme = resolved;
+export function applyTheme(mode: ThemeMode) {
+  document.documentElement.dataset.theme = mode;
+  document.documentElement.style.colorScheme = mode;
 }
 
 export function initThemeFromStorage() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  const preference: ThemePreference =
-    stored === "light" || stored === "dark" || stored === "system" ? stored : "system";
-  applyTheme(preference);
+  const mode = readStoredTheme();
+  applyTheme(mode);
 }
 
 export function useTheme() {
-  const [preference, setPreferenceState] = useState<ThemePreference>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "light" || stored === "dark" || stored === "system") {
-      return stored;
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    const fromDom = document.documentElement.dataset.theme;
+    if (fromDom === "light" || fromDom === "dark") {
+      return fromDom;
     }
-    return "system";
+    return readStoredTheme();
   });
 
-  useEffect(() => {
-    applyTheme(preference);
-    localStorage.setItem(STORAGE_KEY, preference);
-
-    if (preference !== "system") {
-      return;
-    }
-
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => applyTheme("system");
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, [preference]);
-
-  const setPreference = useCallback((next: ThemePreference) => {
-    setPreferenceState(next);
-  }, []);
-
-  const cyclePreference = useCallback(() => {
-    setPreferenceState((current) => {
-      if (current === "light") {
-        return "dark";
-      }
-      if (current === "dark") {
-        return "system";
-      }
-      return "light";
+  const toggleTheme = useCallback(() => {
+    setTheme((current) => {
+      const next: ThemeMode = current === "light" ? "dark" : "light";
+      applyTheme(next);
+      localStorage.setItem(STORAGE_KEY, next);
+      return next;
     });
   }, []);
 
-  return { preference, setPreference, cyclePreference };
+  return { theme, toggleTheme };
 }
