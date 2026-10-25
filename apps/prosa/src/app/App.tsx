@@ -17,7 +17,10 @@ import {
   getLibrary,
   importMarkdownFile,
   initLibrary,
+  isLegacyInternalManuscriptId,
   listManuscripts,
+  migrateAllLegacyManuscriptsToLibrary,
+  migrateLegacyManuscriptToLibrary,
   loadManuscript,
   getManuscriptDiskRevision,
   loadRecoveryCandidate,
@@ -91,9 +94,18 @@ export function App() {
     }
     let cancelled = false;
     void initLibrary()
-      .then((library) => {
+      .then(async (library) => {
+        if (cancelled) {
+          return;
+        }
+        setLibraryPath(library.rootPath);
+        const migrated = await migrateAllLegacyManuscriptsToLibrary().catch(() => 0);
+        if (!cancelled && migrated > 0) {
+          setNotice(`Moved ${migrated} manuscript(s) into your library folder.`);
+        }
+        const items = await listManuscripts();
         if (!cancelled) {
-          setLibraryPath(library.rootPath);
+          setManuscripts(items);
         }
       })
       .catch(() => {
@@ -101,12 +113,6 @@ export function App() {
           void getLibrary()
             .then((library) => setLibraryPath(library.rootPath))
             .catch(() => undefined);
-        }
-      });
-    void listManuscripts()
-      .then((items) => {
-        if (!cancelled) {
-          setManuscripts(items);
         }
       })
       .catch((cause) => {
@@ -145,8 +151,14 @@ export function App() {
     setNotice(null);
     setExternalChange(false);
     try {
-      const loaded = await loadManuscript(id);
-      const recovery = await loadRecoveryCandidate(id);
+      let resolvedId = id;
+      if (isTauriRuntime() && isLegacyInternalManuscriptId(id)) {
+        const migrated = await migrateLegacyManuscriptToLibrary(id);
+        resolvedId = migrated.summary.id;
+        await refreshList();
+      }
+      const loaded = await loadManuscript(resolvedId);
+      const recovery = await loadRecoveryCandidate(resolvedId);
       const decision = resolveRecoveryOnOpen(
         loaded.document,
         loaded.summary.updatedAt,
@@ -155,17 +167,17 @@ export function App() {
       if (decision.kind === "use_recovery") {
         setNotice("Restored unsaved edits from recovery.");
       }
-      setActiveId(id);
+      setActiveId(resolvedId);
       setDocument(decision.document);
       setSaveState("idle");
       if (isTauriRuntime()) {
-        const diskRevision = await getManuscriptDiskRevision(id);
+        const diskRevision = await getManuscriptDiskRevision(resolvedId);
         setDiskRevisionAtOpen(diskRevision);
       }
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Failed to open manuscript");
     }
-  }, []);
+  }, [refreshList]);
 
   const handleCreate = useCallback(async () => {
     setError(null);
@@ -276,8 +288,27 @@ export function App() {
     if (!activeId || !isTauriRuntime()) {
       return;
     }
-    void revealManuscriptInFileManager(activeId).catch(console.error);
-  }, [activeId]);
+    void (async () => {
+      try {
+        let id = activeId;
+        if (isLegacyInternalManuscriptId(activeId)) {
+          const migrated = await migrateLegacyManuscriptToLibrary(activeId);
+          id = migrated.summary.id;
+          setActiveId(id);
+          setDocument(migrated.document);
+          await refreshList();
+        }
+        await revealManuscriptInFileManager(id);
+      } catch (cause) {
+        const message = cause instanceof Error ? cause.message : "Could not reveal file";
+        if (message.includes("legacy_internal")) {
+          setError("This manuscript is still in app storage. It will move to the library on next launch.");
+          return;
+        }
+        setError(message);
+      }
+    })();
+  }, [activeId, refreshList]);
 
   useEffect(() => {
     setDocumentRef(document);

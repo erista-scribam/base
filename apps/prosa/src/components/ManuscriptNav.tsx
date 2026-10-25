@@ -25,8 +25,8 @@ function formatFileMeta(item: ManuscriptSummary): string {
     month: "short",
     day: "numeric",
   });
-  if (!item.filePath) {
-    return `On device · ${date}`;
+  if (!item.filePath || item.source === "internal") {
+    return `App storage · ${date}`;
   }
   const segments = item.filePath.split(/[/\\]/);
   if (segments.length <= 1) {

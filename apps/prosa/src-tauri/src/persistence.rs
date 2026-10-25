@@ -191,6 +191,17 @@ pub fn save_recovery_snapshot(
     atomic_write(&dir.join("recovery.json"), &wrap_recovery(document_json))
 }
 
+pub fn delete_internal_manuscript(app: &AppHandle, id: &str) -> Result<(), String> {
+    if !id.starts_with("ms_") || id.starts_with("ms_path_") {
+        return Err("Not an internal manuscript id".into());
+    }
+    let dir = manuscript_dir(app, id)?;
+    if dir.exists() {
+        fs::remove_dir_all(dir).map_err(|error| error.to_string())?;
+    }
+    Ok(())
+}
+
 pub fn load_recovery_snapshot(app: AppHandle, id: String) -> Result<Option<crate::recovery::RecoveryPayload>, String> {
     let path = manuscript_dir(&app, &id)?.join("recovery.json");
     if !path.exists() {

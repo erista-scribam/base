@@ -2,7 +2,11 @@
 
 ## Canonical model
 
-The Prosa document model (`@scribo/document-model`) is the source of truth in memory. Library manuscripts persist as Markdown on disk; legacy internal manuscripts persist as validated JSON under app data.
+The Prosa document model (`@scribo/document-model`) is the source of truth in memory.
+
+**Library folder** (default `Documents/Scribo Prosa`): each manuscript is a `.md` file you can open in Finder. **App config** (e.g. `com.scribo.prosa`) holds library settings and recovery snapshots under `.scribo/recovery/` inside the library — not your manuscript text.
+
+Legacy manuscripts that were created in app storage are **migrated automatically** to the library as `.md` on launch.
 
 ## Saves
 

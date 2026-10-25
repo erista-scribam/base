@@ -12,6 +12,7 @@ import {
   prosaDocumentToMarkdown,
 } from "../markdown/prosa-markdown";
 import type { RecoveryCandidate } from "./recovery-policy";
+import { isLegacyInternalManuscriptId, isLibraryManuscript } from "./manuscript-id";
 
 export interface LoadedManuscript {
   summary: ManuscriptSummary;
@@ -34,12 +35,7 @@ interface RecoverySnapshotPayload {
   documentJson: string;
 }
 
-export function isLibraryManuscript(summary: ManuscriptSummary | null | undefined): boolean {
-  if (!summary) {
-    return false;
-  }
-  return summary.source === "library" || summary.id.startsWith("ms_path_");
-}
+export { isLegacyInternalManuscriptId, isLibraryManuscript, isLibraryManuscriptId } from "./manuscript-id";
 
 function documentFromPayload(payload: LoadedManuscriptPayload): ProsaDocument {
   if (payload.markdown != null) {
@@ -83,6 +79,37 @@ export async function importMarkdownFile(path: string): Promise<LoadedManuscript
 
 export async function listManuscripts(): Promise<ManuscriptSummary[]> {
   return invoke<ManuscriptSummary[]>("list_manuscripts");
+}
+
+export async function listLegacyInternalManuscripts(): Promise<ManuscriptSummary[]> {
+  return invoke<ManuscriptSummary[]>("list_legacy_internal_manuscripts");
+}
+
+export async function migrateLegacyManuscriptToLibrary(id: string): Promise<LoadedManuscript> {
+  const loaded = await loadManuscript(id);
+  const markdown = prosaDocumentToMarkdown(loaded.document);
+  const payload = await invoke<LoadedManuscriptPayload>("migrate_internal_manuscript", {
+    id,
+    title: loaded.document.title || loaded.summary.title || "Untitled",
+    markdown,
+  });
+  return {
+    summary: payload.summary,
+    document: documentFromPayload(payload),
+  };
+}
+
+export async function migrateAllLegacyManuscriptsToLibrary(): Promise<number> {
+  const legacy = await listLegacyInternalManuscripts();
+  let migrated = 0;
+  for (const item of legacy) {
+    if (!isLegacyInternalManuscriptId(item.id)) {
+      continue;
+    }
+    await migrateLegacyManuscriptToLibrary(item.id);
+    migrated += 1;
+  }
+  return migrated;
 }
 
 export async function createManuscript(title: string): Promise<LoadedManuscript> {
@@ -137,7 +164,7 @@ export async function saveManuscriptDocument(
   summary: ManuscriptSummary | null | undefined,
 ): Promise<ManuscriptSummary> {
   const documentJson = serializeProsaDocument(document);
-  if (isLibraryManuscript(summary)) {
+  if (isLibraryManuscript(summary, id)) {
     return invoke<ManuscriptSummary>("save_manuscript", {
       id,
       documentJson,

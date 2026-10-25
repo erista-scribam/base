@@ -4,15 +4,15 @@ mod persistence;
 mod recovery;
 
 use library::{
-    absolute_path_for_entry, create_library_markdown, ensure_default_library, get_library_info,
-    import_external_markdown, is_library_manuscript_id, list_library_manuscripts,
-    path_key_for_manuscript_id, read_library_markdown, set_library_root, write_library_markdown,
-    LibraryInfo,
+    absolute_path_for_entry, create_library_markdown, create_library_markdown_with_content,
+    ensure_default_library, get_library_info, import_external_markdown, is_library_manuscript_id,
+    library_recovery_path, list_library_manuscripts, path_key_for_manuscript_id,
+    read_library_markdown, set_library_root, write_library_markdown, LibraryInfo,
 };
 use persistence::{
-    ManuscriptSummary, create_manuscript as create_manuscript_impl,
+    delete_internal_manuscript, ManuscriptSummary,
     list_manuscripts as list_internal_manuscripts, load_manuscript as load_internal_manuscript,
-    load_recovery_snapshot as load_recovery_snapshot_impl, save_manuscript as save_internal_manuscript,
+    load_recovery_snapshot as load_recovery_snapshot_impl,
     save_recovery_snapshot as save_recovery_snapshot_impl,
 };
 use recovery::{parse_recovery, wrap_recovery};
@@ -43,21 +43,18 @@ struct DiskRevision {
     modified_at: String,
 }
 
-fn merge_manuscript_lists(
-    library: Vec<ManuscriptSummary>,
-    internal: Vec<ManuscriptSummary>,
-) -> Vec<ManuscriptSummary> {
-    let mut merged = library;
-    merged.extend(internal);
+#[tauri::command]
+fn list_manuscripts(app: tauri::AppHandle) -> Result<Vec<ManuscriptSummary>, String> {
+    let _ = ensure_default_library(&app);
+    let mut merged = list_library_manuscripts(&app).unwrap_or_default();
+    merged.extend(list_internal_manuscripts(app)?);
     merged.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
-    merged
+    Ok(merged)
 }
 
 #[tauri::command]
-fn list_manuscripts(app: tauri::AppHandle) -> Result<Vec<ManuscriptSummary>, String> {
-    let library = list_library_manuscripts(&app).unwrap_or_default();
-    let internal = list_internal_manuscripts(app)?;
-    Ok(merge_manuscript_lists(library, internal))
+fn list_legacy_internal_manuscripts(app: tauri::AppHandle) -> Result<Vec<ManuscriptSummary>, String> {
+    list_internal_manuscripts(app)
 }
 
 #[tauri::command]
@@ -79,22 +76,31 @@ fn set_library(app: tauri::AppHandle, root_path: String) -> Result<LibraryInfo, 
 fn create_manuscript(
     app: tauri::AppHandle,
     title: String,
-    document_json: String,
+    _document_json: String,
 ) -> Result<LoadedManuscript, String> {
-    let _ = ensure_default_library(&app);
-    if let Ok((summary, markdown)) = create_library_markdown(&app, title.clone()) {
-        return Ok(LoadedManuscript {
-            summary,
-            document_json: None,
-            markdown: Some(markdown),
-        });
-    }
-
-    let (summary, document_json) = create_manuscript_impl(app, title, document_json)?;
+    ensure_default_library(&app)?;
+    let (summary, markdown) = create_library_markdown(&app, title)?;
     Ok(LoadedManuscript {
         summary,
-        document_json: Some(document_json),
-        markdown: None,
+        document_json: None,
+        markdown: Some(markdown),
+    })
+}
+
+#[tauri::command]
+fn migrate_internal_manuscript(
+    app: tauri::AppHandle,
+    id: String,
+    title: String,
+    markdown: String,
+) -> Result<LoadedManuscript, String> {
+    ensure_default_library(&app)?;
+    let (summary, markdown) = create_library_markdown_with_content(&app, title, markdown)?;
+    delete_internal_manuscript(&app, &id)?;
+    Ok(LoadedManuscript {
+        summary,
+        document_json: None,
+        markdown: Some(markdown),
     })
 }
 
@@ -142,7 +148,7 @@ fn load_manuscript(app: tauri::AppHandle, id: String) -> Result<LoadedManuscript
 fn save_manuscript(
     app: tauri::AppHandle,
     id: String,
-    document_json: String,
+    _document_json: String,
     markdown: Option<String>,
 ) -> Result<ManuscriptSummary, String> {
     if is_library_manuscript_id(&id) {
@@ -150,7 +156,7 @@ fn save_manuscript(
         let markdown = markdown.ok_or("Markdown is required for library manuscripts")?;
         return write_library_markdown(&app, path_key, markdown);
     }
-    save_internal_manuscript(app, id, document_json)
+    Err("Legacy app-storage manuscripts are read-only. Move them to the library.".into())
 }
 
 #[tauri::command]
@@ -165,12 +171,11 @@ fn import_markdown_file(app: tauri::AppHandle, path: String) -> Result<LoadedMan
 
 #[tauri::command]
 fn reveal_in_file_manager(app: tauri::AppHandle, id: String) -> Result<(), String> {
-    let path = if is_library_manuscript_id(&id) {
-        let path_key = path_key_for_manuscript_id(&id).ok_or("Invalid library manuscript id")?;
-        absolute_path_for_entry(&app, &path_key)?
-    } else {
-        persistence::manuscript_dir(&app, &id)?
-    };
+    if !is_library_manuscript_id(&id) {
+        return Err("legacy_internal_manuscript".into());
+    }
+    let path_key = path_key_for_manuscript_id(&id).ok_or("Invalid library manuscript id")?;
+    let path = absolute_path_for_entry(&app, &path_key)?;
     reveal_path(&path)
 }
 
@@ -226,8 +231,7 @@ fn save_recovery_snapshot(
 ) -> Result<(), String> {
     if is_library_manuscript_id(&id) {
         let path_key = path_key_for_manuscript_id(&id).ok_or("Invalid library manuscript id")?;
-        let path = absolute_path_for_entry(&app, &path_key)?;
-        let recovery_path = path.with_extension("prosa-recovery.json");
+        let recovery_path = library_recovery_path(&app, &path_key)?;
         atomic_write(&recovery_path, &wrap_recovery(document_json))?;
         return Ok(());
     }
@@ -238,8 +242,7 @@ fn save_recovery_snapshot(
 fn load_recovery_snapshot(app: tauri::AppHandle, id: String) -> Result<Option<RecoverySnapshot>, String> {
     if is_library_manuscript_id(&id) {
         let path_key = path_key_for_manuscript_id(&id).ok_or("Invalid library manuscript id")?;
-        let path = absolute_path_for_entry(&app, &path_key)?;
-        let recovery_path = path.with_extension("prosa-recovery.json");
+        let recovery_path = library_recovery_path(&app, &path_key)?;
         if !recovery_path.exists() {
             return Ok(None);
         }
@@ -283,10 +286,12 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             list_manuscripts,
+            list_legacy_internal_manuscripts,
             get_library,
             init_library,
             set_library,
             create_manuscript,
+            migrate_internal_manuscript,
             load_manuscript,
             save_manuscript,
             import_markdown_file,

@@ -165,12 +165,15 @@ fn walk_markdown_files(root: &Path, dir: &Path, entries: &mut Vec<(PathBuf, Stri
         if path
             .file_name()
             .and_then(|name| name.to_str())
-            .is_some_and(|name| name.starts_with('.'))
+            .is_some_and(|name| name.starts_with('.') || name == ".scribo")
         {
             continue;
         }
         let file_type = entry.file_type().map_err(|error| error.to_string())?;
         if file_type.is_dir() {
+            if path.file_name().is_some_and(|name| name == ".scribo") {
+                continue;
+            }
             walk_markdown_files(root, &path, entries)?;
             continue;
         }
@@ -261,10 +264,15 @@ pub fn write_library_markdown(app: &AppHandle, path_key: String, markdown: Strin
     })
 }
 
-pub fn create_library_markdown(app: &AppHandle, title: String) -> Result<(ManuscriptSummary, String), String> {
+pub fn library_recovery_path(app: &AppHandle, path_key: &str) -> Result<PathBuf, String> {
     let config = read_config(app)?.ok_or("Library is not configured")?;
-    fs::create_dir_all(&config.root_path).map_err(|error| error.to_string())?;
+    let dir = config.root_path.join(".scribo/recovery");
+    fs::create_dir_all(&dir).map_err(|error| error.to_string())?;
+    let hash = URL_SAFE_NO_PAD.encode(path_key.as_bytes());
+    Ok(dir.join(format!("{hash}.json")))
+}
 
+fn unique_markdown_path(root: &Path, title: &str) -> Result<(PathBuf, String), String> {
     let base_name = title
         .chars()
         .map(|ch| if ch.is_ascii_alphanumeric() || ch == ' ' || ch == '-' || ch == '_' {
@@ -282,28 +290,45 @@ pub fn create_library_markdown(app: &AppHandle, title: String) -> Result<(Manusc
         base_name
     };
 
-    let mut candidate = config.root_path.join(format!("{base_name}.md"));
+    let mut candidate = root.join(format!("{base_name}.md"));
     let mut counter = 2;
     while candidate.exists() {
-        candidate = config
-            .root_path
-            .join(format!("{base_name} {counter}.md"));
+        candidate = root.join(format!("{base_name} {counter}.md"));
         counter += 1;
     }
 
     let rel = candidate
-        .strip_prefix(&config.root_path)
+        .strip_prefix(root)
         .map_err(|error| error.to_string())?
         .to_string_lossy()
         .into_owned();
-    let markdown = String::new();
-    fs::write(&candidate, &markdown).map_err(|error| error.to_string())?;
-    let now = Utc::now().to_rfc3339();
+    Ok((candidate, rel))
+}
+
+pub fn create_library_markdown(app: &AppHandle, title: String) -> Result<(ManuscriptSummary, String), String> {
+    create_library_markdown_with_content(app, title, String::new())
+}
+
+pub fn create_library_markdown_with_content(
+    app: &AppHandle,
+    title: String,
+    markdown: String,
+) -> Result<(ManuscriptSummary, String), String> {
+    let config = read_config(app)?.ok_or("Library is not configured")?;
+    fs::create_dir_all(&config.root_path).map_err(|error| error.to_string())?;
+
+    let (path, rel) = unique_markdown_path(&config.root_path, &title)?;
+    atomic_write(&path, &markdown)?;
+    let modified = fs::metadata(&path)
+        .ok()
+        .and_then(|meta| meta.modified().ok())
+        .map(|time| chrono::DateTime::<Utc>::from(time).to_rfc3339())
+        .unwrap_or_else(|| Utc::now().to_rfc3339());
     Ok((
         ManuscriptSummary {
             id: manuscript_id_for_path(&rel),
-            title: title_from_path(&candidate),
-            updated_at: now,
+            title: title_from_path(&path),
+            updated_at: modified,
             file_path: Some(rel),
             source: Some("library".into()),
         },
