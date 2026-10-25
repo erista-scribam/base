@@ -5,11 +5,13 @@ import {
   createEmptyProsaDocument,
   deserializeProsaDocument,
   serializeProsaDocument,
+  tryValidateProsaDocument,
 } from "@scribo/document-model";
 import {
   markdownToProsaDocument,
   prosaDocumentToMarkdown,
 } from "../markdown/prosa-markdown";
+import type { RecoveryCandidate } from "./recovery-policy";
 
 export interface LoadedManuscript {
   summary: ManuscriptSummary;
@@ -25,6 +27,11 @@ interface LoadedManuscriptPayload {
   summary: ManuscriptSummary;
   documentJson?: string;
   markdown?: string;
+}
+
+interface RecoverySnapshotPayload {
+  capturedAt: string;
+  documentJson: string;
 }
 
 export function isLibraryManuscript(summary: ManuscriptSummary | null | undefined): boolean {
@@ -98,6 +105,32 @@ export async function loadManuscript(id: string): Promise<LoadedManuscript> {
   };
 }
 
+export async function getManuscriptDiskRevision(id: string): Promise<string> {
+  const result = await invoke<{ modifiedAt: string }>("get_manuscript_disk_revision", { id });
+  return result.modifiedAt;
+}
+
+export async function loadRecoveryCandidate(id: string): Promise<RecoveryCandidate | null> {
+  const payload = await invoke<RecoverySnapshotPayload | null>("load_recovery_snapshot", { id });
+  if (!payload) {
+    return null;
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(payload.documentJson) as unknown;
+  } catch {
+    return null;
+  }
+  const validated = tryValidateProsaDocument(parsed);
+  if (!validated.success) {
+    return null;
+  }
+  return {
+    capturedAt: payload.capturedAt,
+    document: validated.data,
+  };
+}
+
 export async function saveManuscriptDocument(
   id: string,
   document: ProsaDocument,
@@ -125,17 +158,4 @@ export async function saveRecoverySnapshot(
 ): Promise<void> {
   const documentJson = serializeProsaDocument(document);
   await invoke("save_recovery_snapshot", { id, documentJson });
-}
-
-export async function loadRecoverySnapshot(id: string): Promise<ProsaDocument | null> {
-  const json = await invoke<string | null>("load_recovery_snapshot", { id });
-  return json ? deserializeProsaDocument(json) : null;
-}
-
-/** @deprecated Use saveManuscriptDocument */
-export async function saveManuscript(
-  id: string,
-  document: ProsaDocument,
-): Promise<ManuscriptSummary> {
-  return saveManuscriptDocument(id, document, null);
 }

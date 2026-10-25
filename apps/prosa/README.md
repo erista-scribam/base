@@ -1,6 +1,8 @@
-# Tauri + React + Typescript
+# Scribo Prosa
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+Desktop prose editor (Tauri 2 + React). Library manuscripts live as Markdown in `Documents/Scribo Prosa` by default.
+
+Persistence, recovery, and save guarantees are documented in [RELIABILITY.md](./RELIABILITY.md).
 
 ## Recommended IDE Setup
 

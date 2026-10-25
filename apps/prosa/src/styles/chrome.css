@@ -445,6 +445,18 @@
   color: var(--scribo-ui-danger-text);
 }
 
+.app-notice {
+  flex-shrink: 0;
+  padding: var(--scribo-space-2) var(--scribo-space-4);
+  font-size: 0.8125rem;
+  background: color-mix(in srgb, var(--scribo-ui-accent) 12%, var(--scribo-ui-bg));
+  color: var(--scribo-ui-text-secondary);
+}
+
+.app-notice-warn {
+  background: color-mix(in srgb, var(--scribo-ui-accent) 8%, var(--scribo-ui-surface));
+}
+
 .editor-scroll-inner {
   display: flex;
   min-height: 100%;

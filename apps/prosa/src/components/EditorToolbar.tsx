@@ -7,7 +7,7 @@ import { IconButton } from "./IconButton";
 export interface EditorToolbarProps {
   title: string;
   onTitleChange: (title: string) => void;
-  saveState: "idle" | "saving" | "saved" | "error";
+  saveState: "idle" | "dirty" | "saving" | "saved" | "error";
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
   focusMode: boolean;
@@ -110,9 +110,11 @@ export function EditorToolbar({
       ? "Saving…"
       : saveState === "saved"
         ? "Saved"
-        : saveState === "error"
-          ? "Save failed"
-          : "";
+        : saveState === "dirty"
+          ? "Unsaved changes"
+          : saveState === "error"
+            ? "Save failed"
+            : "";
 
   return (
     <div className="editor-chrome">

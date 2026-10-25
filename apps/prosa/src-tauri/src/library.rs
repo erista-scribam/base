@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use tauri::AppHandle;
 use tauri::Manager;
 
+use crate::atomic_io::atomic_write;
 use crate::persistence::ManuscriptSummary;
 
 const LIBRARY_DIR_NAME: &str = "Scribo Prosa";
@@ -237,7 +238,7 @@ pub fn write_library_markdown(app: &AppHandle, path_key: String, markdown: Strin
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|error| error.to_string())?;
     }
-    fs::write(&path, markdown).map_err(|error| error.to_string())?;
+    atomic_write(&path, &markdown)?;
     let rel = if path.starts_with(&config.root_path) {
         path.strip_prefix(&config.root_path)
             .map_err(|error| error.to_string())?
