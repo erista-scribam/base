@@ -2,8 +2,11 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Heading from "@tiptap/extension-heading";
 import Blockquote from "@tiptap/extension-blockquote";
+import CodeBlock from "@tiptap/extension-code-block";
 import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
+import TaskList from "@tiptap/extension-task-list";
+import TaskItem from "@tiptap/extension-task-item";
 import Placeholder from "@tiptap/extension-placeholder";
 import type { Editor } from "@tiptap/core";
 import type { ProsaDocument } from "@scribo/document-model";
@@ -33,10 +36,13 @@ export function ProsaEditor({ document, onDocumentChange, onEditorReady }: Prosa
         codeBlock: false,
         horizontalRule: false,
       }),
-      Heading.configure({ levels: [1, 2, 3, 4, 5] }),
+      Heading.configure({ levels: [1, 2, 3, 4, 5, 6] }),
       Blockquote,
+      CodeBlock,
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
+      TaskList,
+      TaskItem.configure({ nested: true }),
       SceneBreak,
       Placeholder.configure({
         placeholder: "Begin writing…",

@@ -8,7 +8,9 @@
   --ms-heading-3-size: 1.125rem;
   --ms-heading-4-size: 1.0625rem;
   --ms-heading-5-size: 1rem;
+  --ms-heading-6-size: 0.9375rem;
   --ms-quote-indent: 1.125rem;
+  --ms-code-bg: color-mix(in srgb, var(--scribo-ui-border-subtle) 65%, transparent);
   --ms-scene-break-gap: 1.75rem;
 
   width: 100%;
@@ -44,11 +46,13 @@
 .manuscript-root .ProseMirror h3,
 .manuscript-root .ProseMirror h4,
 .manuscript-root .ProseMirror h5,
+.manuscript-root .ProseMirror h6,
 .manuscript-root.manuscript-preview h1,
 .manuscript-root.manuscript-preview h2,
 .manuscript-root.manuscript-preview h3,
 .manuscript-root.manuscript-preview h4,
-.manuscript-root.manuscript-preview h5 {
+.manuscript-root.manuscript-preview h5,
+.manuscript-root.manuscript-preview h6 {
   font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 1.28;
@@ -60,12 +64,14 @@
 .manuscript-root .ProseMirror h3:first-child,
 .manuscript-root .ProseMirror h4:first-child,
 .manuscript-root .ProseMirror h5:first-child,
+.manuscript-root .ProseMirror h6:first-child,
 .manuscript-root .ProseMirror p:first-child,
 .manuscript-root.manuscript-preview h1:first-child,
 .manuscript-root.manuscript-preview h2:first-child,
 .manuscript-root.manuscript-preview h3:first-child,
 .manuscript-root.manuscript-preview h4:first-child,
 .manuscript-root.manuscript-preview h5:first-child,
+.manuscript-root.manuscript-preview h6:first-child,
 .manuscript-root.manuscript-preview p:first-child {
   margin-top: 0;
 }
@@ -89,6 +95,11 @@
 .manuscript-root .ProseMirror h5,
 .manuscript-root.manuscript-preview h5 {
   font-size: var(--ms-heading-5-size);
+}
+.manuscript-root .ProseMirror h6,
+.manuscript-root.manuscript-preview h6 {
+  font-size: var(--ms-heading-6-size);
+  color: var(--scribo-ui-text-secondary);
 }
 
 .manuscript-root .ProseMirror blockquote,
@@ -137,17 +148,142 @@
   text-underline-offset: 2px;
 }
 
+/* Tailwind preflight strips list markers — restore for manuscript preview & editor */
 .manuscript-root .ProseMirror ol,
-.manuscript-root .ProseMirror ul,
-.manuscript-root.manuscript-preview ol,
-.manuscript-root.manuscript-preview ul {
+.manuscript-root.manuscript-preview ol.ms-ordered-list {
   margin: 0 0 var(--ms-paragraph-spacing);
-  padding-left: 1.35rem;
+  padding-left: 1.75rem;
+  list-style-type: decimal;
+  list-style-position: outside;
 }
 
-.manuscript-root .ProseMirror li,
-.manuscript-root.manuscript-preview li {
+.manuscript-root .ProseMirror ul:not([data-type="taskList"]):not(.ms-task-list),
+.manuscript-root.manuscript-preview ul.ms-bullet-list {
+  margin: 0 0 var(--ms-paragraph-spacing);
+  padding-left: 1.75rem;
+  list-style-type: disc;
+  list-style-position: outside;
+}
+
+.manuscript-root .ProseMirror ol.ms-ordered-list ol,
+.manuscript-root.manuscript-preview ol.ms-ordered-list ol {
+  list-style-type: lower-alpha;
+}
+
+.manuscript-root .ProseMirror ul.ms-bullet-list ul,
+.manuscript-root.manuscript-preview ul.ms-bullet-list ul {
+  list-style-type: circle;
+}
+
+.manuscript-root .ProseMirror ol li,
+.manuscript-root .ProseMirror ul:not([data-type="taskList"]) li,
+.manuscript-root.manuscript-preview ol.ms-ordered-list li,
+.manuscript-root.manuscript-preview ul.ms-bullet-list li {
+  display: list-item;
   margin: 0.25em 0;
+}
+
+.manuscript-root .ProseMirror li[data-indent="1"],
+.manuscript-root.manuscript-preview li[data-indent="1"] {
+  margin-left: 1.25rem;
+}
+.manuscript-root .ProseMirror li[data-indent="2"],
+.manuscript-root.manuscript-preview li[data-indent="2"] {
+  margin-left: 2.5rem;
+}
+.manuscript-root .ProseMirror li[data-indent="3"],
+.manuscript-root.manuscript-preview li[data-indent="3"] {
+  margin-left: 3.75rem;
+}
+
+.manuscript-root .ProseMirror ul[data-type="taskList"],
+.manuscript-root .ProseMirror ul.ms-task-list,
+.manuscript-root.manuscript-preview ul.ms-task-list {
+  margin: 0 0 var(--ms-paragraph-spacing);
+  padding-left: 0;
+  list-style: none;
+}
+
+.manuscript-root .ProseMirror ul[data-type="taskList"] li,
+.manuscript-root .ProseMirror li.ms-task-item,
+.manuscript-root.manuscript-preview li.ms-task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0.35em 0;
+  list-style: none;
+}
+
+.manuscript-root .ProseMirror .ms-task-checkbox,
+.manuscript-root.manuscript-preview .ms-task-checkbox {
+  flex-shrink: 0;
+  width: 0.95rem;
+  height: 0.95rem;
+  margin-top: 0.35em;
+  border: 1px solid var(--scribo-ui-border);
+  border-radius: 3px;
+  background: var(--scribo-ui-canvas);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--scribo-ui-text) 6%, transparent);
+}
+
+.manuscript-root .ProseMirror li.ms-task-item[data-checked="true"] .ms-task-checkbox,
+.manuscript-root.manuscript-preview li.ms-task-item[data-checked="true"] .ms-task-checkbox {
+  background: var(--scribo-ui-accent);
+  border-color: var(--scribo-ui-accent);
+  box-shadow: none;
+}
+
+.manuscript-root .ProseMirror li.ms-task-item[data-checked="true"] .ms-task-checkbox::after,
+.manuscript-root.manuscript-preview li.ms-task-item[data-checked="true"] .ms-task-checkbox::after {
+  content: "";
+  display: block;
+  width: 0.3rem;
+  height: 0.55rem;
+  margin: 0.1rem auto 0;
+  border: solid var(--scribo-ui-on-accent);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.manuscript-root .ProseMirror li.ms-task-item[data-checked="true"] .ms-task-body,
+.manuscript-root.manuscript-preview li.ms-task-item[data-checked="true"] .ms-task-body {
+  color: var(--scribo-ui-text-secondary);
+  text-decoration: line-through;
+  text-decoration-color: var(--scribo-ui-muted);
+}
+
+.manuscript-root .ProseMirror code,
+.manuscript-root.manuscript-preview code {
+  font-family: var(--scribo-font-mono);
+  font-size: 0.88em;
+  padding: 0.12em 0.32em;
+  border-radius: var(--scribo-radius-sm);
+  background: var(--ms-code-bg);
+}
+
+.manuscript-root .ProseMirror pre.ms-code-block,
+.manuscript-root.manuscript-preview pre.ms-code-block {
+  margin: 0 0 var(--ms-paragraph-spacing);
+  padding: var(--scribo-space-4);
+  overflow-x: auto;
+  border-radius: var(--scribo-radius-md);
+  background: var(--ms-code-bg);
+  font-family: var(--scribo-font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.manuscript-root .ProseMirror pre.ms-code-block code,
+.manuscript-root.manuscript-preview pre.ms-code-block code {
+  padding: 0;
+  background: transparent;
+  font-size: inherit;
+}
+
+.manuscript-root .ProseMirror del,
+.manuscript-root.manuscript-preview del {
+  text-decoration: line-through;
+  color: var(--scribo-ui-text-secondary);
 }
 
 .manuscript-root .ProseMirror li p,

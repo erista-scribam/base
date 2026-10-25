@@ -49,11 +49,24 @@ function repairBlock(block: unknown): Record<string, unknown> | null {
       };
     }
     const ordered = typeof record.ordered === "boolean" ? record.ordered : true;
+    const task = typeof record.task === "boolean" ? record.task : undefined;
     return {
       type: "list",
       id: typeof record.id === "string" && record.id.length ? record.id : "blk_repaired",
       ordered,
+      ...(task !== undefined ? { task } : {}),
       items,
+    };
+  }
+
+  if (type === "code_block") {
+    return {
+      type: "code_block",
+      id: typeof record.id === "string" && record.id.length ? record.id : "blk_repaired",
+      text: typeof record.text === "string" ? record.text : "",
+      ...(typeof record.language === "string" && record.language.length
+        ? { language: record.language }
+        : {}),
     };
   }
 
@@ -105,7 +118,7 @@ function repairInlineNode(node: unknown): Record<string, unknown> | null {
     return null;
   }
 
-  const allowedMarks = new Set(["bold", "italic", "underline", "link"]);
+  const allowedMarks = new Set(["bold", "italic", "underline", "link", "code", "strike"]);
   const marks = Array.isArray(record.marks)
     ? record.marks.filter(
         (mark): mark is "bold" | "italic" | "underline" | "link" =>

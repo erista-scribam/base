@@ -22,12 +22,23 @@ function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number } {
   if (ordered?.[1]) {
     return { kind: "list", markerCh: ordered[1].length };
   }
+  const taskBullet = /^[-*+]\s+\[[ xX]\]\s/.exec(text);
+  if (taskBullet) {
+    return { kind: "list", markerCh: taskBullet[0].length };
+  }
+  const taskOrdered = /^\d+\.\s+\[[ xX]\]\s/.exec(text);
+  if (taskOrdered) {
+    return { kind: "list", markerCh: taskOrdered[0].length };
+  }
   const bullet = /^([-*+]\s)/.exec(text);
   if (bullet?.[1]) {
     return { kind: "list", markerCh: bullet[1].length };
   }
+  if (text.trimStart().startsWith("```")) {
+    return { kind: "break", markerCh: 0 };
+  }
   const trimmed = text.trim();
-  if (trimmed === "* * *" || trimmed === "***") {
+  if (trimmed === "* * *" || trimmed === "***" || trimmed === "---" || trimmed === "___") {
     return { kind: "break", markerCh: 0 };
   }
   return { kind: "body", markerCh: 0 };

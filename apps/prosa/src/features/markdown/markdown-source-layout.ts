@@ -6,14 +6,14 @@ export function stripLegacySourceIndent(markdown: string): string {
       if (!line.trim()) {
         return line;
       }
-      if (/^#{1,5}\s/.test(line.trimStart())) {
+      if (/^#{1,6}\s/.test(line.trimStart())) {
         return line.trimStart();
       }
       if (line.trimStart().startsWith(">")) {
         return line.trimStart();
       }
       const trimmed = line.trim();
-      if (trimmed === "* * *" || trimmed === "***") {
+      if (isSceneBreakLineRaw(trimmed)) {
         return trimmed;
       }
       return line.replace(/^ {1,3}/, "");
@@ -23,5 +23,5 @@ export function stripLegacySourceIndent(markdown: string): string {
 
 export function isSceneBreakLineRaw(line: string): boolean {
   const trimmed = line.trim();
-  return trimmed === "* * *" || trimmed === "***";
+  return trimmed === "* * *" || trimmed === "***" || trimmed === "---" || trimmed === "___";
 }

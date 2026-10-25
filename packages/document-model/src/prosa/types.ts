@@ -1,7 +1,7 @@
 import type { DocumentId } from "@scribo/core";
 import type { ProsaSchemaVersion } from "./version";
 
-export type ProsaInlineMark = "bold" | "italic" | "underline" | "link";
+export type ProsaInlineMark = "bold" | "italic" | "underline" | "link" | "code" | "strike";
 
 export interface ProsaInlineNode {
   type: "text";
@@ -15,7 +15,7 @@ export interface ProsaInlineNode {
 export interface ProsaHeadingBlock {
   type: "heading";
   id: string;
-  level: 1 | 2 | 3 | 4 | 5;
+  level: 1 | 2 | 3 | 4 | 5 | 6;
   content: ProsaInlineNode[];
 }
 
@@ -36,15 +36,28 @@ export interface ProsaSceneBreakBlock {
   id: string;
 }
 
+export interface ProsaCodeBlockBlock {
+  type: "code_block";
+  id: string;
+  text: string;
+  language?: string;
+}
+
 export interface ProsaListItem {
   id: string;
   content: ProsaInlineNode[];
+  /** Nesting depth (0 = top level). */
+  indent?: number;
+  /** Task-list checkbox state. */
+  checked?: boolean;
 }
 
 export interface ProsaListBlock {
   type: "list";
   id: string;
   ordered: boolean;
+  /** Task list (`- [ ]` / `- [x]`). */
+  task?: boolean;
   items: ProsaListItem[];
 }
 
@@ -53,6 +66,7 @@ export type ProsaBlock =
   | ProsaParagraphBlock
   | ProsaBlockquoteBlock
   | ProsaSceneBreakBlock
+  | ProsaCodeBlockBlock
   | ProsaListBlock;
 
 export interface ProsaDocument {

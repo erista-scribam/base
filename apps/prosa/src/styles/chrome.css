@@ -179,15 +179,49 @@
 
 .format-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 1px;
+  gap: var(--scribo-space-1);
   min-height: var(--scribo-format-bar-height);
-  padding: 0 var(--scribo-space-3);
-  border-top: 1px solid var(--scribo-ui-border-subtle);
+  padding: var(--scribo-space-2) var(--scribo-space-4);
+  border-top: 1px solid var(--scribo-ui-border);
+  background: color-mix(in srgb, var(--scribo-ui-surface) 88%, var(--scribo-ui-bg));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--scribo-ui-text) 5%, transparent);
+}
+
+.format-bar-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.format-bar-reference {
+  gap: var(--scribo-space-2);
+}
+
+.format-bar-hint {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--scribo-ui-muted);
+  white-space: nowrap;
+}
+
+.format-ref-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--scribo-radius-sm);
+  border: 1px solid var(--scribo-ui-border-subtle);
+  background: color-mix(in srgb, var(--scribo-ui-canvas) 70%, transparent);
+  color: var(--scribo-ui-text-secondary);
+  opacity: 0.92;
 }
 
 .app-shell[data-focus="true"] .format-bar {
-  border-top-color: transparent;
+  border-top-color: var(--scribo-ui-border-subtle);
 }
 
 .format-text-label {
@@ -204,9 +238,28 @@
 
 .format-bar-divider {
   width: 1px;
-  height: 1rem;
-  margin: 0 var(--scribo-space-2);
-  background: var(--scribo-ui-border-subtle);
+  align-self: stretch;
+  min-height: 1.5rem;
+  margin: 0 var(--scribo-space-1);
+  background: var(--scribo-ui-border);
+}
+
+.format-bar .icon-btn {
+  width: 2rem;
+  height: 2rem;
+  color: var(--scribo-ui-text);
+  border: 1px solid transparent;
+}
+
+.format-bar .icon-btn:hover {
+  background: var(--scribo-ui-hover);
+  border-color: var(--scribo-ui-border-subtle);
+}
+
+.format-bar .icon-btn[data-active="true"] {
+  background: var(--scribo-ui-selected);
+  border-color: color-mix(in srgb, var(--scribo-ui-accent) 40%, var(--scribo-ui-border));
+  color: var(--scribo-ui-accent);
 }
 
 .icon-btn {

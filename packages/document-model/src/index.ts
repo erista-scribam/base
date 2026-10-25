@@ -10,6 +10,7 @@ export type {
   ProsaSceneBreakBlock,
   ProsaListBlock,
   ProsaListItem,
+  ProsaCodeBlockBlock,
 } from "./prosa/types";
 export { prosaDocumentSchema, prosaBlockSchema } from "./prosa/schema";
 export {

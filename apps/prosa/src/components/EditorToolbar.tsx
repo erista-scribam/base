@@ -1,7 +1,7 @@
 import type { Editor } from "@tiptap/core";
 import type { ThemeMode } from "../hooks/useTheme";
 import type { EditorViewMode } from "./EditorWorkspace";
-import { FormatToolbar } from "./FormatToolbar";
+import { FormatToolbar, MarkdownFormatReferenceBar } from "./FormatToolbar";
 import { IconButton } from "./IconButton";
 
 export interface EditorToolbarProps {
@@ -157,7 +157,11 @@ export function EditorToolbar({
           <IconFocus />
         </IconButton>
       </header>
-      {viewMode === "classic" ? <FormatToolbar editor={editor} /> : null}
+      {viewMode === "classic" ? (
+        <FormatToolbar editor={editor} />
+      ) : (
+        <MarkdownFormatReferenceBar />
+      )}
     </div>
   );
 }

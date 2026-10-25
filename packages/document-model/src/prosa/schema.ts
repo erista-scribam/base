@@ -2,7 +2,7 @@ import { z } from "zod";
 import { isDocumentId } from "@scribo/core";
 import { PROSA_SCHEMA_VERSION } from "./version";
 
-const inlineMarkSchema = z.enum(["bold", "italic", "underline", "link"]);
+const inlineMarkSchema = z.enum(["bold", "italic", "underline", "link", "code", "strike"]);
 
 export const prosaInlineNodeSchema = z
   .object({
@@ -38,7 +38,14 @@ export const prosaBlockSchema = z.discriminatedUnion("type", [
     .object({
       type: z.literal("heading"),
       id: z.string().min(1),
-      level: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]),
+      level: z.union([
+        z.literal(1),
+        z.literal(2),
+        z.literal(3),
+        z.literal(4),
+        z.literal(5),
+        z.literal(6),
+      ]),
       content: inlineContentSchema,
     })
     .strict(),
@@ -67,16 +74,27 @@ export const prosaBlockSchema = z.discriminatedUnion("type", [
       type: z.literal("list"),
       id: z.string().min(1),
       ordered: z.boolean(),
+      task: z.boolean().optional(),
       items: z
         .array(
           z
             .object({
               id: z.string().min(1),
               content: inlineContentSchema,
+              indent: z.number().int().min(0).max(8).optional(),
+              checked: z.boolean().optional(),
             })
             .strict(),
         )
         .min(1),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("code_block"),
+      id: z.string().min(1),
+      text: z.string(),
+      language: z.string().min(1).optional(),
     })
     .strict(),
 ]);
