@@ -23,6 +23,48 @@ function emptyParagraphBlock(): ProsaBlock {
   };
 }
 
+function blockToPlainParagraph(block: ProsaBlock): ProsaBlock {
+  switch (block.type) {
+    case "heading":
+    case "paragraph":
+    case "blockquote":
+      return {
+        type: "paragraph",
+        id: block.id,
+        content: block.content.length
+          ? block.content
+          : [{ type: "text", id: inlineId(), text: "" }],
+      };
+    case "code_block":
+      return {
+        type: "paragraph",
+        id: block.id,
+        content: [{ type: "text", id: inlineId(), text: block.text }],
+      };
+    case "scene_break":
+      return {
+        type: "paragraph",
+        id: block.id,
+        content: [{ type: "text", id: inlineId(), text: "* * *" }],
+      };
+    case "list": {
+      const text = block.items
+        .map((item) => serializeInline(item.content))
+        .filter(Boolean)
+        .join("\n");
+      return {
+        type: "paragraph",
+        id: block.id,
+        content: [{ type: "text", id: inlineId(), text: text || "" }],
+      };
+    }
+    default: {
+      const _exhaustive: never = block;
+      return _exhaustive;
+    }
+  }
+}
+
 function coerceMarkdownDocument(base: ProsaDocument, blocks: ProsaBlock[]): ProsaDocument {
   const candidate = {
     schemaVersion: PROSA_SCHEMA_VERSION,
@@ -34,7 +76,27 @@ function coerceMarkdownDocument(base: ProsaDocument, blocks: ProsaBlock[]): Pros
   if (parsed.success) {
     return parsed.data;
   }
-  return base;
+
+  const salvagedBlocks: ProsaBlock[] = [];
+  for (const block of candidate.blocks) {
+    const single = tryValidateProsaDocument({ ...candidate, blocks: [block] });
+    if (single.success) {
+      salvagedBlocks.push(single.data.blocks[0]!);
+    } else {
+      salvagedBlocks.push(blockToPlainParagraph(block));
+    }
+  }
+
+  const salvaged = tryValidateProsaDocument({ ...candidate, blocks: salvagedBlocks });
+  if (salvaged.success) {
+    return salvaged.data;
+  }
+
+  const fallback = tryValidateProsaDocument({
+    ...candidate,
+    blocks: [emptyParagraphBlock()],
+  });
+  return fallback.success ? fallback.data : base;
 }
 
 type ParsedListLine = {

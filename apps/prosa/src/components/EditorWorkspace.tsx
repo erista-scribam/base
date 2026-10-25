@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Editor } from "@tiptap/core";
-import type { ProsaDocument } from "@scribo/document-model";
+import { serializeProsaDocument, type ProsaDocument } from "@scribo/document-model";
 import { ProsaEditor } from "../editor/ProsaEditor";
 import { ManuscriptPreview } from "./ManuscriptPreview";
 import { MarkdownSourceEditor } from "./MarkdownSourceEditor";
@@ -26,10 +26,42 @@ export function EditorWorkspace({
 }: EditorWorkspaceProps) {
   const [markdown, setMarkdown] = useState(() => prosaDocumentToMarkdown(document));
   const documentRef = useRef(document);
+  const markdownRef = useRef(markdown);
 
   useEffect(() => {
     documentRef.current = document;
   }, [document]);
+
+  useEffect(() => {
+    markdownRef.current = markdown;
+  }, [markdown]);
+
+  useEffect(() => {
+    if (viewMode !== "split") {
+      return;
+    }
+    setMarkdown(prosaDocumentToMarkdown(documentRef.current));
+  }, [document.id, viewMode]);
+
+  useEffect(() => {
+    if (viewMode !== "classic") {
+      return;
+    }
+    const parsed = markdownToProsaDocument(documentRef.current, markdownRef.current);
+    let parsedJson: string;
+    let currentJson: string;
+    try {
+      parsedJson = serializeProsaDocument(parsed);
+      currentJson = serializeProsaDocument(documentRef.current);
+    } catch {
+      return;
+    }
+    if (parsedJson !== currentJson) {
+      onDocumentChange(parsed);
+    }
+    // Apply markdown → model when entering classic so TipTap receives full content.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when view mode flips
+  }, [viewMode]);
 
   const handleMarkdownChange = useCallback(
     (value: string) => {

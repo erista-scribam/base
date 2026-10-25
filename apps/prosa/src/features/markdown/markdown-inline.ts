@@ -26,7 +26,7 @@ export function parseInlineMarkdown(text: string): ProsaInlineNode[] {
 
   while ((match = INLINE_PATTERN.exec(text)) !== null) {
     pushPlain(text.slice(lastIndex, match.index));
-    if (match[2] && match[3]) {
+    if (match[2] && match[3]?.length) {
       tokens.push({ text: match[2], marks: ["link"], href: match[3] });
     } else if (match[4]) {
       tokens.push({ text: match[4], marks: ["code"] });

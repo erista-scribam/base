@@ -33,6 +33,19 @@ Meh`;
     ).not.toThrow();
   });
 
+  it("applies parsed markdown even when a block fails strict validation", () => {
+    const base = createEmptyProsaDocument("Test");
+    const doc = markdownToProsaDocument(base, "# Title\n\n[bad link]()\n\nStill here");
+    expect(doc.blocks.some((block) => block.type === "heading")).toBe(true);
+    expect(
+      doc.blocks.some(
+        (block) =>
+          block.type === "paragraph" &&
+          block.content.some((node) => node.text.includes("Still here")),
+      ),
+    ).toBe(true);
+  });
+
   it("does not treat scene breaks as bullet lists", () => {
     const base = createEmptyProsaDocument("Test");
     const doc = markdownToProsaDocument(base, "Before\n* * *\nAfter");

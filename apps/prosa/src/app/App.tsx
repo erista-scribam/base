@@ -184,7 +184,7 @@ export function App() {
               <div className="editor-scroll" data-view={viewMode}>
                 <div className="editor-scroll-inner" data-view={viewMode}>
                   <EditorWorkspace
-                    key={`${document.id}:${viewMode}`}
+                    key={document.id}
                     document={document}
                     viewMode={viewMode}
                     onDocumentChange={handleDocumentChange}
