@@ -1,6 +1,7 @@
 import type { ManuscriptSummary } from "@scribo/core";
 import type { ProsaDocument } from "@scribo/document-model";
 import {
+  clearRecoverySnapshot,
   saveManuscriptDocument,
   saveRecoverySnapshot,
 } from "./tauri-manuscripts";
@@ -107,6 +108,7 @@ export class ManuscriptPersistence {
     try {
       await saveRecoverySnapshot(manuscriptId, document, summary);
       const saved = await saveManuscriptDocument(manuscriptId, document, summary);
+      await clearRecoverySnapshot(manuscriptId).catch(() => undefined);
       if (revision < this.revision) {
         this.callbacks.onStateChange(this.revision > this.lastPersistedRevision ? "dirty" : "saved");
         return;

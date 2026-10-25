@@ -210,3 +210,11 @@ pub fn load_recovery_snapshot(app: AppHandle, id: String) -> Result<Option<crate
     let raw = fs::read_to_string(path).map_err(|error| error.to_string())?;
     Ok(Some(parse_recovery(&raw)))
 }
+
+pub fn clear_recovery_snapshot(app: &AppHandle, id: &str) -> Result<(), String> {
+    let path = manuscript_dir(app, id)?.join("recovery.json");
+    if path.exists() {
+        fs::remove_file(path).map_err(|error| error.to_string())?;
+    }
+    Ok(())
+}

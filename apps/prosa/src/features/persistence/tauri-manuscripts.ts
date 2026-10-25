@@ -186,3 +186,7 @@ export async function saveRecoverySnapshot(
   const documentJson = serializeProsaDocument(document);
   await invoke("save_recovery_snapshot", { id, documentJson });
 }
+
+export async function clearRecoverySnapshot(id: string): Promise<void> {
+  await invoke("clear_recovery_snapshot", { id });
+}

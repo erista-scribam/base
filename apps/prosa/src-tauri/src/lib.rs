@@ -6,12 +6,13 @@ mod recovery;
 use library::{
     absolute_path_for_entry, create_library_markdown, create_library_markdown_with_content,
     ensure_default_library, get_library_info, import_external_markdown, is_library_manuscript_id,
-    library_recovery_path, list_library_manuscripts, path_key_for_manuscript_id,
+    clear_library_recovery, library_recovery_path, list_library_manuscripts, path_key_for_manuscript_id,
     read_library_markdown, set_library_root, write_library_markdown, LibraryInfo,
 };
 use persistence::{
     delete_internal_manuscript, ManuscriptSummary,
     list_manuscripts as list_internal_manuscripts, load_manuscript as load_internal_manuscript,
+    clear_recovery_snapshot as clear_internal_recovery_snapshot,
     load_recovery_snapshot as load_recovery_snapshot_impl,
     save_recovery_snapshot as save_recovery_snapshot_impl,
 };
@@ -261,6 +262,15 @@ fn load_recovery_snapshot(app: tauri::AppHandle, id: String) -> Result<Option<Re
 }
 
 #[tauri::command]
+fn clear_recovery_snapshot(app: tauri::AppHandle, id: String) -> Result<(), String> {
+    if is_library_manuscript_id(&id) {
+        let path_key = path_key_for_manuscript_id(&id).ok_or("Invalid library manuscript id")?;
+        return clear_library_recovery(&app, &path_key);
+    }
+    clear_internal_recovery_snapshot(&app, &id)
+}
+
+#[tauri::command]
 fn get_manuscript_disk_revision(app: tauri::AppHandle, id: String) -> Result<DiskRevision, String> {
     let modified_at = if is_library_manuscript_id(&id) {
         let path_key = path_key_for_manuscript_id(&id).ok_or("Invalid library manuscript id")?;
@@ -299,6 +309,7 @@ pub fn run() {
             reveal_library_folder,
             save_recovery_snapshot,
             load_recovery_snapshot,
+            clear_recovery_snapshot,
             get_manuscript_disk_revision
         ])
         .run(tauri::generate_context!())

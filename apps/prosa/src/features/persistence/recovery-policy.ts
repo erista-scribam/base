@@ -1,5 +1,5 @@
 import { tryValidateProsaDocument, type ProsaDocument } from "@scribo/document-model";
-import { documentsEqual } from "./document-revision";
+import { manuscriptContentEqual } from "./document-revision";
 
 export interface RecoveryCandidate {
   document: ProsaDocument;
@@ -32,7 +32,7 @@ export function resolveRecoveryOnOpen(
   }
 
   const recoveryDoc = validated.data;
-  if (documentsEqual(saved, recoveryDoc)) {
+  if (manuscriptContentEqual(saved, recoveryDoc)) {
     return { kind: "use_saved", document: saved };
   }
 

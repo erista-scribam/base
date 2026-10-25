@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Editor } from "@tiptap/core";
 import type { ManuscriptSummary } from "@scribo/core";
 import type { ProsaDocument } from "@scribo/document-model";
@@ -8,6 +8,10 @@ import { EmptyWorkspace } from "../components/EmptyWorkspace";
 import { EditorWorkspace, type EditorViewMode } from "../components/EditorWorkspace";
 import { useManuscriptPersistence } from "../hooks/useManuscriptPersistence";
 import { useMarkdownPreviewVisible } from "../hooks/useMarkdownPreviewVisible";
+import {
+  diskRevisionIsNewer,
+  manuscriptContentEqual,
+} from "../features/persistence/document-revision";
 import { resolveRecoveryOnOpen } from "../features/persistence/recovery-policy";
 import { useAppShortcuts } from "../hooks/useAppShortcuts";
 import { useTheme } from "../hooks/useTheme";
@@ -52,6 +56,16 @@ export function App() {
   const { markdownPreviewVisible, toggleMarkdownPreview } = useMarkdownPreviewVisible();
 
   const activeSummary = manuscripts.find((item) => item.id === activeId) ?? null;
+  const editorDocumentRef = useRef(document);
+  const saveStateRef = useRef(saveState);
+
+  useEffect(() => {
+    editorDocumentRef.current = document;
+  }, [document]);
+
+  useEffect(() => {
+    saveStateRef.current = saveState;
+  }, [saveState]);
 
   const restoreChromeAfterWindowChange = useCallback(() => {
     setLayoutKey((value) => value + 1);
@@ -75,16 +89,38 @@ export function App() {
     }
     const onFocus = () => {
       void refreshList();
-      if (!activeId || !diskRevisionAtOpen) {
+      const id = activeId;
+      const baseline = diskRevisionAtOpen;
+      if (!id || !baseline) {
         return;
       }
-      void getManuscriptDiskRevision(activeId)
-        .then((modifiedAt) => {
-          if (modifiedAt > diskRevisionAtOpen) {
-            setExternalChange(true);
+      if (saveStateRef.current === "saving") {
+        return;
+      }
+      void (async () => {
+        try {
+          const modifiedAt = await getManuscriptDiskRevision(id);
+          if (!diskRevisionIsNewer(modifiedAt, baseline)) {
+            return;
           }
-        })
-        .catch(() => undefined);
+          const editorDoc = editorDocumentRef.current;
+          if (!editorDoc) {
+            return;
+          }
+          if (saveStateRef.current === "dirty") {
+            return;
+          }
+          const loaded = await loadManuscript(id);
+          if (manuscriptContentEqual(editorDoc, loaded.document)) {
+            setDiskRevisionAtOpen(modifiedAt);
+            setExternalChange(false);
+            return;
+          }
+          setExternalChange(true);
+        } catch {
+          // Ignore transient disk checks (e.g. file briefly locked).
+        }
+      })();
     };
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);

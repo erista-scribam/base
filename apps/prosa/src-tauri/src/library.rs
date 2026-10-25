@@ -272,6 +272,14 @@ pub fn library_recovery_path(app: &AppHandle, path_key: &str) -> Result<PathBuf,
     Ok(dir.join(format!("{hash}.json")))
 }
 
+pub fn clear_library_recovery(app: &AppHandle, path_key: &str) -> Result<(), String> {
+    let path = library_recovery_path(app, path_key)?;
+    if path.exists() {
+        fs::remove_file(path).map_err(|error| error.to_string())?;
+    }
+    Ok(())
+}
+
 fn unique_markdown_path(root: &Path, title: &str) -> Result<(PathBuf, String), String> {
     let base_name = title
         .chars()

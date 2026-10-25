@@ -9,6 +9,7 @@ vi.mock("./tauri-manuscripts", () => ({
     updatedAt: new Date().toISOString(),
   })),
   saveRecoverySnapshot: vi.fn(async () => undefined),
+  clearRecoverySnapshot: vi.fn(async () => undefined),
 }));
 
 describe("ManuscriptPersistence", () => {
