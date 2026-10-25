@@ -1,26 +1,37 @@
-/* Manuscript presentation — global typography tokens (not per-node overrides) */
 .manuscript-root {
-  --ms-font-family: "Literata", "Georgia", serif;
-  --ms-font-size: 1.05rem;
-  --ms-line-height: 1.65;
-  --ms-paragraph-spacing: 0.85em;
-  --ms-heading-1-size: 1.85rem;
-  --ms-heading-2-size: 1.55rem;
-  --ms-heading-3-size: 1.3rem;
-  --ms-heading-4-size: 1.15rem;
-  --ms-heading-5-size: 1.05rem;
-  --ms-quote-indent: 1.25rem;
-  --ms-scene-break-gap: 1.5rem;
+  --ms-font-family: var(--scribo-font-ms);
+  --ms-font-size: 1.0625rem;
+  --ms-line-height: 1.72;
+  --ms-paragraph-spacing: 0.75em;
+  --ms-heading-1-size: 1.75rem;
+  --ms-heading-2-size: 1.375rem;
+  --ms-heading-3-size: 1.125rem;
+  --ms-heading-4-size: 1.0625rem;
+  --ms-heading-5-size: 1rem;
+  --ms-quote-indent: 1.125rem;
+  --ms-scene-break-gap: 1.75rem;
 
+  width: 100%;
+  max-width: var(--scribo-ms-max-width);
   font-family: var(--ms-font-family);
   font-size: var(--ms-font-size);
   line-height: var(--ms-line-height);
-  max-width: 42rem;
+  color: var(--scribo-ui-text);
 }
 
 .manuscript-root .ProseMirror {
   outline: none;
-  min-height: 60vh;
+  min-height: calc(100vh - 12rem);
+  caret-color: var(--scribo-ui-caret);
+}
+
+.manuscript-root .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--scribo-ui-muted);
+  font-style: italic;
 }
 
 .manuscript-root .ProseMirror p {
@@ -33,8 +44,18 @@
 .manuscript-root .ProseMirror h4,
 .manuscript-root .ProseMirror h5 {
   font-weight: 600;
-  line-height: 1.25;
-  margin: 1.25em 0 0.5em;
+  letter-spacing: -0.015em;
+  line-height: 1.28;
+  margin: 1.35em 0 0.45em;
+}
+
+.manuscript-root .ProseMirror h1:first-child,
+.manuscript-root .ProseMirror h2:first-child,
+.manuscript-root .ProseMirror h3:first-child,
+.manuscript-root .ProseMirror h4:first-child,
+.manuscript-root .ProseMirror h5:first-child,
+.manuscript-root .ProseMirror p:first-child {
+  margin-top: 0;
 }
 
 .manuscript-root .ProseMirror h1 {
@@ -56,8 +77,8 @@
 .manuscript-root .ProseMirror blockquote {
   margin: 0 0 var(--ms-paragraph-spacing);
   padding-left: var(--ms-quote-indent);
-  border-left: 3px solid var(--scribo-ui-border);
-  color: var(--scribo-ui-muted);
+  border-left: 2px solid var(--scribo-ui-border);
+  color: var(--scribo-ui-text-secondary);
 }
 
 .manuscript-root .ProseMirror hr[data-scene-break] {
@@ -68,11 +89,21 @@
 
 .manuscript-root .ProseMirror hr[data-scene-break]::before {
   content: "* * *";
-  letter-spacing: 0.35em;
+  letter-spacing: 0.4em;
+  font-size: 0.875rem;
   color: var(--scribo-ui-muted);
 }
 
 .manuscript-root .ProseMirror a {
   color: var(--scribo-ui-accent);
   text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.manuscript-root .ProseMirror strong {
+  font-weight: 600;
+}
+
+.manuscript-root .ProseMirror em {
+  font-style: italic;
 }

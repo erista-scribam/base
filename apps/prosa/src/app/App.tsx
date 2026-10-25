@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
+import type { Editor } from "@tiptap/core";
 import type { ManuscriptSummary } from "@scribo/core";
 import type { ProsaDocument } from "@scribo/document-model";
 import { ManuscriptNav } from "../components/ManuscriptNav";
 import { EditorToolbar } from "../components/EditorToolbar";
+import { EmptyWorkspace } from "../components/EmptyWorkspace";
 import { ProsaEditor } from "../editor/ProsaEditor";
 import { useAutosave } from "../hooks/useAutosave";
+import { useAppShortcuts } from "../hooks/useAppShortcuts";
 import {
   createManuscript,
   listManuscripts,
@@ -19,6 +22,9 @@ export function App() {
   const [document, setDocument] = useState<ProsaDocument | null>(null);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
+  const [editor, setEditor] = useState<Editor | null>(null);
 
   const refreshList = useCallback(async () => {
     const items = await listManuscripts();
@@ -43,12 +49,29 @@ export function App() {
     };
   }, []);
 
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed((value) => !value);
+  }, []);
+
+  const toggleFocusMode = useCallback(() => {
+    setFocusMode((value) => {
+      const next = !value;
+      if (next) {
+        setSidebarCollapsed(true);
+      }
+      return next;
+    });
+  }, []);
+
+  useAppShortcuts({ onToggleSidebar: toggleSidebar, onToggleFocusMode: toggleFocusMode });
+
   const openManuscript = useCallback(async (id: string) => {
     setError(null);
     const loaded = await loadManuscript(id);
     const recovery = await loadRecoverySnapshot(id);
     setActiveId(id);
     setDocument(recovery ?? loaded.document);
+    setSaveState("idle");
   }, []);
 
   const handleCreate = useCallback(async () => {
@@ -57,6 +80,9 @@ export function App() {
     await refreshList();
     setActiveId(created.summary.id);
     setDocument(created.document);
+    setSaveState("idle");
+    setSidebarCollapsed(false);
+    setFocusMode(false);
   }, [refreshList]);
 
   const handleDocumentChange = useCallback(
@@ -87,41 +113,52 @@ export function App() {
     [document, handleDocumentChange],
   );
 
+  const handleEditorReady = useCallback((instance: Editor | null) => {
+    setEditor(instance);
+  }, []);
+
   useAutosave(activeId, document);
 
   return (
-    <div className="flex h-screen flex-col">
-      <div className="border-b border-[var(--scribo-ui-border)] px-4 py-2 text-sm font-semibold tracking-tight">
-        Scribo Prosa
-      </div>
-      {error ? (
-        <div className="bg-red-100 px-4 py-2 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
-          {error}
-        </div>
-      ) : null}
-      <div className="flex min-h-0 flex-1">
+    <div
+      className="app-shell"
+      data-sidebar-collapsed={sidebarCollapsed ? "true" : "false"}
+      data-focus={focusMode ? "true" : "false"}
+    >
+      <div className="titlebar-drag" data-tauri-drag-region aria-hidden />
+      {error ? <div className="app-error">{error}</div> : null}
+      <div className="app-body">
         <ManuscriptNav
           manuscripts={manuscripts}
           activeId={activeId}
           onSelect={(id) => void openManuscript(id)}
           onCreate={() => void handleCreate()}
         />
-        <main className="flex min-w-0 flex-1 flex-col">
+        <main className="app-main">
           {document ? (
             <>
               <EditorToolbar
                 title={document.title}
                 onTitleChange={handleTitleChange}
                 saveState={saveState}
+                sidebarCollapsed={sidebarCollapsed}
+                onToggleSidebar={toggleSidebar}
+                focusMode={focusMode}
+                onToggleFocusMode={toggleFocusMode}
+                editor={editor}
               />
-              <div className="min-h-0 flex-1 overflow-y-auto p-6">
-                <ProsaEditor document={document} onDocumentChange={handleDocumentChange} />
+              <div className="editor-scroll">
+                <div className="editor-canvas-wrap">
+                  <ProsaEditor
+                    document={document}
+                    onDocumentChange={handleDocumentChange}
+                    onEditorReady={handleEditorReady}
+                  />
+                </div>
               </div>
             </>
           ) : (
-            <div className="flex flex-1 items-center justify-center text-[var(--scribo-ui-muted)]">
-              Select or create a manuscript to start writing.
-            </div>
+            <EmptyWorkspace onCreate={() => void handleCreate()} />
           )}
         </main>
       </div>

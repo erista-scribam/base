@@ -4,6 +4,8 @@ import Heading from "@tiptap/extension-heading";
 import Blockquote from "@tiptap/extension-blockquote";
 import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
+import Placeholder from "@tiptap/extension-placeholder";
+import type { Editor } from "@tiptap/core";
 import type { ProsaDocument } from "@scribo/document-model";
 import { useEffect, useRef } from "react";
 import { SceneBreak } from "./scene-break";
@@ -12,9 +14,10 @@ import { prosaDocumentFromTiptapJson, tiptapJsonFromProsaDocument } from "./pros
 export interface ProsaEditorProps {
   document: ProsaDocument;
   onDocumentChange: (document: ProsaDocument) => void;
+  onEditorReady: (editor: Editor | null) => void;
 }
 
-export function ProsaEditor({ document, onDocumentChange }: ProsaEditorProps) {
+export function ProsaEditor({ document, onDocumentChange, onEditorReady }: ProsaEditorProps) {
   const skipNextUpdate = useRef(true);
 
   useEffect(() => {
@@ -35,6 +38,9 @@ export function ProsaEditor({ document, onDocumentChange }: ProsaEditorProps) {
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
       SceneBreak,
+      Placeholder.configure({
+        placeholder: "Begin writing…",
+      }),
     ],
     content: tiptapJsonFromProsaDocument(document),
     onUpdate: ({ editor: ed }) => {
@@ -52,14 +58,18 @@ export function ProsaEditor({ document, onDocumentChange }: ProsaEditorProps) {
   });
 
   useEffect(() => {
+    onEditorReady(editor);
+    return () => onEditorReady(null);
+  }, [editor, onEditorReady]);
+
+  useEffect(() => {
     if (!editor) {
       return;
     }
     skipNextUpdate.current = true;
     editor.commands.setContent(tiptapJsonFromProsaDocument(document), { emitUpdate: false });
     skipNextUpdate.current = false;
-    // Intentionally keyed on manuscript document id only (not every edit).
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- external reload when switching manuscripts
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reload when switching manuscripts only
   }, [document.id, editor]);
 
   if (!editor) {
@@ -67,7 +77,7 @@ export function ProsaEditor({ document, onDocumentChange }: ProsaEditorProps) {
   }
 
   return (
-    <div className="manuscript-root rounded-lg border border-[var(--scribo-ui-border)] bg-[var(--scribo-ui-surface)] p-8 shadow-sm">
+    <div className="manuscript-root">
       <EditorContent editor={editor} />
     </div>
   );
