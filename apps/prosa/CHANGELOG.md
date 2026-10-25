@@ -1,5 +1,13 @@
 # @scribo/prosa
 
+## 0.3.1
+
+### Patch Changes
+
+- 6dc65ef: Fix library manuscript title saves so renaming the title in the editor renames the `.md` file on disk and keeps the active manuscript in sync.
+  - @scribo/core@0.3.1
+  - @scribo/document-model@0.3.1
+
 ## 0.3.0
 
 ### Minor Changes
