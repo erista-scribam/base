@@ -1,0 +1,46 @@
+{
+  "name": "@scribo/prosa",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@scribo/core": "workspace:*",
+    "@scribo/document-model": "workspace:*",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-opener": "^2",
+    "@tiptap/core": "^3.10.2",
+    "@tiptap/extension-blockquote": "^3.10.2",
+    "@tiptap/extension-heading": "^3.10.2",
+    "@tiptap/extension-link": "^3.10.2",
+    "@tiptap/extension-underline": "^3.10.2",
+    "@tiptap/pm": "^3.10.2",
+    "@tiptap/react": "^3.10.2",
+    "@tiptap/starter-kit": "^3.10.2",
+    "prosemirror-commands": "^1.7.2",
+    "prosemirror-keymap": "^1.2.3",
+    "prosemirror-model": "^1.25.12",
+    "prosemirror-schema-list": "^1.5.1",
+    "prosemirror-state": "^1.4.4",
+    "prosemirror-transform": "^1.12.4",
+    "prosemirror-view": "^1.42.8",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.17",
+    "@tauri-apps/cli": "^2",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^6.0.2",
+    "tailwindcss": "^4.1.17",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.16"
+  }
+}

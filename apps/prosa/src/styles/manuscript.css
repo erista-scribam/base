@@ -1,0 +1,78 @@
+/* Manuscript presentation — global typography tokens (not per-node overrides) */
+.manuscript-root {
+  --ms-font-family: "Literata", "Georgia", serif;
+  --ms-font-size: 1.05rem;
+  --ms-line-height: 1.65;
+  --ms-paragraph-spacing: 0.85em;
+  --ms-heading-1-size: 1.85rem;
+  --ms-heading-2-size: 1.55rem;
+  --ms-heading-3-size: 1.3rem;
+  --ms-heading-4-size: 1.15rem;
+  --ms-heading-5-size: 1.05rem;
+  --ms-quote-indent: 1.25rem;
+  --ms-scene-break-gap: 1.5rem;
+
+  font-family: var(--ms-font-family);
+  font-size: var(--ms-font-size);
+  line-height: var(--ms-line-height);
+  max-width: 42rem;
+}
+
+.manuscript-root .ProseMirror {
+  outline: none;
+  min-height: 60vh;
+}
+
+.manuscript-root .ProseMirror p {
+  margin: 0 0 var(--ms-paragraph-spacing);
+}
+
+.manuscript-root .ProseMirror h1,
+.manuscript-root .ProseMirror h2,
+.manuscript-root .ProseMirror h3,
+.manuscript-root .ProseMirror h4,
+.manuscript-root .ProseMirror h5 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 1.25em 0 0.5em;
+}
+
+.manuscript-root .ProseMirror h1 {
+  font-size: var(--ms-heading-1-size);
+}
+.manuscript-root .ProseMirror h2 {
+  font-size: var(--ms-heading-2-size);
+}
+.manuscript-root .ProseMirror h3 {
+  font-size: var(--ms-heading-3-size);
+}
+.manuscript-root .ProseMirror h4 {
+  font-size: var(--ms-heading-4-size);
+}
+.manuscript-root .ProseMirror h5 {
+  font-size: var(--ms-heading-5-size);
+}
+
+.manuscript-root .ProseMirror blockquote {
+  margin: 0 0 var(--ms-paragraph-spacing);
+  padding-left: var(--ms-quote-indent);
+  border-left: 3px solid var(--scribo-ui-border);
+  color: var(--scribo-ui-muted);
+}
+
+.manuscript-root .ProseMirror hr[data-scene-break] {
+  border: none;
+  text-align: center;
+  margin: var(--ms-scene-break-gap) 0;
+}
+
+.manuscript-root .ProseMirror hr[data-scene-break]::before {
+  content: "* * *";
+  letter-spacing: 0.35em;
+  color: var(--scribo-ui-muted);
+}
+
+.manuscript-root .ProseMirror a {
+  color: var(--scribo-ui-accent);
+  text-decoration: underline;
+}

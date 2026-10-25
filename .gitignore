@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+target/
+
+# Tauri
+apps/*/src-tauri/target/
+
+# Logs and diagnostics
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Test / coverage
+coverage/
+
+# Tauri CLI npm fallback (pnpm workspaces)
+apps/*/package-lock.json
+
+# Local editor state
+.vscode/*
+!.vscode/extensions.json
