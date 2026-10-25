@@ -8,6 +8,8 @@
 
 Feature work branches from `development` (for example `feature/prosa-export`). Open PRs back into `development`. Release PRs merge `development` → `main`.
 
+**Changesets:** include a `.changeset/*.md` file in PRs when the change should appear in the next release changelog (see `.changeset/README.md`).
+
 ## Commits
 
 Use clear, imperative subjects. Conventional Commits are encouraged but not enforced:
@@ -37,9 +39,10 @@ This sets `core.hooksPath` to `.githooks/` (local git config, not committed). Th
 
 | Item                   | Location                                       |
 | ---------------------- | ---------------------------------------------- |
-| CI on push/PR          | `.github/workflows/ci.yml`                     |
-| Desktop release builds | `.github/workflows/release.yml` (tag `v*.*.*`) |
-| Dependency updates     | `.github/dependabot.yml`                       |
-| PR template            | `.github/pull_request_template.md`             |
+| CI on push/PR          | `.github/workflows/ci.yml`                              |
+| Version + tag          | `.github/workflows/version-packages.yml` (push `main`)  |
+| Desktop release builds | `.github/workflows/desktop-release.yml` (tag `v*.*.*`)  |
+| Dependency updates     | `.github/dependabot.yml`                                |
+| PR template            | `.github/pull_request_template.md`                      |
 
-See `docs/RELEASE.md` for tagging and publishing.
+See `docs/RELEASE.md` for the Changesets release flow.

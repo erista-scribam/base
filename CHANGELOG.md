@@ -7,6 +7,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- Initial Scribo Prosa milestone: monorepo, canonical document model, Tauri desktop shell, local persistence.
+Nothing published yet. The first release will be **0.1.0** when the pending changeset in `.changeset/` is applied via the Version packages workflow on `main`.

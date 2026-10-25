@@ -62,9 +62,9 @@ pnpm tauri:build
 
 ## Version control & releases
 
+- **Changesets:** `pnpm changeset` on feature PRs; releases are automated from `main` (see `docs/RELEASE.md`)
 - Branching and hooks: `docs/VERSION_CONTROL.md`
-- Cutting releases (tags `v*.*.*`, GitHub Actions): `docs/RELEASE.md`
-- Change log: `CHANGELOG.md`
+- Changelog: `CHANGELOG.md`
 
 ## Milestone status
 

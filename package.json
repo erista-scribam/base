@@ -1,7 +1,7 @@
 {
   "name": "scribo",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.0.0",
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "engines": {
@@ -21,9 +21,13 @@
     "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm --filter @scribo/prosa build",
     "verify:rust": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo check --workspace",
     "verify:all": "pnpm verify && pnpm verify:rust",
-    "hooks:install": "sh scripts/setup-git-hooks.sh"
+    "hooks:install": "sh scripts/setup-git-hooks.sh",
+    "changeset": "changeset",
+    "version-packages": "changeset version && node scripts/sync-tauri-version.mjs",
+    "release:publish": "node scripts/release-publish.mjs"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
     "@eslint/js": "^9.39.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",

@@ -16,7 +16,8 @@ pnpm hooks:install   # optional: enable .githooks/pre-commit
 ## Branching
 
 - Base feature branches on **`development`** and open PRs into **`development`**.
-- Release by merging **`development` → `main`**, then tag (see `docs/RELEASE.md`).
+- Add a **changeset** when the PR should appear in the next release: `pnpm changeset` (see `.changeset/README.md`).
+- Release by merging **`development` → `main`**; Changesets opens a **Version packages** PR and tags `vX.Y.Z` when merged (see `docs/RELEASE.md`).
 
 Details: `docs/VERSION_CONTROL.md`.
 
@@ -24,6 +25,7 @@ Details: `docs/VERSION_CONTROL.md`.
 
 | Command             | Description                                    |
 | ------------------- | ---------------------------------------------- |
+| `pnpm changeset`    | Add a release note for the next semver bump    |
 | `pnpm verify`       | CI-equivalent JS checks + Prosa frontend build |
 | `pnpm verify:all`   | `verify` plus Rust fmt, Clippy, and check      |
 | `pnpm typecheck`    | TypeScript across workspaces                   |
