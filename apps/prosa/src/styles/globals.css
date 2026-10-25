@@ -1,32 +1,35 @@
 @import "tailwindcss";
+@import "./tokens.css";
+@import "./chrome.css";
+@import "./manuscript.css";
 
-:root {
-  color-scheme: light dark;
-  --scribo-ui-bg: #f4f1ea;
-  --scribo-ui-surface: #ffffff;
-  --scribo-ui-border: #d8d2c8;
-  --scribo-ui-text: #1c1917;
-  --scribo-ui-muted: #78716c;
-  --scribo-ui-accent: #2563eb;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --scribo-ui-bg: #1c1917;
-    --scribo-ui-surface: #292524;
-    --scribo-ui-border: #44403c;
-    --scribo-ui-text: #fafaf9;
-    --scribo-ui-muted: #a8a29e;
-    --scribo-ui-accent: #60a5fa;
-  }
+html {
+  margin: 0;
+  height: 100%;
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  height: var(--scribo-app-height, 100%);
+  min-height: 0;
+  overflow: hidden;
   background: var(--scribo-ui-bg);
   color: var(--scribo-ui-text);
 }
 
-@import "./manuscript.css";
+#root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--scribo-ui-selection-bg);
+  color: var(--scribo-ui-selection-fg);
+}

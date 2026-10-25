@@ -8,9 +8,17 @@ export type {
   ProsaParagraphBlock,
   ProsaBlockquoteBlock,
   ProsaSceneBreakBlock,
+  ProsaListBlock,
+  ProsaListItem,
+  ProsaCodeBlockBlock,
 } from "./prosa/types";
 export { prosaDocumentSchema, prosaBlockSchema } from "./prosa/schema";
-export { validateProsaDocument, parseProsaDocument } from "./prosa/validate";
+export {
+  validateProsaDocument,
+  parseProsaDocument,
+  tryValidateProsaDocument,
+} from "./prosa/validate";
+export { repairProsaDocumentInput } from "./prosa/repair";
 export { serializeProsaDocument, deserializeProsaDocument } from "./prosa/serialize";
 export { createEmptyProsaDocument } from "./prosa/factory";
 export type { DocumentMigration } from "./migration";

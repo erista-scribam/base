@@ -1,6 +1,9 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use crate::atomic_io::atomic_write;
+use crate::recovery::{parse_recovery, wrap_recovery};
+
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use tauri::AppHandle;
@@ -12,6 +15,10 @@ pub struct ManuscriptSummary {
     pub id: String,
     pub title: String,
     pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub file_path: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -34,7 +41,7 @@ fn manuscripts_root(app: &AppHandle) -> Result<PathBuf, String> {
     Ok(root)
 }
 
-fn manuscript_dir(app: &AppHandle, id: &str) -> Result<PathBuf, String> {
+pub fn manuscript_dir(app: &AppHandle, id: &str) -> Result<PathBuf, String> {
     Ok(manuscripts_root(app)?.join(id))
 }
 
@@ -43,9 +50,20 @@ fn read_meta(path: &Path) -> Result<ManuscriptMeta, String> {
     serde_json::from_str(&raw).map_err(|error| error.to_string())
 }
 
+#[allow(dead_code)]
 fn write_meta(path: &Path, meta: &ManuscriptMeta) -> Result<(), String> {
     let raw = serde_json::to_string_pretty(meta).map_err(|error| error.to_string())?;
-    fs::write(path, raw).map_err(|error| error.to_string())
+    atomic_write(path, &raw)
+}
+
+#[allow(dead_code)]
+fn validate_document_json(document_json: &str) -> Result<(), String> {
+    let value: serde_json::Value = serde_json::from_str(document_json)
+        .map_err(|error| format!("Invalid document JSON: {error}"))?;
+    if !value.get("schemaVersion").is_some() || !value.get("blocks").is_some() {
+        return Err("Document JSON is missing required fields".into());
+    }
+    Ok(())
 }
 
 pub fn list_manuscripts(app: AppHandle) -> Result<Vec<ManuscriptSummary>, String> {
@@ -70,6 +88,8 @@ pub fn list_manuscripts(app: AppHandle) -> Result<Vec<ManuscriptSummary>, String
             id: meta.id,
             title: meta.title,
             updated_at: meta.updated_at,
+            file_path: None,
+            source: Some("internal".into()),
         });
     }
 
@@ -77,6 +97,7 @@ pub fn list_manuscripts(app: AppHandle) -> Result<Vec<ManuscriptSummary>, String
     Ok(summaries)
 }
 
+#[allow(dead_code)]
 pub fn create_manuscript(
     app: AppHandle,
     title: String,
@@ -102,14 +123,17 @@ pub fn create_manuscript(
         updated_at: now.clone(),
     };
 
+    validate_document_json(&document_json)?;
     write_meta(&dir.join("meta.json"), &meta)?;
-    fs::write(dir.join("document.json"), &document_json).map_err(|error| error.to_string())?;
+    atomic_write(&dir.join("document.json"), &document_json)?;
 
     Ok((
         ManuscriptSummary {
             id,
             title,
             updated_at: meta.updated_at,
+            file_path: None,
+            source: Some("internal".into()),
         },
         document_json,
     ))
@@ -125,11 +149,14 @@ pub fn load_manuscript(app: AppHandle, id: String) -> Result<(ManuscriptSummary,
             id: meta.id,
             title: meta.title,
             updated_at: meta.updated_at,
+            file_path: None,
+            source: Some("internal".into()),
         },
         document_json,
     ))
 }
 
+#[allow(dead_code)]
 pub fn save_manuscript(
     app: AppHandle,
     id: String,
@@ -145,14 +172,17 @@ pub fn save_manuscript(
         meta.title = title.to_string();
     }
 
+    validate_document_json(&document_json)?;
     meta.updated_at = Utc::now().to_rfc3339();
     write_meta(&meta_path, &meta)?;
-    fs::write(dir.join("document.json"), document_json).map_err(|error| error.to_string())?;
+    atomic_write(&dir.join("document.json"), &document_json)?;
 
     Ok(ManuscriptSummary {
         id: meta.id,
         title: meta.title,
         updated_at: meta.updated_at,
+        file_path: None,
+        source: Some("internal".into()),
     })
 }
 
@@ -162,15 +192,36 @@ pub fn save_recovery_snapshot(
     document_json: String,
 ) -> Result<(), String> {
     let dir = manuscript_dir(&app, &id)?;
-    fs::write(dir.join("recovery.json"), document_json).map_err(|error| error.to_string())
+    atomic_write(&dir.join("recovery.json"), &wrap_recovery(document_json))
 }
 
-pub fn load_recovery_snapshot(app: AppHandle, id: String) -> Result<Option<String>, String> {
+pub fn delete_internal_manuscript(app: &AppHandle, id: &str) -> Result<(), String> {
+    if !id.starts_with("ms_") || id.starts_with("ms_path_") {
+        return Err("Not an internal manuscript id".into());
+    }
+    let dir = manuscript_dir(app, id)?;
+    if dir.exists() {
+        fs::remove_dir_all(dir).map_err(|error| error.to_string())?;
+    }
+    Ok(())
+}
+
+pub fn load_recovery_snapshot(
+    app: AppHandle,
+    id: String,
+) -> Result<Option<crate::recovery::RecoveryPayload>, String> {
     let path = manuscript_dir(&app, &id)?.join("recovery.json");
     if !path.exists() {
         return Ok(None);
     }
-    Ok(Some(
-        fs::read_to_string(path).map_err(|error| error.to_string())?,
-    ))
+    let raw = fs::read_to_string(path).map_err(|error| error.to_string())?;
+    Ok(Some(parse_recovery(&raw)))
+}
+
+pub fn clear_recovery_snapshot(app: &AppHandle, id: &str) -> Result<(), String> {
+    let path = manuscript_dir(app, id)?.join("recovery.json");
+    if path.exists() {
+        fs::remove_file(path).map_err(|error| error.to_string())?;
+    }
+    Ok(())
 }
