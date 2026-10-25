@@ -12,6 +12,10 @@ pub struct ManuscriptSummary {
     pub id: String,
     pub title: String,
     pub updated_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub file_path: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -34,7 +38,7 @@ fn manuscripts_root(app: &AppHandle) -> Result<PathBuf, String> {
     Ok(root)
 }
 
-fn manuscript_dir(app: &AppHandle, id: &str) -> Result<PathBuf, String> {
+pub fn manuscript_dir(app: &AppHandle, id: &str) -> Result<PathBuf, String> {
     Ok(manuscripts_root(app)?.join(id))
 }
 
@@ -70,6 +74,8 @@ pub fn list_manuscripts(app: AppHandle) -> Result<Vec<ManuscriptSummary>, String
             id: meta.id,
             title: meta.title,
             updated_at: meta.updated_at,
+            file_path: None,
+            source: Some("internal".into()),
         });
     }
 
@@ -110,6 +116,8 @@ pub fn create_manuscript(
             id,
             title,
             updated_at: meta.updated_at,
+            file_path: None,
+            source: Some("internal".into()),
         },
         document_json,
     ))
@@ -125,6 +133,8 @@ pub fn load_manuscript(app: AppHandle, id: String) -> Result<(ManuscriptSummary,
             id: meta.id,
             title: meta.title,
             updated_at: meta.updated_at,
+            file_path: None,
+            source: Some("internal".into()),
         },
         document_json,
     ))
@@ -153,6 +163,8 @@ pub fn save_manuscript(
         id: meta.id,
         title: meta.title,
         updated_at: meta.updated_at,
+        file_path: None,
+        source: Some("internal".into()),
     })
 }
 

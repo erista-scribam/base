@@ -8,8 +8,13 @@ export interface ManuscriptMetadata {
   updatedAt: string;
 }
 
+export type ManuscriptSource = "library" | "internal";
+
 export interface ManuscriptSummary {
   id: ManuscriptId;
   title: string;
   updatedAt: string;
+  /** Relative path under library root, or absolute path for external files. */
+  filePath?: string;
+  source?: ManuscriptSource;
 }

@@ -10,13 +10,21 @@ import { useAutosave } from "../hooks/useAutosave";
 import { useAppShortcuts } from "../hooks/useAppShortcuts";
 import { useTheme } from "../hooks/useTheme";
 import { useViewportLayout } from "../hooks/useViewportLayout";
+import { open } from "@tauri-apps/plugin-dialog";
 import {
   createManuscript,
+  getLibrary,
+  importMarkdownFile,
+  initLibrary,
   listManuscripts,
   loadManuscript,
   loadRecoverySnapshot,
-  saveManuscript,
+  revealLibraryFolder,
+  revealManuscriptInFileManager,
+  saveManuscriptDocument,
+  setLibraryRoot,
 } from "../features/persistence/tauri-manuscripts";
+import { isTauriRuntime } from "../features/persistence/is-tauri";
 
 export function App() {
   const [manuscripts, setManuscripts] = useState<ManuscriptSummary[]>([]);
@@ -29,7 +37,10 @@ export function App() {
   const [viewMode, setViewMode] = useState<EditorViewMode>("classic");
   const [editor, setEditor] = useState<Editor | null>(null);
   const [layoutKey, setLayoutKey] = useState(0);
+  const [libraryPath, setLibraryPath] = useState<string | null>(null);
   const { theme, toggleTheme } = useTheme();
+
+  const activeSummary = manuscripts.find((item) => item.id === activeId) ?? null;
 
   const restoreChromeAfterWindowChange = useCallback(() => {
     setLayoutKey((value) => value + 1);
@@ -40,12 +51,42 @@ export function App() {
   useViewportLayout({ onWindowRestored: restoreChromeAfterWindowChange });
 
   const refreshList = useCallback(async () => {
+    if (!isTauriRuntime()) {
+      return;
+    }
     const items = await listManuscripts();
     setManuscripts(items);
   }, []);
 
   useEffect(() => {
+    if (!isTauriRuntime()) {
+      return;
+    }
+    const onFocus = () => {
+      void refreshList();
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [refreshList]);
+
+  useEffect(() => {
+    if (!isTauriRuntime()) {
+      return;
+    }
     let cancelled = false;
+    void initLibrary()
+      .then((library) => {
+        if (!cancelled) {
+          setLibraryPath(library.rootPath);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          void getLibrary()
+            .then((library) => setLibraryPath(library.rootPath))
+            .catch(() => undefined);
+        }
+      });
     void listManuscripts()
       .then((items) => {
         if (!cancelled) {
@@ -123,15 +164,16 @@ export function App() {
         return;
       }
       setSaveState("saving");
-      void saveManuscript(activeId, next)
-        .then(async (summary) => {
+      const summary = manuscripts.find((item) => item.id === activeId) ?? null;
+      void saveManuscriptDocument(activeId, next, summary)
+        .then(async (saved) => {
           setSaveState("saved");
           await refreshList();
-          setManuscripts((prev) => prev.map((item) => (item.id === summary.id ? summary : item)));
+          setManuscripts((prev) => prev.map((item) => (item.id === saved.id ? saved : item)));
         })
         .catch(() => setSaveState("error"));
     },
-    [activeId, refreshList],
+    [activeId, manuscripts, refreshList],
   );
 
   const handleTitleChange = useCallback(
@@ -148,7 +190,63 @@ export function App() {
     setEditor(instance);
   }, []);
 
-  useAutosave(activeId, document);
+  const handleChooseLibrary = useCallback(async () => {
+    if (!isTauriRuntime()) {
+      return;
+    }
+    const selected = await open({
+      directory: true,
+      multiple: false,
+      title: "Choose library folder",
+    });
+    if (typeof selected !== "string") {
+      return;
+    }
+    const library = await setLibraryRoot(selected);
+    setLibraryPath(library.rootPath);
+    await refreshList();
+  }, [refreshList]);
+
+  const handleOpenFile = useCallback(async () => {
+    if (!isTauriRuntime()) {
+      return;
+    }
+    const selected = await open({
+      multiple: false,
+      title: "Open markdown file",
+      filters: [{ name: "Markdown", extensions: ["md", "markdown"] }],
+    });
+    if (typeof selected !== "string") {
+      return;
+    }
+    setError(null);
+    try {
+      const loaded = await importMarkdownFile(selected);
+      await refreshList();
+      setActiveId(loaded.summary.id);
+      setDocument(loaded.document);
+      setSaveState("idle");
+      setSidebarCollapsed(false);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Failed to open file");
+    }
+  }, [refreshList]);
+
+  const handleRevealLibrary = useCallback(() => {
+    if (!isTauriRuntime()) {
+      return;
+    }
+    void revealLibraryFolder().catch(console.error);
+  }, []);
+
+  const handleRevealActive = useCallback(() => {
+    if (!activeId || !isTauriRuntime()) {
+      return;
+    }
+    void revealManuscriptInFileManager(activeId).catch(console.error);
+  }, [activeId]);
+
+  useAutosave(activeId, document, activeSummary);
 
   return (
     <div
@@ -161,8 +259,13 @@ export function App() {
         <ManuscriptNav
           manuscripts={manuscripts}
           activeId={activeId}
+          libraryPath={libraryPath}
           onSelect={(id) => void openManuscript(id)}
           onCreate={() => void handleCreate()}
+          onOpenFile={() => void handleOpenFile()}
+          onChooseLibrary={() => void handleChooseLibrary()}
+          onRevealLibrary={handleRevealLibrary}
+          onRevealActive={handleRevealActive}
         />
         <main className="app-main">
           {document ? (

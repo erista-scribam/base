@@ -18,6 +18,7 @@
     "@scribo/core": "workspace:*",
     "@scribo/document-model": "workspace:*",
     "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-dialog": "^2",
     "@tauri-apps/plugin-opener": "^2",
     "@tiptap/core": "^3.10.2",
     "@tiptap/extension-blockquote": "^3.10.2",

@@ -45,7 +45,77 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--scribo-space-4) var(--scribo-space-4) var(--scribo-space-3);
+  gap: var(--scribo-space-2);
+  padding: var(--scribo-space-4) var(--scribo-space-4) var(--scribo-space-2);
+}
+
+.app-sidebar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--scribo-space-2);
+}
+
+.library-folder {
+  display: flex;
+  align-items: center;
+  gap: var(--scribo-space-1);
+  margin: 0 var(--scribo-space-2) var(--scribo-space-2);
+  padding: var(--scribo-space-1);
+  border: 1px solid var(--scribo-ui-border-subtle);
+  border-radius: var(--scribo-radius-sm);
+  background: color-mix(in srgb, var(--scribo-ui-canvas) 70%, transparent);
+}
+
+.library-folder-path {
+  min-width: 0;
+  flex: 1;
+  padding: var(--scribo-space-1) var(--scribo-space-2);
+  border: none;
+  border-radius: var(--scribo-radius-sm);
+  background: transparent;
+  color: var(--scribo-ui-text-secondary);
+  font-size: 0.6875rem;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.library-folder-path:hover {
+  background: var(--scribo-ui-hover);
+  color: var(--scribo-ui-text);
+}
+
+.library-folder-reveal {
+  width: 1.625rem;
+  height: 1.625rem;
+  flex-shrink: 0;
+  color: var(--scribo-ui-muted);
+}
+
+.app-sidebar-footer {
+  flex-shrink: 0;
+  padding: var(--scribo-space-3) var(--scribo-space-4) var(--scribo-space-4);
+  border-top: 1px solid var(--scribo-ui-border-subtle);
+}
+
+.sidebar-footer-btn {
+  width: 100%;
+  padding: var(--scribo-space-2) var(--scribo-space-3);
+  border: 1px solid var(--scribo-ui-border-subtle);
+  border-radius: var(--scribo-radius-sm);
+  background: transparent;
+  color: var(--scribo-ui-text-secondary);
+  font-family: var(--scribo-font-ui);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.sidebar-footer-btn:hover {
+  background: var(--scribo-ui-hover);
+  color: var(--scribo-ui-text);
 }
 
 .app-sidebar-label {
