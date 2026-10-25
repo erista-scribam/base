@@ -1,0 +1,2 @@
+# scribo
+Scribo writing software
