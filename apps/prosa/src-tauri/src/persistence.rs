@@ -54,7 +54,11 @@ pub fn list_manuscripts(app: AppHandle) -> Result<Vec<ManuscriptSummary>, String
 
     for entry in fs::read_dir(root).map_err(|error| error.to_string())? {
         let entry = entry.map_err(|error| error.to_string())?;
-        if !entry.file_type().map_err(|error| error.to_string())?.is_dir() {
+        if !entry
+            .file_type()
+            .map_err(|error| error.to_string())?
+            .is_dir()
+        {
             continue;
         }
         let meta_path = entry.path().join("meta.json");
@@ -84,7 +88,7 @@ pub fn create_manuscript(
     let document_id = parsed
         .get("id")
         .and_then(|value| value.as_str())
-        .unwrap_or_else(|| "doc_unknown")
+        .unwrap_or("doc_unknown")
         .to_string();
     let now = Utc::now().to_rfc3339();
     let dir = manuscript_dir(&app, &id)?;
@@ -111,10 +115,7 @@ pub fn create_manuscript(
     ))
 }
 
-pub fn load_manuscript(
-    app: AppHandle,
-    id: String,
-) -> Result<(ManuscriptSummary, String), String> {
+pub fn load_manuscript(app: AppHandle, id: String) -> Result<(ManuscriptSummary, String), String> {
     let dir = manuscript_dir(&app, &id)?;
     let meta = read_meta(&dir.join("meta.json"))?;
     let document_json =
@@ -138,10 +139,10 @@ pub fn save_manuscript(
     let meta_path = dir.join("meta.json");
     let mut meta = read_meta(&meta_path)?;
 
-    if let Ok(value) = serde_json::from_str::<serde_json::Value>(&document_json) {
-        if let Some(title) = value.get("title").and_then(|t| t.as_str()) {
-            meta.title = title.to_string();
-        }
+    if let Ok(value) = serde_json::from_str::<serde_json::Value>(&document_json)
+        && let Some(title) = value.get("title").and_then(|t| t.as_str())
+    {
+        meta.title = title.to_string();
     }
 
     meta.updated_at = Utc::now().to_rfc3339();

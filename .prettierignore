@@ -2,3 +2,4 @@ pnpm-lock.yaml
 **/target/**
 **/dist/**
 apps/prosa/src-tauri/icons/**
+apps/prosa/src-tauri/gen/**

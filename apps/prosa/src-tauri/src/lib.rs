@@ -1,10 +1,10 @@
 mod persistence;
 
 use persistence::{
-    create_manuscript as create_manuscript_impl, list_manuscripts as list_manuscripts_impl,
-    load_manuscript as load_manuscript_impl, load_recovery_snapshot as load_recovery_snapshot_impl,
-    save_manuscript as save_manuscript_impl, save_recovery_snapshot as save_recovery_snapshot_impl,
-    ManuscriptSummary,
+    ManuscriptSummary, create_manuscript as create_manuscript_impl,
+    list_manuscripts as list_manuscripts_impl, load_manuscript as load_manuscript_impl,
+    load_recovery_snapshot as load_recovery_snapshot_impl, save_manuscript as save_manuscript_impl,
+    save_recovery_snapshot as save_recovery_snapshot_impl,
 };
 use serde::Serialize;
 
@@ -61,10 +61,7 @@ fn save_recovery_snapshot(
 }
 
 #[tauri::command]
-fn load_recovery_snapshot(
-    app: tauri::AppHandle,
-    id: String,
-) -> Result<Option<String>, String> {
+fn load_recovery_snapshot(app: tauri::AppHandle, id: String) -> Result<Option<String>, String> {
     load_recovery_snapshot_impl(app, id)
 }
 

@@ -16,7 +16,7 @@ Scribo owns the **structure** of the writing; the application owns **presentatio
 
 - **Node.js** 22 or newer
 - **pnpm** 10.x (`corepack enable && corepack prepare pnpm@10.33.0 --activate`)
-- **Rust** stable and [Tauri system dependencies](https://v2.tauri.app/start/prerequisites/) (for desktop run/build)
+- **Rust** stable and [Tauri system dependencies](https://v2.tauri.app/start/prerequisites/) (for desktop run/build). After installing via [rustup](https://rustup.rs/), ensure `~/.cargo/bin` is on your `PATH` (or run `source "$HOME/.cargo/env"` in each new shell).
 
 ## Quick start
 
@@ -48,15 +48,23 @@ pnpm tauri:build
 
 ## Scripts
 
-| Script | Purpose |
-| --- | --- |
-| `pnpm dev` | Vite dev server for Prosa |
-| `pnpm tauri:dev` | Tauri development window |
-| `pnpm tauri:build` | Bundle desktop app |
-| `pnpm test` | Run workspace tests |
-| `pnpm typecheck` | TypeScript check |
-| `pnpm lint` | ESLint |
-| `pnpm format` / `pnpm format:check` | Prettier |
+| Script                              | Purpose                            |
+| ----------------------------------- | ---------------------------------- |
+| `pnpm dev`                          | Vite dev server for Prosa          |
+| `pnpm tauri:dev`                    | Tauri development window           |
+| `pnpm tauri:build`                  | Bundle desktop app                 |
+| `pnpm test`                         | Run workspace tests                |
+| `pnpm typecheck`                    | TypeScript check                   |
+| `pnpm lint`                         | ESLint                             |
+| `pnpm format` / `pnpm format:check` | Prettier                           |
+| `pnpm verify`                       | Full JS/TS CI checks locally       |
+| `pnpm verify:all`                   | `verify` + Rust fmt, Clippy, check |
+
+## Version control & releases
+
+- **Changesets:** `pnpm changeset` on feature PRs; releases are automated from `main` (see `docs/RELEASE.md`)
+- Branching and hooks: `docs/VERSION_CONTROL.md`
+- Changelog: `CHANGELOG.md`
 
 ## Milestone status
 

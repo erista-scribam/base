@@ -22,12 +22,12 @@ flowchart TB
   Prosa --> Tauri
 ```
 
-| Layer | Responsibility |
-| --- | --- |
-| `@scribo/core` | IDs, metadata contracts, domain errors (no UI, I/O, or React) |
-| `@scribo/document-model` | Canonical Prosa schema, validation, JSON serialization |
-| `@scribo/prosa` | Shell UI, TipTap integration, typography CSS, Tauri invoke adapters |
-| Rust / Tauri | Local filesystem persistence, OS integration |
+| Layer                    | Responsibility                                                      |
+| ------------------------ | ------------------------------------------------------------------- |
+| `@scribo/core`           | IDs, metadata contracts, domain errors (no UI, I/O, or React)       |
+| `@scribo/document-model` | Canonical Prosa schema, validation, JSON serialization              |
+| `@scribo/prosa`          | Shell UI, TipTap integration, typography CSS, Tauri invoke adapters |
+| Rust / Tauri             | Local filesystem persistence, OS integration                        |
 
 Future packages (`editor`, `rendering`, `design-system`, `export`) stay out of the tree until they have a concrete boundary. TipTap lives in the app for now; the canonical model remains independent of TipTap types.
 

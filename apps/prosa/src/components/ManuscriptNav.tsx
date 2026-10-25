@@ -7,12 +7,7 @@ export interface ManuscriptNavProps {
   onCreate: () => void;
 }
 
-export function ManuscriptNav({
-  manuscripts,
-  activeId,
-  onSelect,
-  onCreate,
-}: ManuscriptNavProps) {
+export function ManuscriptNav({ manuscripts, activeId, onSelect, onCreate }: ManuscriptNavProps) {
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-[var(--scribo-ui-border)] bg-[var(--scribo-ui-surface)]">
       <div className="flex items-center justify-between border-b border-[var(--scribo-ui-border)] px-4 py-3">
