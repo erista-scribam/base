@@ -7,6 +7,7 @@ import { EditorToolbar } from "../components/EditorToolbar";
 import { EmptyWorkspace } from "../components/EmptyWorkspace";
 import { EditorWorkspace, type EditorViewMode } from "../components/EditorWorkspace";
 import { useManuscriptPersistence } from "../hooks/useManuscriptPersistence";
+import { useMarkdownPreviewVisible } from "../hooks/useMarkdownPreviewVisible";
 import { resolveRecoveryOnOpen } from "../features/persistence/recovery-policy";
 import { useAppShortcuts } from "../hooks/useAppShortcuts";
 import { useTheme } from "../hooks/useTheme";
@@ -48,6 +49,7 @@ export function App() {
   const [layoutKey, setLayoutKey] = useState(0);
   const [libraryPath, setLibraryPath] = useState<string | null>(null);
   const { theme, toggleTheme } = useTheme();
+  const { markdownPreviewVisible, toggleMarkdownPreview } = useMarkdownPreviewVisible();
 
   const activeSummary = manuscripts.find((item) => item.id === activeId) ?? null;
 
@@ -349,7 +351,10 @@ export function App() {
           onRevealLibrary={handleRevealLibrary}
           onRevealActive={handleRevealActive}
         />
-        <main className="app-main">
+        <main
+          className="app-main"
+          data-editor-view={viewMode === "split" ? "markdown" : "classic"}
+        >
           {document ? (
             <>
               <EditorToolbar
@@ -363,15 +368,25 @@ export function App() {
                 editor={editor}
                 viewMode={viewMode}
                 onToggleViewMode={toggleViewMode}
+                markdownPreviewVisible={markdownPreviewVisible}
+                onToggleMarkdownPreview={toggleMarkdownPreview}
                 theme={theme}
                 onToggleTheme={toggleTheme}
               />
-              <div className="editor-scroll" data-view={viewMode}>
-                <div className="editor-scroll-inner" data-view={viewMode}>
+              <div
+                className="editor-scroll"
+                data-view={viewMode === "split" ? "markdown" : "classic"}
+              >
+                <div
+                  className="editor-scroll-inner"
+                  data-view={viewMode === "split" ? "markdown" : "classic"}
+                >
                   <EditorWorkspace
                     key={document.id}
                     document={document}
                     viewMode={viewMode}
+                    markdownPreviewVisible={markdownPreviewVisible}
+                    onToggleMarkdownPreview={toggleMarkdownPreview}
                     onDocumentChange={handleDocumentChange}
                     onEditorReady={handleEditorReady}
                   />

@@ -106,15 +106,22 @@ const markdownSourceEditorTheme = EditorView.theme({
   },
   ".cm-scroller": {
     fontFamily: "var(--scribo-font-mono)",
-    fontSize: "var(--scribo-ms-font-size)",
+    fontSize: "0.9375rem",
     lineHeight: "var(--scribo-ms-line-height)",
     color: "var(--scribo-ui-text)",
+    overflowX: "hidden",
   },
   ".cm-content": {
     caretColor: "var(--scribo-ui-caret)",
     padding: "var(--scribo-ms-pad-y) var(--scribo-ms-pad-x)",
     maxWidth: "var(--scribo-ms-max-width)",
+    width: "100%",
     margin: "0 auto",
+    boxSizing: "border-box",
+  },
+  ".cm-line": {
+    wordBreak: "break-word",
+    overflowWrap: "anywhere",
   },
   ".cm-gutters": {
     display: "none",
@@ -147,5 +154,6 @@ export function markdownSourceExtensions() {
     markdownSourceLayoutPlugin,
     markdownSourceEditorTheme,
     syntaxHighlighting(prosaMarkdownHighlight, { fallback: true }),
+    EditorView.lineWrapping,
   ];
 }

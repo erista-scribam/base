@@ -15,6 +15,8 @@ export interface EditorToolbarProps {
   editor: Editor | null;
   viewMode: EditorViewMode;
   onToggleViewMode: () => void;
+  markdownPreviewVisible: boolean;
+  onToggleMarkdownPreview: () => void;
   theme: ThemeMode;
   onToggleTheme: () => void;
 }
@@ -53,7 +55,7 @@ function IconFocus() {
   );
 }
 
-function IconSplit() {
+function IconPreviewPane() {
   return (
     <svg
       width="16"
@@ -64,8 +66,8 @@ function IconSplit() {
       strokeWidth="1.75"
       aria-hidden
     >
-      <rect x="3" y="4" width="18" height="16" rx="1" />
-      <path d="M12 4v16" />
+      <rect x="4" y="5" width="16" height="14" rx="1" />
+      <path d="M13 5v14" />
     </svg>
   );
 }
@@ -102,9 +104,12 @@ export function EditorToolbar({
   editor,
   viewMode,
   onToggleViewMode,
+  markdownPreviewVisible,
+  onToggleMarkdownPreview,
   theme,
   onToggleTheme,
 }: EditorToolbarProps) {
+  const isMarkdown = viewMode === "split";
   const statusLabel =
     saveState === "saving"
       ? "Saving…"
@@ -117,7 +122,7 @@ export function EditorToolbar({
             : "";
 
   return (
-    <div className="editor-chrome">
+    <div className="editor-chrome" data-mode={isMarkdown ? "markdown" : "classic"}>
       <header className="editor-header">
         <IconButton
           label={sidebarCollapsed || focusMode ? "Show sidebar" : "Hide sidebar"}
@@ -141,13 +146,33 @@ export function EditorToolbar({
         >
           {statusLabel}
         </span>
-        <IconButton
-          label={viewMode === "split" ? "Classic editor" : "Markdown split view"}
-          active={viewMode === "split"}
-          onClick={onToggleViewMode}
-        >
-          <IconSplit />
-        </IconButton>
+        <div className="editor-mode-switch" role="group" aria-label="Editor mode">
+          <button
+            type="button"
+            className="editor-mode-switch-btn"
+            data-active={!isMarkdown ? "true" : undefined}
+            onClick={() => isMarkdown && onToggleViewMode()}
+          >
+            Classic
+          </button>
+          <button
+            type="button"
+            className="editor-mode-switch-btn"
+            data-active={isMarkdown ? "true" : undefined}
+            onClick={() => !isMarkdown && onToggleViewMode()}
+          >
+            Markdown
+          </button>
+        </div>
+        {isMarkdown ? (
+          <IconButton
+            label={markdownPreviewVisible ? "Hide preview pane" : "Show preview pane"}
+            active={markdownPreviewVisible}
+            onClick={onToggleMarkdownPreview}
+          >
+            <IconPreviewPane />
+          </IconButton>
+        ) : null}
         <IconButton label={themeLabel(theme)} active={theme === "dark"} onClick={onToggleTheme}>
           <IconTheme />
         </IconButton>

@@ -196,7 +196,63 @@
   flex-shrink: 0;
   border-bottom: 1px solid var(--scribo-ui-border-subtle);
   background: var(--scribo-ui-bg);
-  transition: opacity var(--scribo-transition-fast);
+  transition:
+    opacity var(--scribo-transition-fast),
+    background var(--scribo-transition-fast),
+    border-color var(--scribo-transition-fast);
+}
+
+.editor-chrome[data-mode="markdown"] {
+  border-bottom: 2px solid color-mix(in srgb, var(--scribo-ui-accent) 55%, var(--scribo-ui-border));
+  background: color-mix(in srgb, var(--scribo-md-source-bg) 35%, var(--scribo-ui-bg));
+}
+
+.editor-chrome[data-mode="markdown"] .editor-title {
+  font-family: var(--scribo-font-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.editor-mode-switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 2px;
+  border: 1px solid var(--scribo-ui-border-subtle);
+  border-radius: var(--scribo-radius-sm);
+  background: color-mix(in srgb, var(--scribo-ui-surface) 80%, transparent);
+}
+
+.editor-mode-switch-btn {
+  padding: var(--scribo-space-1) var(--scribo-space-3);
+  border: none;
+  border-radius: calc(var(--scribo-radius-sm) - 2px);
+  background: transparent;
+  font-family: var(--scribo-font-ui);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--scribo-ui-muted);
+  cursor: pointer;
+}
+
+.editor-mode-switch-btn[data-active="true"] {
+  background: var(--scribo-ui-canvas);
+  color: var(--scribo-ui-text);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--scribo-ui-text) 8%, transparent);
+}
+
+.editor-chrome[data-mode="markdown"] .editor-mode-switch-btn[data-active="true"] {
+  background: var(--scribo-md-source-bg);
+  color: var(--scribo-ui-accent);
+}
+
+.app-main[data-editor-view="markdown"] .editor-scroll {
+  background: var(--scribo-md-source-bg);
+}
+
+.app-main[data-editor-view="classic"] .editor-scroll {
+  background: var(--scribo-ui-canvas);
 }
 
 .app-shell[data-focus="true"] .editor-chrome {
@@ -267,6 +323,11 @@
 
 .format-bar-reference {
   gap: var(--scribo-space-2);
+}
+
+.editor-chrome[data-mode="markdown"] .format-bar-reference {
+  background: color-mix(in srgb, var(--scribo-md-source-bg) 65%, var(--scribo-ui-bg));
+  border-top-color: color-mix(in srgb, var(--scribo-ui-accent) 25%, var(--scribo-ui-border));
 }
 
 .format-bar-hint {
@@ -396,7 +457,7 @@
   overflow-y: auto;
 }
 
-.editor-scroll[data-view="split"] {
+.editor-scroll[data-view="markdown"] {
   overflow: hidden;
 }
 
@@ -463,7 +524,7 @@
   flex-direction: column;
 }
 
-.editor-scroll-inner[data-view="split"] {
+.editor-scroll-inner[data-view="markdown"] {
   min-height: 0;
   height: 100%;
 }
@@ -483,9 +544,21 @@
   flex-direction: column;
 }
 
+.editor-markdown-workspace {
+  border-top: 3px solid color-mix(in srgb, var(--scribo-ui-accent) 40%, transparent);
+}
+
 .editor-split-source {
-  border-right: 1px solid var(--scribo-ui-border-subtle);
+  border-right: 1px solid var(--scribo-ui-border);
   background: var(--scribo-md-source-bg);
+}
+
+.editor-split[data-preview="false"] .editor-split-source {
+  border-right: none;
+}
+
+.editor-split[data-preview="false"] .editor-split-pane {
+  flex: 1;
 }
 
 .editor-split-preview {
@@ -505,6 +578,50 @@
   background: color-mix(in srgb, var(--scribo-ui-border-subtle) 28%, transparent);
 }
 
+.editor-split-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--scribo-space-2);
+}
+
+.editor-split-label-title {
+  color: var(--scribo-ui-text-secondary);
+}
+
+.editor-split-source .editor-split-label {
+  background: color-mix(in srgb, var(--scribo-ui-accent) 10%, var(--scribo-md-source-bg));
+  border-bottom-color: var(--scribo-ui-border);
+}
+
+.editor-split-label-hint {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: var(--scribo-ui-muted);
+}
+
+.editor-split-preview-collapsed {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  justify-content: center;
+  width: 2.75rem;
+  padding: var(--scribo-space-3) var(--scribo-space-1);
+  border-left: 1px solid var(--scribo-ui-border-subtle);
+  background: var(--scribo-ui-surface);
+}
+
+.editor-split-preview-collapsed .sidebar-footer-btn {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  width: auto;
+  padding: var(--scribo-space-3) var(--scribo-space-2);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+}
+
 .markdown-source-stack {
   position: relative;
   min-height: 0;
@@ -520,6 +637,11 @@
 
 .markdown-source-stack .cm-editor .cm-scroller {
   overflow: auto;
+  overflow-x: hidden;
+}
+
+.markdown-source-stack .cm-editor {
+  max-width: 100%;
 }
 
 /* iA-style: `#`, `>`, `**` muted; body copy uses full theme text color */

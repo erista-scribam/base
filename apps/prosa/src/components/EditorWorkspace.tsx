@@ -14,6 +14,8 @@ export type EditorViewMode = "classic" | "split";
 export interface EditorWorkspaceProps {
   document: ProsaDocument;
   viewMode: EditorViewMode;
+  markdownPreviewVisible: boolean;
+  onToggleMarkdownPreview: () => void;
   onDocumentChange: (document: ProsaDocument) => void;
   onEditorReady: (editor: Editor | null) => void;
 }
@@ -21,6 +23,8 @@ export interface EditorWorkspaceProps {
 export function EditorWorkspace({
   document,
   viewMode,
+  markdownPreviewVisible,
+  onToggleMarkdownPreview,
   onDocumentChange,
   onEditorReady,
 }: EditorWorkspaceProps) {
@@ -73,7 +77,7 @@ export function EditorWorkspace({
 
   if (viewMode === "classic") {
     return (
-      <div className="editor-canvas-wrap">
+      <div className="editor-canvas-wrap editor-canvas-classic">
         <ProsaEditor
           document={document}
           onDocumentChange={onDocumentChange}
@@ -84,21 +88,40 @@ export function EditorWorkspace({
   }
 
   return (
-    <div className="editor-split">
+    <div
+      className="editor-split editor-markdown-workspace"
+      data-preview={markdownPreviewVisible ? "true" : "false"}
+    >
       <div className="editor-split-pane editor-split-source">
-        <div className="editor-split-label">Markdown source</div>
+        <div className="editor-split-label editor-split-label-row">
+          <span className="editor-split-label-title">Markdown source</span>
+          <span className="editor-split-label-hint">Plain text · saved to .md</span>
+        </div>
         <MarkdownSourceEditor
           value={markdown}
           onChange={handleMarkdownChange}
           aria-label="Markdown source"
         />
       </div>
-      <div className="editor-split-pane editor-split-preview">
-        <div className="editor-split-label">Preview</div>
-        <div className="editor-split-preview-scroll">
-          <ManuscriptPreview document={document} />
+      {markdownPreviewVisible ? (
+        <div className="editor-split-pane editor-split-preview">
+          <div className="editor-split-label editor-split-label-row">
+            <span className="editor-split-label-title">Preview</span>
+            <button type="button" className="text-btn" onClick={onToggleMarkdownPreview}>
+              Hide preview
+            </button>
+          </div>
+          <div className="editor-split-preview-scroll">
+            <ManuscriptPreview document={document} />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="editor-split-preview-collapsed">
+          <button type="button" className="sidebar-footer-btn" onClick={onToggleMarkdownPreview}>
+            Show preview
+          </button>
+        </div>
+      )}
     </div>
   );
 }
