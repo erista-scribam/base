@@ -37,12 +37,12 @@ This sets `core.hooksPath` to `.githooks/` (local git config, not committed). Th
 
 ## Automation
 
-| Item                   | Location                                       |
-| ---------------------- | ---------------------------------------------- |
-| CI on push/PR          | `.github/workflows/ci.yml`                              |
-| Version + tag          | `.github/workflows/version-packages.yml` (push `main`)  |
-| Desktop release builds | `.github/workflows/desktop-release.yml` (tag `v*.*.*`)  |
-| Dependency updates     | `.github/dependabot.yml`                                |
-| PR template            | `.github/pull_request_template.md`                      |
+| Item                   | Location                                               |
+| ---------------------- | ------------------------------------------------------ |
+| CI on push/PR          | `.github/workflows/ci.yml`                             |
+| Version + tag          | `.github/workflows/version-packages.yml` (push `main`) |
+| Desktop release builds | `.github/workflows/desktop-release.yml` (tag `v*.*.*`) |
+| Dependency updates     | `.github/dependabot.yml`                               |
+| PR template            | `.github/pull_request_template.md`                     |
 
 See `docs/RELEASE.md` for the Changesets release flow.
