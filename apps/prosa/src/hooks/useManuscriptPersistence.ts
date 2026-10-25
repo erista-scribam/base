@@ -14,14 +14,21 @@ export function useManuscriptPersistence(
   const documentRef = useRef<ProsaDocument | null>(null);
   const summaryRef = useRef(summary);
   const engineRef = useRef<ManuscriptPersistence | null>(null);
+  const callbacksRef = useRef({ onSaveState, onSaved, onError });
 
-  if (!engineRef.current) {
-    engineRef.current = new ManuscriptPersistence({
-      onStateChange: onSaveState,
-      onSaved,
-      onError,
-    });
-  }
+  useEffect(() => {
+    callbacksRef.current = { onSaveState, onSaved, onError };
+  }, [onSaveState, onSaved, onError]);
+
+  useEffect(() => {
+    if (engineRef.current == null) {
+      engineRef.current = new ManuscriptPersistence({
+        onStateChange: (state) => callbacksRef.current.onSaveState(state),
+        onSaved: (saved) => callbacksRef.current.onSaved(saved),
+        onError: (message) => callbacksRef.current.onError(message),
+      });
+    }
+  }, []);
 
   useEffect(() => {
     summaryRef.current = summary;
@@ -76,7 +83,11 @@ export function useManuscriptPersistence(
     };
   }, [flushNow]);
 
-  return { notifyDocumentChange, flushNow, setDocumentRef: (doc: ProsaDocument | null) => {
-    documentRef.current = doc;
-  } };
+  return {
+    notifyDocumentChange,
+    flushNow,
+    setDocumentRef: (doc: ProsaDocument | null) => {
+      documentRef.current = doc;
+    },
+  };
 }

@@ -17,7 +17,9 @@
   --scribo-editor-zoom: 1;
   --scribo-ms-font-size: calc(var(--scribo-ms-font-size-base) * var(--scribo-editor-zoom));
   --scribo-md-editor-font-size-base: 0.9375rem;
-  --scribo-md-editor-font-size: calc(var(--scribo-md-editor-font-size-base) * var(--scribo-editor-zoom));
+  --scribo-md-editor-font-size: calc(
+    var(--scribo-md-editor-font-size-base) * var(--scribo-editor-zoom)
+  );
   --scribo-ms-line-height: 1.68;
   --scribo-ms-paragraph-gap: 0.55em;
   --scribo-ms-pad-x: 1.25rem;

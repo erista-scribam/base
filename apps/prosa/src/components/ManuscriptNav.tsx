@@ -52,7 +52,12 @@ export function ManuscriptNav({
       <div className="app-sidebar-header">
         <span className="app-sidebar-label">Library</span>
         <div className="app-sidebar-actions">
-          <button type="button" className="text-btn" onClick={onOpenFile} title="Open markdown file">
+          <button
+            type="button"
+            className="text-btn"
+            onClick={onOpenFile}
+            title="Open markdown file"
+          >
             Open
           </button>
           <button type="button" className="text-btn" onClick={onCreate}>
@@ -118,7 +123,15 @@ export function ManuscriptNav({
 
 function IconReveal() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      aria-hidden
+    >
       <path d="M14 3h7v7M10 14L21 3M5 12v7h7" />
     </svg>
   );

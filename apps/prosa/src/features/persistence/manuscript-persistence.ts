@@ -106,11 +106,13 @@ export class ManuscriptPersistence {
     this.callbacks.onStateChange("saving");
 
     try {
-      await saveRecoverySnapshot(manuscriptId, document, summary);
+      await saveRecoverySnapshot(manuscriptId, document);
       const saved = await saveManuscriptDocument(manuscriptId, document, summary);
       await clearRecoverySnapshot(manuscriptId).catch(() => undefined);
       if (revision < this.revision) {
-        this.callbacks.onStateChange(this.revision > this.lastPersistedRevision ? "dirty" : "saved");
+        this.callbacks.onStateChange(
+          this.revision > this.lastPersistedRevision ? "dirty" : "saved",
+        );
         return;
       }
       this.lastPersistedRevision = revision;

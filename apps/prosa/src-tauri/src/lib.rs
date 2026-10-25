@@ -3,23 +3,24 @@ mod library;
 mod persistence;
 mod recovery;
 
+use crate::atomic_io::atomic_write;
 use library::{
-    absolute_path_for_entry, create_library_markdown, create_library_markdown_with_content,
-    ensure_default_library, get_library_info, import_external_markdown, is_library_manuscript_id,
-    clear_library_recovery, library_recovery_path, list_library_manuscripts, path_key_for_manuscript_id,
-    read_library_markdown, set_library_root, write_library_markdown, LibraryInfo,
+    LibraryInfo, absolute_path_for_entry, clear_library_recovery, create_library_markdown,
+    create_library_markdown_with_content, ensure_default_library, get_library_info,
+    import_external_markdown, is_library_manuscript_id, library_recovery_path,
+    list_library_manuscripts, path_key_for_manuscript_id, read_library_markdown, set_library_root,
+    write_library_markdown,
 };
 use persistence::{
-    delete_internal_manuscript, ManuscriptSummary,
-    list_manuscripts as list_internal_manuscripts, load_manuscript as load_internal_manuscript,
-    clear_recovery_snapshot as clear_internal_recovery_snapshot,
+    ManuscriptSummary, clear_recovery_snapshot as clear_internal_recovery_snapshot,
+    delete_internal_manuscript, list_manuscripts as list_internal_manuscripts,
+    load_manuscript as load_internal_manuscript,
     load_recovery_snapshot as load_recovery_snapshot_impl,
     save_recovery_snapshot as save_recovery_snapshot_impl,
 };
 use recovery::{parse_recovery, wrap_recovery};
 use serde::Serialize;
 use std::process::Command;
-use crate::atomic_io::atomic_write;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -54,7 +55,9 @@ fn list_manuscripts(app: tauri::AppHandle) -> Result<Vec<ManuscriptSummary>, Str
 }
 
 #[tauri::command]
-fn list_legacy_internal_manuscripts(app: tauri::AppHandle) -> Result<Vec<ManuscriptSummary>, String> {
+fn list_legacy_internal_manuscripts(
+    app: tauri::AppHandle,
+) -> Result<Vec<ManuscriptSummary>, String> {
     list_internal_manuscripts(app)
 }
 
@@ -191,7 +194,7 @@ fn reveal_path(path: &std::path::Path) -> Result<(), String> {
             .arg(path)
             .spawn()
             .map_err(|error| error.to_string())?;
-        return Ok(());
+        Ok(())
     }
     #[cfg(target_os = "windows")]
     {
@@ -199,7 +202,7 @@ fn reveal_path(path: &std::path::Path) -> Result<(), String> {
             .arg(format!("/select,{}", path.display()))
             .spawn()
             .map_err(|error| error.to_string())?;
-        return Ok(());
+        Ok(())
     }
     #[cfg(all(unix, not(target_os = "macos")))]
     {
@@ -209,7 +212,7 @@ fn reveal_path(path: &std::path::Path) -> Result<(), String> {
                 .spawn()
                 .map_err(|error| error.to_string())?;
         }
-        return Ok(());
+        Ok(())
     }
     #[cfg(not(any(target_os = "macos", target_os = "windows", unix)))]
     {
@@ -240,7 +243,10 @@ fn save_recovery_snapshot(
 }
 
 #[tauri::command]
-fn load_recovery_snapshot(app: tauri::AppHandle, id: String) -> Result<Option<RecoverySnapshot>, String> {
+fn load_recovery_snapshot(
+    app: tauri::AppHandle,
+    id: String,
+) -> Result<Option<RecoverySnapshot>, String> {
     if is_library_manuscript_id(&id) {
         let path_key = path_key_for_manuscript_id(&id).ok_or("Invalid library manuscript id")?;
         let recovery_path = library_recovery_path(&app, &path_key)?;

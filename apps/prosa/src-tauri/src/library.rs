@@ -101,7 +101,12 @@ pub fn get_library_info(app: &AppHandle) -> Result<LibraryInfo, String> {
 pub fn set_library_root(app: &AppHandle, root_path: String) -> Result<LibraryInfo, String> {
     let path = PathBuf::from(&root_path);
     fs::create_dir_all(&path).map_err(|error| error.to_string())?;
-    write_config(app, &LibraryConfig { root_path: path.clone() })?;
+    write_config(
+        app,
+        &LibraryConfig {
+            root_path: path.clone(),
+        },
+    )?;
     Ok(LibraryInfo {
         root_path: path.to_string_lossy().into_owned(),
         exists: true,
@@ -109,7 +114,10 @@ pub fn set_library_root(app: &AppHandle, root_path: String) -> Result<LibraryInf
 }
 
 pub fn manuscript_id_for_path(path_key: &str) -> String {
-    format!("{PATH_ID_PREFIX}{}", URL_SAFE_NO_PAD.encode(path_key.as_bytes()))
+    format!(
+        "{PATH_ID_PREFIX}{}",
+        URL_SAFE_NO_PAD.encode(path_key.as_bytes())
+    )
 }
 
 pub fn path_key_for_manuscript_id(id: &str) -> Option<String> {
@@ -158,7 +166,11 @@ fn resolve_library_path(root: &Path, path_key: &str) -> Result<PathBuf, String> 
     Ok(candidate)
 }
 
-fn walk_markdown_files(root: &Path, dir: &Path, entries: &mut Vec<(PathBuf, String)>) -> Result<(), String> {
+fn walk_markdown_files(
+    root: &Path,
+    dir: &Path,
+    entries: &mut Vec<(PathBuf, String)>,
+) -> Result<(), String> {
     for entry in fs::read_dir(dir).map_err(|error| error.to_string())? {
         let entry = entry.map_err(|error| error.to_string())?;
         let path = entry.path();
@@ -203,22 +215,19 @@ pub fn list_library_manuscripts(app: &AppHandle) -> Result<Vec<ManuscriptSummary
 
     let mut summaries = files
         .into_iter()
-        .filter_map(|(absolute, rel)| {
+        .map(|(absolute, rel)| {
             let modified = fs::metadata(&absolute)
                 .ok()
                 .and_then(|meta| meta.modified().ok())
-                .map(|time| {
-                    chrono::DateTime::<Utc>::from(time)
-                        .to_rfc3339()
-                })
+                .map(|time| chrono::DateTime::<Utc>::from(time).to_rfc3339())
                 .unwrap_or_else(|| Utc::now().to_rfc3339());
-            Some(ManuscriptSummary {
+            ManuscriptSummary {
                 id: manuscript_id_for_path(&rel),
                 title: title_from_path(&absolute),
                 updated_at: modified,
                 file_path: Some(rel),
                 source: Some("library".into()),
-            })
+            }
         })
         .collect::<Vec<_>>();
 
@@ -235,7 +244,11 @@ pub fn read_library_markdown(app: &AppHandle, path_key: String) -> Result<String
     fs::read_to_string(path).map_err(|error| error.to_string())
 }
 
-pub fn write_library_markdown(app: &AppHandle, path_key: String, markdown: String) -> Result<ManuscriptSummary, String> {
+pub fn write_library_markdown(
+    app: &AppHandle,
+    path_key: String,
+    markdown: String,
+) -> Result<ManuscriptSummary, String> {
     let config = read_config(app)?.ok_or("Library is not configured")?;
     let path = resolve_library_path(&config.root_path, &path_key)?;
     if let Some(parent) = path.parent() {
@@ -283,10 +296,12 @@ pub fn clear_library_recovery(app: &AppHandle, path_key: &str) -> Result<(), Str
 fn unique_markdown_path(root: &Path, title: &str) -> Result<(PathBuf, String), String> {
     let base_name = title
         .chars()
-        .map(|ch| if ch.is_ascii_alphanumeric() || ch == ' ' || ch == '-' || ch == '_' {
-            ch
-        } else {
-            ' '
+        .map(|ch| {
+            if ch.is_ascii_alphanumeric() || ch == ' ' || ch == '-' || ch == '_' {
+                ch
+            } else {
+                ' '
+            }
         })
         .collect::<String>()
         .split_whitespace()
@@ -313,7 +328,10 @@ fn unique_markdown_path(root: &Path, title: &str) -> Result<(PathBuf, String), S
     Ok((candidate, rel))
 }
 
-pub fn create_library_markdown(app: &AppHandle, title: String) -> Result<(ManuscriptSummary, String), String> {
+pub fn create_library_markdown(
+    app: &AppHandle,
+    title: String,
+) -> Result<(ManuscriptSummary, String), String> {
     create_library_markdown_with_content(app, title, String::new())
 }
 
@@ -344,7 +362,10 @@ pub fn create_library_markdown_with_content(
     ))
 }
 
-pub fn import_external_markdown(_app: &AppHandle, absolute_path: String) -> Result<(ManuscriptSummary, String), String> {
+pub fn import_external_markdown(
+    _app: &AppHandle,
+    absolute_path: String,
+) -> Result<(ManuscriptSummary, String), String> {
     let path = PathBuf::from(&absolute_path);
     if !path.is_absolute() {
         return Err("Path must be absolute".into());

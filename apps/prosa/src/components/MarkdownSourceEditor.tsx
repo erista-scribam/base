@@ -65,7 +65,7 @@ export const MarkdownSourceEditor = forwardRef<
       ...markdownSourceExtensions(),
       guideCompartment.of(guideExtensionFor(rulerMode, editorZoom)),
     ],
-    [],
+    [rulerMode, editorZoom],
   );
 
   useImperativeHandle(

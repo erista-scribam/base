@@ -228,11 +228,7 @@ export function EditorToolbar({
           <IconFocus />
         </IconButton>
       </header>
-      {viewMode === "classic" ? (
-        <FormatToolbar editor={editor} />
-      ) : (
-        <MarkdownFormatReferenceBar />
-      )}
+      {viewMode === "classic" ? <FormatToolbar editor={editor} /> : <MarkdownFormatReferenceBar />}
     </div>
   );
 }

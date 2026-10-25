@@ -63,5 +63,12 @@ export function useEditorZoom() {
     persist(EDITOR_ZOOM_DEFAULT);
   }, [persist]);
 
-  return { zoom, zoomIn, zoomOut, resetZoom, canZoomIn: zoom < EDITOR_ZOOM_MAX, canZoomOut: zoom > EDITOR_ZOOM_MIN };
+  return {
+    zoom,
+    zoomIn,
+    zoomOut,
+    resetZoom,
+    canZoomIn: zoom < EDITOR_ZOOM_MAX,
+    canZoomOut: zoom > EDITOR_ZOOM_MIN,
+  };
 }

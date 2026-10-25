@@ -192,38 +192,37 @@ export function App() {
     onZoomReset: resetZoom,
   });
 
-  const openManuscript = useCallback(async (id: string) => {
-    setError(null);
-    setNotice(null);
-    setExternalChange(false);
-    try {
-      let resolvedId = id;
-      if (isTauriRuntime() && isLegacyInternalManuscriptId(id)) {
-        const migrated = await migrateLegacyManuscriptToLibrary(id);
-        resolvedId = migrated.summary.id;
-        await refreshList();
+  const openManuscript = useCallback(
+    async (id: string) => {
+      setError(null);
+      setNotice(null);
+      setExternalChange(false);
+      try {
+        let resolvedId = id;
+        if (isTauriRuntime() && isLegacyInternalManuscriptId(id)) {
+          const migrated = await migrateLegacyManuscriptToLibrary(id);
+          resolvedId = migrated.summary.id;
+          await refreshList();
+        }
+        const loaded = await loadManuscript(resolvedId);
+        const recovery = await loadRecoveryCandidate(resolvedId);
+        const decision = resolveRecoveryOnOpen(loaded.document, loaded.summary.updatedAt, recovery);
+        if (decision.kind === "use_recovery") {
+          setNotice("Restored unsaved edits from recovery.");
+        }
+        setActiveId(resolvedId);
+        setDocument(decision.document);
+        setSaveState("idle");
+        if (isTauriRuntime()) {
+          const diskRevision = await getManuscriptDiskRevision(resolvedId);
+          setDiskRevisionAtOpen(diskRevision);
+        }
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : "Failed to open manuscript");
       }
-      const loaded = await loadManuscript(resolvedId);
-      const recovery = await loadRecoveryCandidate(resolvedId);
-      const decision = resolveRecoveryOnOpen(
-        loaded.document,
-        loaded.summary.updatedAt,
-        recovery,
-      );
-      if (decision.kind === "use_recovery") {
-        setNotice("Restored unsaved edits from recovery.");
-      }
-      setActiveId(resolvedId);
-      setDocument(decision.document);
-      setSaveState("idle");
-      if (isTauriRuntime()) {
-        const diskRevision = await getManuscriptDiskRevision(resolvedId);
-        setDiskRevisionAtOpen(diskRevision);
-      }
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Failed to open manuscript");
-    }
-  }, [refreshList]);
+    },
+    [refreshList],
+  );
 
   const handleCreate = useCallback(async () => {
     setError(null);
@@ -348,7 +347,9 @@ export function App() {
       } catch (cause) {
         const message = cause instanceof Error ? cause.message : "Could not reveal file";
         if (message.includes("legacy_internal")) {
-          setError("This manuscript is still in app storage. It will move to the library on next launch.");
+          setError(
+            "This manuscript is still in app storage. It will move to the library on next launch.",
+          );
           return;
         }
         setError(message);
@@ -395,10 +396,7 @@ export function App() {
           onRevealLibrary={handleRevealLibrary}
           onRevealActive={handleRevealActive}
         />
-        <main
-          className="app-main"
-          data-editor-view={viewMode === "split" ? "markdown" : "classic"}
-        >
+        <main className="app-main" data-editor-view={viewMode === "split" ? "markdown" : "classic"}>
           {document ? (
             <>
               <EditorToolbar

@@ -10,11 +10,7 @@ export interface MarkdownRulerProps {
   onSelectFullWidth: () => void;
 }
 
-export function MarkdownRuler({
-  mode,
-  onSelectLineLength,
-  onSelectFullWidth,
-}: MarkdownRulerProps) {
+export function MarkdownRuler({ mode, onSelectLineLength, onSelectFullWidth }: MarkdownRulerProps) {
   return (
     <div className="markdown-guide-bar">
       <label className="markdown-guide-label" htmlFor="markdown-line-length">

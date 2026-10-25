@@ -7,10 +7,7 @@ import {
   serializeProsaDocument,
   tryValidateProsaDocument,
 } from "@scribo/document-model";
-import {
-  markdownToProsaDocument,
-  prosaDocumentToMarkdown,
-} from "../markdown/prosa-markdown";
+import { markdownToProsaDocument, prosaDocumentToMarkdown } from "../markdown/prosa-markdown";
 import type { RecoveryCandidate } from "./recovery-policy";
 import { isLegacyInternalManuscriptId, isLibraryManuscript } from "./manuscript-id";
 
@@ -35,7 +32,11 @@ interface RecoverySnapshotPayload {
   documentJson: string;
 }
 
-export { isLegacyInternalManuscriptId, isLibraryManuscript, isLibraryManuscriptId } from "./manuscript-id";
+export {
+  isLegacyInternalManuscriptId,
+  isLibraryManuscript,
+  isLibraryManuscriptId,
+} from "./manuscript-id";
 
 function documentFromPayload(payload: LoadedManuscriptPayload): ProsaDocument {
   if (payload.markdown != null) {
@@ -178,11 +179,7 @@ export async function saveManuscriptDocument(
   });
 }
 
-export async function saveRecoverySnapshot(
-  id: string,
-  document: ProsaDocument,
-  _summary: ManuscriptSummary | null | undefined,
-): Promise<void> {
+export async function saveRecoverySnapshot(id: string, document: ProsaDocument): Promise<void> {
   const documentJson = serializeProsaDocument(document);
   await invoke("save_recovery_snapshot", { id, documentJson });
 }

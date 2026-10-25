@@ -29,13 +29,13 @@ pub fn wrap_recovery(document_json: String) -> String {
 }
 
 pub fn parse_recovery(raw: &str) -> RecoveryPayload {
-    if let Ok(envelope) = serde_json::from_str::<RecoveryEnvelope>(raw) {
-        if envelope.version == RECOVERY_VERSION {
-            return RecoveryPayload {
-                captured_at: envelope.captured_at,
-                document_json: envelope.document_json,
-            };
-        }
+    if let Ok(envelope) = serde_json::from_str::<RecoveryEnvelope>(raw)
+        && envelope.version == RECOVERY_VERSION
+    {
+        return RecoveryPayload {
+            captured_at: envelope.captured_at,
+            document_json: envelope.document_json,
+        };
     }
     RecoveryPayload {
         captured_at: Utc::now().to_rfc3339(),

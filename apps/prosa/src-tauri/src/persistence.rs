@@ -50,14 +50,16 @@ fn read_meta(path: &Path) -> Result<ManuscriptMeta, String> {
     serde_json::from_str(&raw).map_err(|error| error.to_string())
 }
 
+#[allow(dead_code)]
 fn write_meta(path: &Path, meta: &ManuscriptMeta) -> Result<(), String> {
     let raw = serde_json::to_string_pretty(meta).map_err(|error| error.to_string())?;
     atomic_write(path, &raw)
 }
 
+#[allow(dead_code)]
 fn validate_document_json(document_json: &str) -> Result<(), String> {
-    let value: serde_json::Value =
-        serde_json::from_str(document_json).map_err(|error| format!("Invalid document JSON: {error}"))?;
+    let value: serde_json::Value = serde_json::from_str(document_json)
+        .map_err(|error| format!("Invalid document JSON: {error}"))?;
     if !value.get("schemaVersion").is_some() || !value.get("blocks").is_some() {
         return Err("Document JSON is missing required fields".into());
     }
@@ -95,6 +97,7 @@ pub fn list_manuscripts(app: AppHandle) -> Result<Vec<ManuscriptSummary>, String
     Ok(summaries)
 }
 
+#[allow(dead_code)]
 pub fn create_manuscript(
     app: AppHandle,
     title: String,
@@ -153,6 +156,7 @@ pub fn load_manuscript(app: AppHandle, id: String) -> Result<(ManuscriptSummary,
     ))
 }
 
+#[allow(dead_code)]
 pub fn save_manuscript(
     app: AppHandle,
     id: String,
@@ -202,7 +206,10 @@ pub fn delete_internal_manuscript(app: &AppHandle, id: &str) -> Result<(), Strin
     Ok(())
 }
 
-pub fn load_recovery_snapshot(app: AppHandle, id: String) -> Result<Option<crate::recovery::RecoveryPayload>, String> {
+pub fn load_recovery_snapshot(
+    app: AppHandle,
+    id: String,
+) -> Result<Option<crate::recovery::RecoveryPayload>, String> {
     let path = manuscript_dir(&app, &id)?.join("recovery.json");
     if !path.exists() {
         return Ok(None);

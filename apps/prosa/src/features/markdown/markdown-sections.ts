@@ -15,8 +15,7 @@ export function parseMarkdownHeadingLine(
 }
 
 export type LineBoundary =
-  | { kind: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; title: string }
-  | { kind: "scene" };
+  { kind: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; title: string } | { kind: "scene" };
 
 export function lineBoundaryForText(text: string): LineBoundary | null {
   if (isSceneBreakLineRaw(text)) {
@@ -79,11 +78,7 @@ function referenceContentLine(doc: Text, lineNumber: number, prefer: "above" | "
   }
   const order = prefer === "above" ? [-1, 1] : [1, -1];
   for (const delta of order) {
-    for (
-      let line = lineNumber + delta;
-      delta < 0 ? line >= 1 : line <= doc.lines;
-      line += delta
-    ) {
+    for (let line = lineNumber + delta; delta < 0 ? line >= 1 : line <= doc.lines; line += delta) {
       if (!isBoundaryLine(doc, line)) {
         return line;
       }
@@ -187,10 +182,7 @@ export function buildMarkdownOutline(source: string): MarkdownOutlineEntry[] {
   return entries;
 }
 
-export function outlineEntryContainsLine(
-  entry: MarkdownOutlineEntry,
-  lineNumber: number,
-): boolean {
+export function outlineEntryContainsLine(entry: MarkdownOutlineEntry, lineNumber: number): boolean {
   if (entry.type === "scene_break") {
     return entry.line === lineNumber;
   }

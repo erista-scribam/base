@@ -1,4 +1,10 @@
-import { EditorView, ViewPlugin, Decoration, type DecorationSet, type ViewUpdate } from "@codemirror/view";
+import {
+  EditorView,
+  ViewPlugin,
+  Decoration,
+  type DecorationSet,
+  type ViewUpdate,
+} from "@codemirror/view";
 import { RangeSetBuilder } from "@codemirror/state";
 
 function bottomPadStyle(view: EditorView): string {

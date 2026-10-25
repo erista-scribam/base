@@ -1,5 +1,1 @@
-export {
-  sectionLineRange,
-  targetSectionEnd,
-  targetSectionStart,
-} from "./markdown-sections";
+export { sectionLineRange, targetSectionEnd, targetSectionStart } from "./markdown-sections";

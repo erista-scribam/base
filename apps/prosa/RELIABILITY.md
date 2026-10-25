@@ -18,12 +18,12 @@ Legacy manuscripts that were created in app storage are **migrated automatically
 
 ## Save status
 
-| Status | Meaning |
-|--------|---------|
-| Unsaved changes | Edits not yet flushed |
-| Saving… | Persist in progress |
-| Saved | Last flush succeeded |
-| Save failed | Disk error; edits remain in memory |
+| Status          | Meaning                            |
+| --------------- | ---------------------------------- |
+| Unsaved changes | Edits not yet flushed              |
+| Saving…         | Persist in progress                |
+| Saved           | Last flush succeeded               |
+| Save failed     | Disk error; edits remain in memory |
 
 ## Recovery
 

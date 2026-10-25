@@ -63,9 +63,7 @@ function cursorEndOfThisOrNextLine(view: EditorView, extend: boolean): boolean {
   const afterDown = view.state.selection.main.head;
   const nextEnd = visualLineEnd(view, afterDown);
   view.dispatch({
-    selection: extend
-      ? EditorSelection.range(anchor, nextEnd)
-      : EditorSelection.cursor(nextEnd),
+    selection: extend ? EditorSelection.range(anchor, nextEnd) : EditorSelection.cursor(nextEnd),
     scrollIntoView: true,
   });
   return true;
@@ -79,19 +77,13 @@ function moveToParagraphLine(view: EditorView, delta: -1 | 1, extend: boolean): 
     return false;
   }
   view.dispatch({
-    selection: extend
-      ? EditorSelection.range(anchor, newHead)
-      : EditorSelection.cursor(newHead),
+    selection: extend ? EditorSelection.range(anchor, newHead) : EditorSelection.cursor(newHead),
     scrollIntoView: true,
   });
   return true;
 }
 
-function moveToSectionBoundary(
-  view: EditorView,
-  which: "start" | "end",
-  extend: boolean,
-): boolean {
+function moveToSectionBoundary(view: EditorView, which: "start" | "end", extend: boolean): boolean {
   const head = view.state.selection.main.head;
   const anchor = view.state.selection.main.anchor;
   const pos =

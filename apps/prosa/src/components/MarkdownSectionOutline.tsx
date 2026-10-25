@@ -35,7 +35,9 @@ export function MarkdownSectionOutline({
   const entries = buildMarkdownOutline(markdown);
 
   if (entries.length === 0) {
-    return <p className="markdown-outline-empty">No sections yet — add headings or scene breaks.</p>;
+    return (
+      <p className="markdown-outline-empty">No sections yet — add headings or scene breaks.</p>
+    );
   }
 
   return (

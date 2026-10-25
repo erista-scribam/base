@@ -12,9 +12,7 @@ export function columnsForWrapMode(mode: MarkdownWrapMode): number | null {
   return mode.kind === "length" ? mode.columns : null;
 }
 
-export type MarkdownWrapMode =
-  | { kind: "length"; columns: IaLineLength }
-  | { kind: "full" };
+export type MarkdownWrapMode = { kind: "length"; columns: IaLineLength } | { kind: "full" };
 
 /** @deprecated alias for editor code */
 export type MarkdownRulerMode = MarkdownWrapMode;
@@ -58,10 +56,7 @@ export function useMarkdownRuler() {
   const [mode, setMode] = useState<MarkdownWrapMode>(readStored);
 
   useEffect(() => {
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      mode.kind === "full" ? "full" : String(mode.columns),
-    );
+    window.localStorage.setItem(STORAGE_KEY, mode.kind === "full" ? "full" : String(mode.columns));
   }, [mode]);
 
   const setLineLength = useCallback((columns: IaLineLength) => {
