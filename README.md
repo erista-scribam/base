@@ -48,15 +48,23 @@ pnpm tauri:build
 
 ## Scripts
 
-| Script | Purpose |
-| --- | --- |
-| `pnpm dev` | Vite dev server for Prosa |
-| `pnpm tauri:dev` | Tauri development window |
-| `pnpm tauri:build` | Bundle desktop app |
-| `pnpm test` | Run workspace tests |
-| `pnpm typecheck` | TypeScript check |
-| `pnpm lint` | ESLint |
-| `pnpm format` / `pnpm format:check` | Prettier |
+| Script                              | Purpose                            |
+| ----------------------------------- | ---------------------------------- |
+| `pnpm dev`                          | Vite dev server for Prosa          |
+| `pnpm tauri:dev`                    | Tauri development window           |
+| `pnpm tauri:build`                  | Bundle desktop app                 |
+| `pnpm test`                         | Run workspace tests                |
+| `pnpm typecheck`                    | TypeScript check                   |
+| `pnpm lint`                         | ESLint                             |
+| `pnpm format` / `pnpm format:check` | Prettier                           |
+| `pnpm verify`                       | Full JS/TS CI checks locally       |
+| `pnpm verify:all`                   | `verify` + Rust fmt, Clippy, check |
+
+## Version control & releases
+
+- Branching and hooks: `docs/VERSION_CONTROL.md`
+- Cutting releases (tags `v*.*.*`, GitHub Actions): `docs/RELEASE.md`
+- Change log: `CHANGELOG.md`
 
 ## Milestone status
 

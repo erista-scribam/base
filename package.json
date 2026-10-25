@@ -17,7 +17,11 @@
     "typecheck": "pnpm -r --if-present run typecheck",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm --filter @scribo/prosa build",
+    "verify:rust": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo check --workspace",
+    "verify:all": "pnpm verify && pnpm verify:rust",
+    "hooks:install": "sh scripts/setup-git-hooks.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

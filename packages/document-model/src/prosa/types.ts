@@ -37,10 +37,7 @@ export interface ProsaSceneBreakBlock {
 }
 
 export type ProsaBlock =
-  | ProsaHeadingBlock
-  | ProsaParagraphBlock
-  | ProsaBlockquoteBlock
-  | ProsaSceneBreakBlock;
+  ProsaHeadingBlock | ProsaParagraphBlock | ProsaBlockquoteBlock | ProsaSceneBreakBlock;
 
 export interface ProsaDocument {
   schemaVersion: ProsaSchemaVersion;

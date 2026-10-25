@@ -96,10 +96,7 @@ function blockFromTiptap(node: JSONContent): ProsaBlock | null {
   }
 }
 
-export function prosaDocumentFromTiptapJson(
-  base: ProsaDocument,
-  doc: JSONContent,
-): ProsaDocument {
+export function prosaDocumentFromTiptapJson(base: ProsaDocument, doc: JSONContent): ProsaDocument {
   const blocks: ProsaBlock[] = [];
   for (const node of doc.content ?? []) {
     const block = blockFromTiptap(node);

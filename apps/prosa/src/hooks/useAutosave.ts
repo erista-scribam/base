@@ -1,9 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { ProsaDocument } from "@scribo/document-model";
-import {
-  saveManuscript,
-  saveRecoverySnapshot,
-} from "../features/persistence/tauri-manuscripts";
+import { saveManuscript, saveRecoverySnapshot } from "../features/persistence/tauri-manuscripts";
 
 const AUTOSAVE_MS = 3000;
 

@@ -70,9 +70,7 @@ export function App() {
         .then(async (summary) => {
           setSaveState("saved");
           await refreshList();
-          setManuscripts((prev) =>
-            prev.map((item) => (item.id === summary.id ? summary : item)),
-          );
+          setManuscripts((prev) => prev.map((item) => (item.id === summary.id ? summary : item)));
         })
         .catch(() => setSaveState("error"));
     },
