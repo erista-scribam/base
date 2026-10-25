@@ -22,6 +22,8 @@
   --scribo-ms-paragraph-gap: 0.55em;
   --scribo-ms-pad-x: 1.25rem;
   --scribo-ms-pad-y: 1.5rem;
+  /** Extra scroll room below the last line so the caret is not pinned to the viewport bottom. */
+  --scribo-editor-pad-bottom: max(12rem, 48vh);
   --scribo-radius-sm: 4px;
   --scribo-radius-md: 6px;
 
@@ -67,6 +69,7 @@
 
   /* Markdown source (iA-style: body text full contrast, markers subdued) */
   --scribo-md-marker: #9a9488;
+  --scribo-scene-break-fg: #8a847a;
   --scribo-md-source-bg: var(--scribo-ui-surface);
 }
 
@@ -101,6 +104,7 @@
   --scribo-ui-focus-ring: 0 0 0 2px var(--scribo-ui-bg), 0 0 0 4px var(--scribo-ui-accent);
 
   --scribo-md-marker: #6f6a61;
+  --scribo-scene-break-fg: #a8a299;
   --scribo-md-source-bg: var(--scribo-ui-surface);
 }
 

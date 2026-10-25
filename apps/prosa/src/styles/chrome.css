@@ -183,6 +183,7 @@
 .app-main {
   display: flex;
   min-width: 0;
+  min-height: 0;
   flex: 1;
   flex-direction: column;
   background: var(--scribo-ui-bg);
@@ -511,7 +512,7 @@
 .editor-canvas-wrap {
   display: flex;
   justify-content: center;
-  padding: var(--scribo-ms-pad-y) var(--scribo-ms-pad-x) var(--scribo-space-6);
+  padding: var(--scribo-ms-pad-y) var(--scribo-ms-pad-x) var(--scribo-editor-pad-bottom);
   background: var(--scribo-ui-canvas);
 }
 
@@ -649,6 +650,111 @@
   color: var(--scribo-ui-muted);
 }
 
+.editor-split-side-tabs {
+  gap: var(--scribo-space-3);
+}
+
+.editor-side-tablist {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.editor-side-tab {
+  border: none;
+  border-radius: var(--scribo-radius-sm);
+  padding: 0.2rem 0.45rem;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--scribo-ui-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.editor-side-tab[data-active="true"] {
+  color: var(--scribo-ui-text-secondary);
+  background: color-mix(in srgb, var(--scribo-ui-accent) 14%, transparent);
+}
+
+.editor-side-tab:hover {
+  color: var(--scribo-ui-text);
+}
+
+.markdown-outline {
+  padding: var(--scribo-space-3) var(--scribo-ms-pad-x);
+}
+
+.markdown-outline-empty {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--scribo-ui-muted);
+}
+
+.markdown-outline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.markdown-outline-item {
+  margin: 0;
+}
+
+.markdown-outline-heading {
+  padding-left: calc((var(--outline-level, 1) - 1) * 0.75rem);
+}
+
+.markdown-outline-link,
+.markdown-outline-break-btn {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: var(--scribo-radius-sm);
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--scribo-ui-text-secondary);
+  background: transparent;
+  cursor: pointer;
+}
+
+.markdown-outline-passage-link {
+  font-style: italic;
+  color: var(--scribo-ui-muted);
+}
+
+.markdown-outline-link[data-active="true"],
+.markdown-outline-break-btn[data-active="true"] {
+  color: var(--scribo-ui-text);
+  background: color-mix(in srgb, var(--scribo-ui-accent) 12%, transparent);
+}
+
+.markdown-outline-link:hover,
+.markdown-outline-break-btn:hover {
+  background: color-mix(in srgb, var(--scribo-ui-border-subtle) 45%, transparent);
+}
+
+.markdown-outline-break {
+  padding: var(--scribo-space-1) 0;
+}
+
+.markdown-outline-break-btn {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--scribo-scene-break-fg);
+}
+
 .editor-split-preview-collapsed {
   display: flex;
   flex-shrink: 0;
@@ -727,23 +833,42 @@
 }
 
 .markdown-source-stack .markdown-codemirror {
-  flex: 1;
+  display: flex;
   min-height: 0;
+  flex: 1;
+  flex-direction: column;
 }
 
-.markdown-source-stack .cm-editor,
+.markdown-source-stack .markdown-codemirror > div {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
 .markdown-codemirror {
-  height: 100%;
+  background: transparent !important;
+}
+
+.markdown-source-stack .cm-editor {
+  display: flex !important;
+  min-height: 0;
+  max-width: 100%;
+  flex: 1;
+  flex-direction: column;
   background: transparent !important;
 }
 
 .markdown-source-stack .cm-editor .cm-scroller {
-  overflow: auto;
+  min-height: 0;
+  flex: 1 1 0;
   overflow-x: hidden;
+  overflow-y: auto !important;
 }
 
-.markdown-source-stack .cm-editor {
-  max-width: 100%;
+.cm-md-bottom-spacer {
+  width: 100%;
+  pointer-events: none;
 }
 
 /* iA-style: `#`, `>`, `**` muted; body copy uses full theme text color */
@@ -766,6 +891,23 @@
 
 .markdown-source-stack .cm-line.cm-md-list {
   padding-bottom: 0.2em;
+}
+
+.markdown-source-stack .cm-line.cm-md-break {
+  padding-left: 0 !important;
+  text-indent: 0 !important;
+  text-align: center;
+  letter-spacing: 0.4em;
+  color: var(--scribo-scene-break-fg);
+  padding-top: var(--ms-scene-break-gap, 1.75rem);
+  padding-bottom: var(--ms-scene-break-gap, 1.75rem);
+}
+
+/* Scene breaks are plain text; keep asterisks one color (not emphasis markup). */
+.markdown-source-stack .cm-line.cm-md-break span {
+  color: inherit !important;
+  font-weight: inherit !important;
+  font-style: normal !important;
 }
 
 .editor-split-source:focus-within {

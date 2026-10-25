@@ -111,7 +111,7 @@ function moveToSectionBoundary(
  * - Ctrl+↑/↓: previous/next paragraph (source line)
  * - Alt+↑/↓: start/end of wrapped line, then previous/next
  * - Cmd+←/→: start/end of source line
- * - Cmd+↑/↓: start/end of current scene (between `* * *` breaks)
+ * - Cmd+↑/↓: start/end of current section (headings + scene breaks)
  */
 const iaWriterNavigationKeymap = keymap.of([
   { key: "Ctrl-ArrowUp", run: (view) => moveToParagraphLine(view, -1, false) },

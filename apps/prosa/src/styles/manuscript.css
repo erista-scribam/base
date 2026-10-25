@@ -27,6 +27,13 @@
   caret-color: var(--scribo-ui-caret);
 }
 
+.manuscript-root .ProseMirror::after {
+  content: "";
+  display: block;
+  height: var(--scribo-editor-pad-bottom);
+  pointer-events: none;
+}
+
 .manuscript-root .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
@@ -112,6 +119,8 @@
 
 .manuscript-root .ProseMirror hr[data-scene-break],
 .manuscript-root.manuscript-preview hr[data-scene-break] {
+  display: block;
+  width: 100%;
   border: none;
   text-align: center;
   margin: var(--ms-scene-break-gap) 0;
@@ -122,7 +131,7 @@
   content: "* * *";
   letter-spacing: 0.4em;
   font-size: 0.875rem;
-  color: var(--scribo-ui-muted);
+  color: var(--scribo-scene-break-fg);
 }
 
 .manuscript-root .ProseMirror a,

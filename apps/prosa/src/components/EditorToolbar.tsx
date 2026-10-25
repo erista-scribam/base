@@ -179,7 +179,7 @@ export function EditorToolbar({
         </div>
         {isMarkdown ? (
           <IconButton
-            label={markdownPreviewVisible ? "Hide preview pane" : "Show preview pane"}
+            label={markdownPreviewVisible ? "Hide side panel" : "Show side panel"}
             active={markdownPreviewVisible}
             onClick={onToggleMarkdownPreview}
           >

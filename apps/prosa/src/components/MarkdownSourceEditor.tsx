@@ -1,7 +1,7 @@
-import { Compartment } from "@codemirror/state";
-import type { EditorView } from "@codemirror/view";
+import { Compartment, EditorSelection } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
-import { useEffect, useMemo, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 import {
   markdownGuideExtension,
   relayoutMarkdownColumnGuide,
@@ -25,6 +25,10 @@ function guideExtensionFor(mode: MarkdownWrapMode, editorZoom: number) {
   return markdownGuideExtension(bodyColumnLimit(mode), editorZoom);
 }
 
+export interface MarkdownSourceEditorHandle {
+  goToLine(line: number): void;
+}
+
 export interface MarkdownSourceEditorProps {
   value: string;
   onChange: (value: string) => void;
@@ -32,20 +36,29 @@ export interface MarkdownSourceEditorProps {
   onSelectLineLength: (columns: IaLineLength) => void;
   onRulerSelectFullWidth: () => void;
   editorZoom: number;
+  onCursorLineChange?: (line: number) => void;
   "aria-label"?: string;
 }
 
-export function MarkdownSourceEditor({
-  value,
-  onChange,
-  rulerMode,
-  onSelectLineLength,
-  onRulerSelectFullWidth,
-  editorZoom,
-  "aria-label": ariaLabel,
-}: MarkdownSourceEditorProps) {
+export const MarkdownSourceEditor = forwardRef<
+  MarkdownSourceEditorHandle,
+  MarkdownSourceEditorProps
+>(function MarkdownSourceEditor(
+  {
+    value,
+    onChange,
+    rulerMode,
+    onSelectLineLength,
+    onRulerSelectFullWidth,
+    editorZoom,
+    onCursorLineChange,
+    "aria-label": ariaLabel,
+  },
+  ref,
+) {
   const { theme } = useTheme();
   const editorViewRef = useRef<EditorView | null>(null);
+  const programmaticNavRef = useRef(false);
 
   const extensions = useMemo(
     () => [
@@ -53,6 +66,32 @@ export function MarkdownSourceEditor({
       guideCompartment.of(guideExtensionFor(rulerMode, editorZoom)),
     ],
     [],
+  );
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      goToLine(line: number) {
+        const view = editorViewRef.current;
+        if (!view) {
+          return;
+        }
+        const lineNumber = Math.min(Math.max(1, line), view.state.doc.lines);
+        const docLine = view.state.doc.line(lineNumber);
+        programmaticNavRef.current = true;
+        view.dispatch({
+          selection: EditorSelection.cursor(docLine.from),
+          effects: EditorView.scrollIntoView(docLine.from, { y: "start", yMargin: 72 }),
+          scrollIntoView: true,
+        });
+        requestAnimationFrame(() => {
+          view.focus();
+          programmaticNavRef.current = false;
+          onCursorLineChange?.(lineNumber);
+        });
+      },
+    }),
+    [onCursorLineChange],
   );
 
   useEffect(() => {
@@ -83,6 +122,18 @@ export function MarkdownSourceEditor({
         onCreateEditor={(view) => {
           editorViewRef.current = view;
           relayoutMarkdownColumnGuide(view);
+          const head = view.state.selection.main.head;
+          onCursorLineChange?.(view.state.doc.lineAt(head).number);
+        }}
+        onUpdate={(update) => {
+          if (programmaticNavRef.current) {
+            return;
+          }
+          if (!update.selectionSet && !update.focusChanged) {
+            return;
+          }
+          const head = update.state.selection.main.head;
+          onCursorLineChange?.(update.state.doc.lineAt(head).number);
         }}
         basicSetup={{
           lineNumbers: false,
@@ -97,4 +148,4 @@ export function MarkdownSourceEditor({
       />
     </div>
   );
-}
+});

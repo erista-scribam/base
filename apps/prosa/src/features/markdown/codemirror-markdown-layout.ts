@@ -5,6 +5,8 @@ import { EditorView, ViewPlugin, Decoration, type DecorationSet } from "@codemir
 import { RangeSetBuilder } from "@codemirror/state";
 import { prosaMarkdownNavigationExtensions } from "./markdown-source-arrows";
 import { prosaMarkdownShiftEnterKeymap } from "./markdown-source-enter";
+import { isSceneBreakLineRaw } from "./markdown-source-layout";
+import { markdownEditorBottomSpace } from "./markdown-editor-bottom-space";
 
 /** Fixed marker column width (`##### `). Body text starts after this. */
 export const MARKDOWN_MARKER_COLUMNS = 6;
@@ -15,6 +17,9 @@ export const MARKDOWN_BODY_COLUMN_CH = MARKDOWN_MARKER_COLUMNS;
 type LineKind = "heading" | "quote" | "list" | "break" | "body";
 
 export function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number } {
+  if (isSceneBreakLineRaw(text.trim())) {
+    return { kind: "break", markerCh: 0 };
+  }
   const heading = /^(#{1,5}) /.exec(text);
   if (heading) {
     return { kind: "heading", markerCh: heading[0].length };
@@ -42,10 +47,6 @@ export function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number
   if (text.trimStart().startsWith("```")) {
     return { kind: "break", markerCh: 0 };
   }
-  const trimmed = text.trim();
-  if (trimmed === "* * *" || trimmed === "***" || trimmed === "---" || trimmed === "___") {
-    return { kind: "break", markerCh: 0 };
-  }
   return { kind: "body", markerCh: 0 };
 }
 
@@ -63,8 +64,8 @@ function buildLineDecorations(view: EditorView): DecorationSet {
       line.from,
       line.from,
       Decoration.line({
+        class: classes.join(" "),
         attributes: {
-          class: classes.join(" "),
           style: `--md-marker-ch:${meta.markerCh}`,
         },
       }),
@@ -108,13 +109,19 @@ const prosaMarkdownHighlight = HighlightStyle.define([
 
 const markdownSourceEditorTheme = EditorView.theme({
   "&": {
+    display: "flex",
+    flexDirection: "column",
     height: "100%",
+    maxHeight: "100%",
     backgroundColor: "transparent",
   },
   "&.cm-focused": {
     outline: "none",
   },
   ".cm-scroller": {
+    flex: "1 1 0",
+    minHeight: "0",
+    overflowY: "auto",
     fontFamily: "var(--scribo-font-mono)",
     fontSize: "var(--scribo-md-editor-font-size)",
     lineHeight: "var(--scribo-ms-line-height)",
@@ -123,7 +130,7 @@ const markdownSourceEditorTheme = EditorView.theme({
   },
   ".cm-content": {
     caretColor: "var(--scribo-ui-caret)",
-    padding: "var(--scribo-ms-pad-y) var(--scribo-ms-pad-x)",
+    padding: "var(--scribo-ms-pad-y) var(--scribo-ms-pad-x) 0",
     maxWidth: "var(--scribo-ms-max-width)",
     width: "100%",
     margin: "0 auto",
@@ -148,21 +155,32 @@ const markdownSourceEditorTheme = EditorView.theme({
   ".cm-md-line": {
     paddingLeft: "var(--md-marker-width, calc(6 * 0.6em))",
   },
-  ".cm-md-line.cm-md-heading, .cm-md-line.cm-md-quote, .cm-md-line.cm-md-list": {
+  ".cm-md-line.cm-md-heading, .cm-md-line.cm-md-quote": {
     textIndent: "calc(-1 * var(--md-marker-ch) * var(--md-char-width, 0.6em))",
+  },
+  ".cm-md-line.cm-md-list": {
+    paddingLeft: "calc(var(--md-marker-ch) * var(--md-char-width, 0.6em))",
+    textIndent: "0",
   },
   ".cm-md-line.cm-md-break": {
     paddingLeft: "0",
     textAlign: "center",
-    color: "var(--scribo-md-marker)",
+    color: "var(--scribo-scene-break-fg)",
   },
 });
+
+const markdownScrollMargins = EditorView.scrollMargins.of((view) => ({
+  top: 72,
+  bottom: Math.round(view.scrollDOM.clientHeight * 0.48),
+}));
 
 export function markdownSourceExtensions() {
   return [
     markdown({ base: markdownLanguage }),
     markdownSourceLayoutPlugin,
     markdownSourceEditorTheme,
+    markdownEditorBottomSpace,
+    markdownScrollMargins,
     syntaxHighlighting(prosaMarkdownHighlight, { fallback: true }),
     EditorView.lineWrapping,
     ...prosaMarkdownNavigationExtensions,

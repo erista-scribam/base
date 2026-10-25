@@ -52,6 +52,19 @@ Meh`;
     expect(doc.blocks.filter((block) => block.type === "paragraph")).toHaveLength(3);
   });
 
+  it("preserves prose after ordered lists when exporting markdown", () => {
+    const base = createEmptyProsaDocument("Test");
+    const md = "Intro line\n1. one\n2. two\nAfter the list\nStill here";
+    const doc = markdownToProsaDocument(base, md);
+    expect(prosaDocumentToMarkdown(doc)).toBe(md);
+    expect(doc.blocks.map((block) => block.type)).toEqual([
+      "paragraph",
+      "list",
+      "paragraph",
+      "paragraph",
+    ]);
+  });
+
   it("does not treat scene breaks as bullet lists", () => {
     const base = createEmptyProsaDocument("Test");
     const doc = markdownToProsaDocument(base, "Before\n* * *\nAfter");
