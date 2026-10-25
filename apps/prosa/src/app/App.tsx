@@ -237,23 +237,26 @@ export function App() {
   }, [refreshList]);
 
   const handleSaved = useCallback(
-    async (saved: ManuscriptSummary) => {
+    async (saved: ManuscriptSummary, savedFromManuscriptId: string) => {
       await refreshList();
       setManuscripts((prev) => prev.map((item) => (item.id === saved.id ? saved : item)));
-      if (isTauriRuntime() && activeId) {
-        const diskRevision = await getManuscriptDiskRevision(activeId);
+      setActiveId((current) =>
+        current === savedFromManuscriptId || current === saved.id ? saved.id : current,
+      );
+      if (isTauriRuntime()) {
+        const diskRevision = await getManuscriptDiskRevision(saved.id);
         setDiskRevisionAtOpen(diskRevision);
         setExternalChange(false);
       }
     },
-    [activeId, refreshList],
+    [refreshList],
   );
 
   const { notifyDocumentChange, setDocumentRef } = useManuscriptPersistence(
     activeId,
     activeSummary,
     setSaveState,
-    (saved) => void handleSaved(saved),
+    (saved, savedFromManuscriptId) => void handleSaved(saved, savedFromManuscriptId),
     (message) => setError(message),
   );
 
