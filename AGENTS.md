@@ -4,7 +4,7 @@ Scribam Prosa is a local-first Tauri desktop writing app. Follow this file befor
 
 ## Non-negotiables
 
-- Read [docs/product/philosophy.md](docs/product/philosophy.md) and [docs/product/invariants.md](docs/product/invariants.md).
+- Read [docs/product/philosophy.md](docs/product/philosophy.md) and [docs/product/invariants.md](docs/product/invariants.md). Brand naming and assets: [MASTERPLAN.md](MASTERPLAN.md) §3 and [docs/brands/scribam-brand-kit/](docs/brands/scribam-brand-kit/).
 - Persistence, recovery, and schema changes require explicit failure-mode thinking and tests.
 - Analysis and annotations must not silently mutate manuscript content.
 - Do not commit secrets, real user manuscripts, or credentials.

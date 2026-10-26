@@ -1,6 +1,6 @@
 # Scribam Brand Kit — v1.0
 
-Vector assets and tokens aligned with the [brand sheet](./brand-sheet-v1.jpg). **Scribam** (_scribam_, “let me write”) is the primary line; **(instead of edit)** is the secondary tagline on lockups. Product law: [philosophy.md](../../product/philosophy.md).
+Vector assets and tokens aligned with the [brand sheet](./brand-sheet-v1.jpg). **Scribam** (_scribam_, “let me write”) is the primary line; **(instead of edit)** is the secondary tagline on lockups. Product law: [philosophy.md](../../product/philosophy.md). **Reusable plan summary:** [MASTERPLAN.md](../../../MASTERPLAN.md) §3.
 
 ## Files
 

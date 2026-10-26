@@ -18,6 +18,8 @@ Start here for product and engineering knowledge. **One topic, one canonical fil
 | [product/roadmap.md](./product/roadmap.md)                                   | Phased delivery                             |
 | [product/known-limitations.md](./product/known-limitations.md)               | Current gaps                                |
 | [product/licensing.md](./product/licensing.md)                               | Open core (AGPL) vs premium services        |
+| [brands/scribam-brand-kit/](./brands/scribam-brand-kit/)                     | Logos, palette, app icons (marketing)       |
+| [../MASTERPLAN.md](../MASTERPLAN.md) §3                                      | Brand plan summary (reuse across apps)      |
 
 ## Engineering
 
