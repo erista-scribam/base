@@ -1,5 +1,11 @@
 # @scribam/document-model
 
+## 0.5.1
+
+### Patch Changes
+
+- @scribam/core@0.5.1
+
 ## 0.5.0
 
 ### Patch Changes
