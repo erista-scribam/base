@@ -22,6 +22,8 @@ export interface SourceControlPanelProps {
   onGitOperationComplete: (result: ProjectVersionControl) => void | Promise<void>;
   onBeforeGitOperation: () => void | Promise<void>;
   onOpenChangedPath: (relativePath: string) => void;
+  activeDiffPath: string | null;
+  onOpenDiffTab: (relativePath: string) => void;
 }
 
 function BranchSwitcher({
@@ -184,6 +186,8 @@ export function SourceControlPanel({
   onGitOperationComplete,
   onBeforeGitOperation,
   onOpenChangedPath,
+  activeDiffPath,
+  onOpenDiffTab,
 }: SourceControlPanelProps) {
   const [status, setStatus] = useState<ProjectVersionControl | null>(null);
   const [summary, setSummary] = useState("");
@@ -303,7 +307,8 @@ export function SourceControlPanel({
               )}
               <ChangedFilesList
                 files={status.changedFiles ?? []}
-                refreshKey={refreshKey}
+                activeDiffPath={activeDiffPath}
+                onOpenDiff={onOpenDiffTab}
                 onOpenInEditor={onOpenChangedPath}
               />
               <div className="sc-commit-box">

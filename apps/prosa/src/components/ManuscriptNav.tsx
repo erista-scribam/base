@@ -13,6 +13,8 @@ import { SourceControlPanel } from "./SourceControlPanel";
 export interface ManuscriptNavProps {
   manuscripts: ManuscriptSummary[];
   activeId: string | null;
+  activeDiffPath: string | null;
+  onOpenDiffTab: (relativePath: string) => void;
   libraryPath: string | null;
   projectTitle: string | null;
   sidebarProjectView: SidebarProjectView;
@@ -41,6 +43,8 @@ export interface ManuscriptNavProps {
 export function ManuscriptNav({
   manuscripts,
   activeId,
+  activeDiffPath,
+  onOpenDiffTab,
   libraryPath,
   projectTitle,
   sidebarProjectView,
@@ -119,6 +123,8 @@ export function ManuscriptNav({
                     await onGitOperationComplete(result.workspaceUpdated === true);
                   }}
                   onOpenChangedPath={onOpenRepoPath}
+                  activeDiffPath={activeDiffPath}
+                  onOpenDiffTab={onOpenDiffTab}
                 />
               ) : (
                 <div className="sidebar-panel-scroll sidebar-explorer-body">

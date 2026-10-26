@@ -6,6 +6,7 @@ import { ManuscriptNav } from "../components/ManuscriptNav";
 import { MergeConflictOverlay } from "../components/MergeConflictOverlay";
 import { EditorTabBar } from "../components/EditorTabBar";
 import { EditorToolbar } from "../components/EditorToolbar";
+import { GitDiffEditorTab } from "../components/GitDiffEditorTab";
 import { EmptyWorkspace } from "../components/EmptyWorkspace";
 import {
   EditorWorkspace,
@@ -50,6 +51,7 @@ import { useProjectGitStatus } from "../hooks/useProjectGitStatus";
 import { useEditorTabs } from "../hooks/useEditorTabs";
 import { useSidebarProjectView } from "../hooks/useSidebarProjectView";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
+import { diffTabId, isDiffTabId, parseDiffTabId } from "../features/editor/editor-tab-ids";
 
 export function App() {
   const [manuscripts, setManuscripts] = useState<ManuscriptSummary[]>([]);
@@ -85,7 +87,13 @@ export function App() {
   const { openTabIds, registerTab, unregisterTab, replaceTabId, pickAdjacentTabId, setOpenTabIds } =
     useEditorTabs();
 
-  const activeSummary = manuscripts.find((item) => item.id === activeId) ?? null;
+  const activeDiffPath = activeId ? parseDiffTabId(activeId) : null;
+  const persistenceManuscriptId =
+    activeId && !isDiffTabId(activeId) ? activeId : (document?.id ?? null);
+  const activeSummary =
+    persistenceManuscriptId != null
+      ? (manuscripts.find((item) => item.id === persistenceManuscriptId) ?? null)
+      : null;
   const manuscriptsById = useMemo(
     () => new Map(manuscripts.map((item) => [item.id, item])),
     [manuscripts],
@@ -132,9 +140,9 @@ export function App() {
     }
     const onFocus = () => {
       void refreshList();
-      const id = activeId;
+      const id = persistenceManuscriptId;
       const baseline = diskRevisionAtOpen;
-      if (!id || !baseline) {
+      if (!id || !baseline || activeDiffPath) {
         return;
       }
       if (saveStateRef.current === "saving") {
@@ -167,7 +175,7 @@ export function App() {
     };
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
-  }, [activeId, diskRevisionAtOpen, refreshList]);
+  }, [activeDiffPath, diskRevisionAtOpen, persistenceManuscriptId, refreshList]);
 
   useEffect(() => {
     if (!isTauriRuntime()) {
@@ -251,7 +259,7 @@ export function App() {
       }
       setExternalChange(false);
       try {
-        if (activeId && activeId !== id) {
+        if (activeId && activeId !== id && !isDiffTabId(activeId)) {
           await flushNowRef.current();
         }
         let resolvedId = id;
@@ -374,7 +382,7 @@ export function App() {
   );
 
   const { notifyDocumentChange, setDocumentRef, flushNow } = useManuscriptPersistence(
-    activeId,
+    persistenceManuscriptId,
     activeSummary,
     setSaveState,
     (saved, savedFromManuscriptId) => void handleSaved(saved, savedFromManuscriptId),
@@ -389,20 +397,45 @@ export function App() {
     await flushNow();
   }, [flushNow]);
 
+  const openDiffTab = useCallback(
+    (relativePath: string) => {
+      void (async () => {
+        const tabId = diffTabId(relativePath);
+        if (activeId && activeId !== tabId && !isDiffTabId(activeId)) {
+          await flushNow();
+        }
+        registerTab(tabId);
+        setActiveId(tabId);
+        setSidebarCollapsed(false);
+        setFocusMode(false);
+      })();
+    },
+    [activeId, flushNow, registerTab],
+  );
+
   const switchEditorTab = useCallback(
     (id: string) => {
       if (id === activeId) {
         return;
       }
+      if (isDiffTabId(id)) {
+        void (async () => {
+          if (activeId && !isDiffTabId(activeId)) {
+            await flushNow();
+          }
+          setActiveId(id);
+        })();
+        return;
+      }
       void openManuscript(id);
     },
-    [activeId, openManuscript],
+    [activeId, flushNow, openManuscript],
   );
 
   const closeEditorTab = useCallback(
     (id: string) => {
       void (async () => {
-        if (activeId === id) {
+        if (activeId === id && !isDiffTabId(id)) {
           await flushNow();
         }
         const nextId = pickAdjacentTabId(id);
@@ -411,7 +444,11 @@ export function App() {
           return;
         }
         if (nextId) {
-          await openManuscript(nextId);
+          if (isDiffTabId(nextId)) {
+            setActiveId(nextId);
+          } else {
+            await openManuscript(nextId);
+          }
         } else {
           setActiveId(null);
           setDocument(null);
@@ -427,7 +464,7 @@ export function App() {
     async (workspaceUpdated: boolean) => {
       await refreshList();
       setVersionControlRefreshKey((value) => value + 1);
-      if (workspaceUpdated && activeId) {
+      if (workspaceUpdated && activeId && !isDiffTabId(activeId)) {
         await openManuscript(activeId, { preferDisk: true });
         setNotice("Project files on disk changed — manuscript reloaded.");
       }
@@ -593,11 +630,11 @@ export function App() {
   }, [document, setDocumentRef]);
 
   const handleReloadExternal = useCallback(() => {
-    if (!activeId) {
+    if (!persistenceManuscriptId) {
       return;
     }
-    void openManuscript(activeId);
-  }, [activeId, openManuscript]);
+    void openManuscript(persistenceManuscriptId);
+  }, [openManuscript, persistenceManuscriptId]);
 
   const handleDeleteManuscript = useCallback(
     (id: string) => {
@@ -696,7 +733,9 @@ export function App() {
       <div className="app-body" key={layoutKey}>
         <ManuscriptNav
           manuscripts={manuscripts}
-          activeId={activeId}
+          activeId={persistenceManuscriptId}
+          activeDiffPath={activeDiffPath}
+          onOpenDiffTab={openDiffTab}
           libraryPath={libraryPath}
           projectTitle={projectTitle}
           sidebarProjectView={sidebarProjectView}
@@ -722,64 +761,76 @@ export function App() {
           onGitOperationComplete={handleGitOperationComplete}
         />
         <main className="app-main" data-editor-view={viewMode === "split" ? "markdown" : "classic"}>
-          {document ? (
+          {openTabIds.length > 0 || document || activeDiffPath ? (
             <>
-              <EditorTabBar
-                openTabIds={openTabIds}
-                activeId={activeId}
-                manuscriptsById={manuscriptsById}
-                saveState={saveState}
-                onSelectTab={switchEditorTab}
-                onCloseTab={closeEditorTab}
-              />
-              <EditorToolbar
-                title={document.title}
-                onTitleChange={handleTitleChange}
-                saveState={saveState}
-                sidebarCollapsed={sidebarCollapsed}
-                onToggleSidebar={toggleSidebar}
-                focusMode={focusMode}
-                onToggleFocusMode={toggleFocusMode}
-                editor={editor}
-                viewMode={viewMode}
-                onToggleViewMode={toggleViewMode}
-                markdownPreviewVisible={markdownPreviewVisible}
-                onToggleMarkdownPreview={toggleMarkdownPreview}
-                theme={theme}
-                onToggleTheme={toggleTheme}
-                editorZoom={zoom}
-                canZoomIn={canZoomIn}
-                canZoomOut={canZoomOut}
-                onZoomIn={zoomIn}
-                onZoomOut={zoomOut}
-                onZoomReset={resetZoom}
-                onMarkdownFormat={viewMode === "split" ? handleMarkdownFormat : undefined}
-                gitBranch={gitInitialized ? currentBranch : null}
-                gitChangeCount={changeCount}
-                gitMergeInProgress={mergeInProgress}
-                onGitBranchClick={openSourceControlSidebar}
-              />
-              <div
-                className="editor-scroll"
-                data-view={viewMode === "split" ? "markdown" : "classic"}
-              >
-                <div
-                  className="editor-scroll-inner"
-                  data-view={viewMode === "split" ? "markdown" : "classic"}
-                >
-                  <EditorWorkspace
-                    ref={workspaceRef}
-                    key={document.id}
-                    document={document}
+              {openTabIds.length > 0 ? (
+                <EditorTabBar
+                  openTabIds={openTabIds}
+                  activeId={activeId}
+                  manuscriptsById={manuscriptsById}
+                  saveState={saveState}
+                  onSelectTab={switchEditorTab}
+                  onCloseTab={closeEditorTab}
+                />
+              ) : null}
+              {activeDiffPath ? (
+                <GitDiffEditorTab
+                  relativePath={activeDiffPath}
+                  refreshKey={versionControlRefreshKey}
+                  onOpenInEditor={() => handleOpenRepoPath(activeDiffPath)}
+                />
+              ) : document ? (
+                <>
+                  <EditorToolbar
+                    title={document.title}
+                    onTitleChange={handleTitleChange}
+                    saveState={saveState}
+                    sidebarCollapsed={sidebarCollapsed}
+                    onToggleSidebar={toggleSidebar}
+                    focusMode={focusMode}
+                    onToggleFocusMode={toggleFocusMode}
+                    editor={editor}
                     viewMode={viewMode}
+                    onToggleViewMode={toggleViewMode}
                     markdownPreviewVisible={markdownPreviewVisible}
                     onToggleMarkdownPreview={toggleMarkdownPreview}
-                    onDocumentChange={handleDocumentChange}
-                    onEditorReady={handleEditorReady}
+                    theme={theme}
+                    onToggleTheme={toggleTheme}
                     editorZoom={zoom}
+                    canZoomIn={canZoomIn}
+                    canZoomOut={canZoomOut}
+                    onZoomIn={zoomIn}
+                    onZoomOut={zoomOut}
+                    onZoomReset={resetZoom}
+                    onMarkdownFormat={viewMode === "split" ? handleMarkdownFormat : undefined}
+                    gitBranch={gitInitialized ? currentBranch : null}
+                    gitChangeCount={changeCount}
+                    gitMergeInProgress={mergeInProgress}
+                    onGitBranchClick={openSourceControlSidebar}
                   />
-                </div>
-              </div>
+                  <div
+                    className="editor-scroll"
+                    data-view={viewMode === "split" ? "markdown" : "classic"}
+                  >
+                    <div
+                      className="editor-scroll-inner"
+                      data-view={viewMode === "split" ? "markdown" : "classic"}
+                    >
+                      <EditorWorkspace
+                        ref={workspaceRef}
+                        key={document.id}
+                        document={document}
+                        viewMode={viewMode}
+                        markdownPreviewVisible={markdownPreviewVisible}
+                        onToggleMarkdownPreview={toggleMarkdownPreview}
+                        onDocumentChange={handleDocumentChange}
+                        onEditorReady={handleEditorReady}
+                        editorZoom={zoom}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : null}
             </>
           ) : (
             <EmptyWorkspace onCreate={() => void handleCreate()} />

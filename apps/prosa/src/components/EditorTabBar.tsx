@@ -1,4 +1,5 @@
 import type { ManuscriptSummary } from "@scribo/core";
+import { isDiffTabId, parseDiffTabId } from "../features/editor/editor-tab-ids";
 import { splitRepoPath } from "../features/projects/project-tree";
 
 export interface EditorTabBarProps {
@@ -11,6 +12,10 @@ export interface EditorTabBarProps {
 }
 
 function tabLabel(summary: ManuscriptSummary | undefined, id: string): string {
+  const diffPath = parseDiffTabId(id);
+  if (diffPath) {
+    return splitRepoPath(diffPath).fileName;
+  }
   if (summary?.filePath) {
     return splitRepoPath(summary.filePath.replace(/\\/g, "/")).fileName;
   }
@@ -35,7 +40,10 @@ export function EditorTabBar({
         const summary = manuscriptsById.get(id);
         const label = tabLabel(summary, id);
         const isActive = id === activeId;
-        const showDirty = isActive && (saveState === "dirty" || saveState === "saving");
+        const isDiff = isDiffTabId(id);
+        const showDirty = isActive && !isDiff && (saveState === "dirty" || saveState === "saving");
+        const diffPath = parseDiffTabId(id);
+        const title = diffPath ?? summary?.filePath ?? summary?.title ?? id;
 
         return (
           <div
@@ -44,14 +52,16 @@ export function EditorTabBar({
             role="tab"
             aria-selected={isActive}
             data-active={isActive ? "true" : undefined}
+            data-kind={isDiff ? "diff" : "file"}
           >
             <button
               type="button"
               className="editor-tab-label"
-              title={summary?.filePath ?? summary?.title ?? id}
+              title={title}
               onClick={() => onSelectTab(id)}
             >
               {showDirty ? <span className="editor-tab-dirty" aria-hidden /> : null}
+              {isDiff ? <span className="editor-tab-diff-badge">M</span> : null}
               <span className="editor-tab-name">{label}</span>
             </button>
             <button

@@ -1907,6 +1907,71 @@ button.git-branch-chip:hover {
   background: var(--scribo-ui-hover);
 }
 
+.editor-tab[data-kind="diff"] .editor-tab-diff-badge {
+  flex-shrink: 0;
+  padding: 0 0.2rem;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--scribo-ui-accent, #3b82f6) 25%, var(--scribo-ui-canvas));
+  color: var(--scribo-ui-accent, #3b82f6);
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.editor-diff-tab {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--scribo-ui-bg);
+}
+
+.editor-diff-tab-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--scribo-space-2);
+  padding: 0.375rem var(--scribo-space-3);
+  border-bottom: 1px solid var(--scribo-ui-border-subtle);
+  background: color-mix(in srgb, var(--scribo-ui-canvas) 45%, var(--scribo-ui-surface));
+}
+
+.editor-diff-tab-path {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--scribo-font-mono, ui-monospace, monospace);
+  font-size: 0.75rem;
+  color: var(--scribo-ui-muted);
+}
+
+.editor-diff-tab-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  padding: var(--scribo-space-2);
+}
+
+.editor-diff-compare {
+  flex: 1;
+  min-height: 0;
+  border: 1px solid color-mix(in srgb, var(--scribo-ui-text) 10%, var(--scribo-ui-border-subtle));
+  border-radius: var(--scribo-radius-sm);
+}
+
+.editor-diff-compare .merge-conflict-pane pre {
+  max-height: none;
+  font-size: 0.75rem;
+}
+
+.editor-diff-tab-placeholder {
+  margin: auto;
+  font-size: 0.8125rem;
+  color: var(--scribo-ui-muted);
+}
+
 .app-main {
   display: flex;
   min-width: 0;

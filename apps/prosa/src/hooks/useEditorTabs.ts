@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { isPersistedEditorTabId } from "../features/editor/editor-tab-ids";
 
 const OPEN_TABS_KEY = "prosa.editor.openTabs";
 
@@ -15,7 +16,9 @@ function readStoredTabIds(): string[] {
     if (!Array.isArray(parsed)) {
       return [];
     }
-    return parsed.filter((item): item is string => typeof item === "string");
+    return parsed.filter(
+      (item): item is string => typeof item === "string" && isPersistedEditorTabId(item),
+    );
   } catch {
     return [];
   }
@@ -25,7 +28,8 @@ export function useEditorTabs() {
   const [openTabIds, setOpenTabIds] = useState<string[]>(readStoredTabIds);
 
   useEffect(() => {
-    window.localStorage.setItem(OPEN_TABS_KEY, JSON.stringify(openTabIds));
+    const persisted = openTabIds.filter(isPersistedEditorTabId);
+    window.localStorage.setItem(OPEN_TABS_KEY, JSON.stringify(persisted));
   }, [openTabIds]);
 
   const registerTab = useCallback((id: string) => {
