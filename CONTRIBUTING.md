@@ -44,4 +44,6 @@ Details: `docs/VERSION_CONTROL.md`.
 - Keep Tauri permissions minimal; add native commands deliberately.
 - Run `pnpm verify` (or `pnpm verify:all` if you touched Rust) before opening a PR.
 
-See `MASTERPLAN.md` and `docs/ARCHITECTURE.md` for product and layering rules.
+See `MASTERPLAN.md` and `docs/ARCHITECTURE.md` for stack and layering rules.
+
+**Product changes:** Read [docs/PRODUCT_CONSTITUTION.md](docs/PRODUCT_CONSTITUTION.md) and use the feature gate there. Cross-cutting behavior should have a spec under `docs/specs/` or an entry in `docs/DECISIONS.md`. Track phase alignment in [docs/ROADMAP.md](docs/ROADMAP.md).

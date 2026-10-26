@@ -9,8 +9,9 @@ Scribo owns the **structure** of the writing; the application owns **presentatio
 - `apps/prosa` — Tauri 2 desktop app (React + TypeScript + Vite)
 - `packages/core` — Domain IDs, metadata contracts, errors
 - `packages/document-model` — Canonical Prosa document schema and validation
-- `docs/` — Architecture and decision log
-- `MASTERPLAN.md` — Full product and engineering specification
+- `docs/` — Architecture, **product constitution**, roadmap, specs
+- `MASTERPLAN.md` — Stack, monorepo, and Prosa schema foundation
+- `plans/003-prosa-deep-writing-features.md` — Writer-centred strategy (source essay)
 
 ## Prerequisites
 
@@ -72,4 +73,6 @@ This repository implements the **initial architectural milestone** from `MASTERP
 
 Not included yet: DOCX/PDF, cloud sync, full export pipeline, and additional Scribo product lines (Drama, Versus, Academia).
 
-See `docs/ARCHITECTURE.md` and `docs/DECISIONS.md` for diagrams, dependency rules, and known limits.
+**Governance:** [docs/PRODUCT_CONSTITUTION.md](docs/PRODUCT_CONSTITUTION.md) · [docs/ROADMAP.md](docs/ROADMAP.md) · [docs/PRODUCT_INVARIANTS.md](docs/PRODUCT_INVARIANTS.md)
+
+See `docs/ARCHITECTURE.md`, `docs/ARCHITECTURE_AUDIT.md`, and `docs/DECISIONS.md` for structure, baseline audit, and known limits.

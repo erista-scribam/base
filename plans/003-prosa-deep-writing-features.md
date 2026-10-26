@@ -2,7 +2,7 @@
 
 ## Product Philosophy and Deep-Feature Plan
 
-**Status:** Strategic working document\
+**Status:** Strategic working document — **codified** in `docs/PRODUCT_CONSTITUTION.md`, `docs/PRODUCT_INVARIANTS.md`, `docs/ROADMAP.md` (implementation tracks those files)\
 **Product:** Scribo Prosa, with principles intended to guide the wider
 Scribo family\
 **Purpose:** Define what Scribo should optimize for before committing to

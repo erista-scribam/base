@@ -31,6 +31,8 @@ flowchart TB
 
 Future packages (`editor`, `rendering`, `design-system`, `export`) stay out of the tree until they have a concrete boundary. TipTap lives in the app for now; the canonical model remains independent of TipTap types.
 
+**Product direction:** [PRODUCT_CONSTITUTION.md](./PRODUCT_CONSTITUTION.md) and [ROADMAP.md](./ROADMAP.md). **Current code map:** [ARCHITECTURE_AUDIT.md](./ARCHITECTURE_AUDIT.md).
+
 ## Document flow
 
 1. **Authoritative state** — `ProsaDocument` JSON (validated by `@scribo/document-model`).

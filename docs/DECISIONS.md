@@ -9,6 +9,7 @@
 5. **Structured editor** — TipTap StarterKit is trimmed (no code blocks, no arbitrary horizontal rules); scene breaks are a dedicated block node (`Mod-Shift-S` inserts a scene break).
 6. **Recovery** — Autosave writes both `document.json` and `recovery.json`; opening a manuscript prefers `recovery.json` when present after a crash.
 7. **pnpm hoisting** — Root `.npmrc` uses `node-linker=hoisted` so Vite 8 / Rolldown resolves TipTap and ProseMirror packages reliably in the workspace.
+8. **Product constitution (plan 003)** — Writer-centred principles, invariants, and phased roadmap in `docs/PRODUCT_CONSTITUTION.md`, `docs/PRODUCT_INVARIANTS.md`, and `docs/ROADMAP.md` supersede ad hoc feature direction. `MASTERPLAN.md` remains the stack and monorepo foundation; strategic depth lives in plan 003 and the docs above.
 
 ## Known limitations (milestone 1)
 
