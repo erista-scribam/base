@@ -8,7 +8,7 @@
 
 - **Incremental, reversible** steps; no full rewrite unless audit proves necessary.
 - **Preserve working Prosa** behavior until migration gates pass.
-- **Lanista:** document current gap (Prosa hub is interim); implement launcher without domain logic.
+- **Standalone apps first.** Prosa owns its hub until a future **paid Lanista** product exists — see [lanista-future.md](../../product/lanista-future.md).
 
 ```mermaid
 flowchart LR
@@ -24,8 +24,10 @@ flowchart LR
   R0 --> R1 --> R2
   R0 --> R3 --> R2
   R1 --> R4 --> R5
-  R4 --> R6 --> R7
-  R6 --> R8
+  R4 --> R5
+  R5 -.-> R6
+  R6 -.-> R7
+  R6 -.-> R8
 ```
 
 ---
@@ -85,7 +87,7 @@ flowchart LR
 **Status:** **Shipped (Prosa)** — `grants.rs` enforces manuscript-tree writes; `ERR_SCRIBO_PATH_FORBIDDEN`.
 
 | Scope | Shared crate; Prosa Tauri commands check grants |
-| Interim | Grant = full project root until Lanista spawns |
+| Interim | Grant = manuscript trees; full project root for Prosa standalone |
 
 **Acceptance:** Contract tests [app-filesystem-grants.md](../../specs/app-filesystem-grants.md).
 
@@ -102,31 +104,33 @@ flowchart LR
 
 ---
 
-## Phase R6 — Lanista MVP
+## Phase R6 — Lanista (future paid hub)
 
-**Status:** **Shipped** — `apps/lanista`, `lanista.json`, spawn Prosa with `SCRIBO_PROJECT_ROOT`. See [apps/lanista/README.md](../../../apps/lanista/README.md).
+**Status:** **Deferred** — no Lanista app in monorepo; [lanista-future.md](../../product/lanista-future.md). Brand assets only.
 
-| Scope | `apps/lanista` (new): list projects, register Prosa, spawn with grants |
-| Retain | Prosa still openable standalone in **dev** until R7 |
+| Scope | Future: integrated project + app switching (sub-apps TBD) |
+| Today | Prosa `library.json` catalog remains authoritative |
 
-**Acceptance:** Manual QA open project in Prosa via Lanista; catalog persists in Lanista config.
+**Acceptance:** N/A until product definition and licensing model exist.
 
 ---
 
-## Phase R7 — Prosa production entry
+## Phase R7 — Prosa via Lanista
 
-**Status:** **Partial** — Prosa honors `SCRIBO_PROJECT_ROOT`; `get_prosa_launch_context` limits hub switcher when spawned from Lanista; dual catalog (Lanista + Prosa `library.json`) remains.
+**Status:** **Cancelled** (standalone Prosa is the shipping entry).
 
-| Scope | “Return to Lanista”; Lanista-only recents cutover |
-| Migration | Move `library.json` catalog duties to Lanista |
+| Former scope           | Superseded by                                        |
+| ---------------------- | ---------------------------------------------------- |
+| Lanista-only catalog   | Prosa project switcher + `library.json`              |
+| Spawn env / hub limits | Removed; optional `SCRIBO_PROJECT_ROOT` for dev only |
 
-**Gate:** R4 + R6 + user migration notes.
+**Gate:** Revisit only when R6 product ships.
 
 ---
 
 ## Phase R8 — Scribo Folia / Drama (future)
 
-**Status:** **Stub** — empty `contents/canon/folia`, `contents/canon/drama`, `contents/shared/*` created on new Lanista projects.
+**Status:** **Stub** — empty `contents/canon/folia`, `contents/canon/drama`, `contents/shared/*` created on new Prosa projects.
 
 | Scope | App stubs, manifest entries, canon paths only |
 | Non-goals | Full editors |
@@ -141,7 +145,7 @@ flowchart LR
 | `scribo.project.json`              | Extend, don’t rename without ADR |
 | Project-root Git code              | Keep until R5 decision           |
 | Explorer, tabs, SCM UI             | Re-scope to grants + domain      |
-| Home → project subfolder migration | Lanista-owned later              |
+| Home → project subfolder migration | Prosa-owned for now              |
 | Recovery sidecars                  | Per-domain rules TBD             |
 
 ---
@@ -153,7 +157,7 @@ flowchart LR
 | `content/` → `contents/canon/`              | R2 + wizard                |
 | `.md` → `.mdprosa` on save                  | R3 **shipped** (dual-read) |
 | Full layout v2 `contents/canon/manuscripts` | R2 adapter only            |
-| Prosa hub → Lanista-only catalog            | R7 partial                 |
+| Prosa hub → Lanista-only catalog            | R7 **cancelled**           |
 | Git split (if any)                          | R5 **deferred (Option A)** |
 | Folia/Drama apps                            | R8 stub dirs only          |
 
@@ -163,6 +167,6 @@ flowchart LR
 
 1. R0 spec review (this roadmap + multi-app spec).
 2. Git ADR (R5) before migration tooling.
-3. Lanista primary binary (R7) requires Changeset + migration doc.
+3. Future Lanista (R6) requires its own product plan, licensing, and migration doc.
 
 **Final status:** **Ready for architectural review** at R0; implementation **blocked** until gate 1.

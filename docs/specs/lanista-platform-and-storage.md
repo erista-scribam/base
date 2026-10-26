@@ -1,6 +1,6 @@
 # Lanista platform and storage (stub)
 
-**Status:** Draft — **Phase A gate for [plan 006](../plans/active/006-scribo-lanista-platform.md)**  
+**Status:** **Deferred** — [lanista-future.md](../product/lanista-future.md); [plan 006](../plans/active/006-scribo-lanista-platform.md) withdrawn.  
 **Supersedes (for execution):** project-root Git and Prosa-as-hub sections of [project-architecture-and-storage.md](./project-architecture-and-storage.md)
 
 ## Purpose

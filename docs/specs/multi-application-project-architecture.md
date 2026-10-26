@@ -12,7 +12,7 @@
 **Recommended direction:**
 
 1. **Three levels:** (a) **Scribo applications** with distinct domain models; (b) **Scribo projects** as user-visible folders; (c) **shared infrastructure** (identity, storage contracts, Git, migrations, integrity) in typed packages and Rust services—not a universal document model.
-2. **Scribo Lanista** (launcher): project discovery, app registration, compatibility checks, spawn with **capability grants**. **No** manuscript, folia, or drama semantics in Lanista.
+2. **Scribo Lanista** (future paid hub): integrated project + app switching; satellites (Prosa, Folia, Drama) remain domain apps. **Not shipped** — see [lanista-future.md](../product/lanista-future.md). Prosa is standalone today.
 3. **Project layout (evolution):** adopt a **`contents/canon/` + `contents/shared/`** tree (see §5), evolving from today’s verified `content/manuscripts/` via adapters—not a big-bang rename without migration.
 4. **Git (default):** **one repository per project** (Option A) tracking all **canonical** paths; **capability checks** at app/Tauri boundaries—not folder names alone. Revisit **domain-separated repos** (Option B) only with measured evidence (§6).
 5. **Formats:** **typed extensions** (e.g. `.mdprosa`, future `.folia`, `.drama`) where they encode an **enforceable contract**; shared research/assets use neutral formats + manifest typing.

@@ -7,7 +7,7 @@ Editable, scalable SVG starter assets for the Scribo identity.
 - `scribo-mark.svg` — square parent-brand mark / app icon
 - `scribo-wordmark.svg` — light-background wordmark with tagline
 - `scribo-wordmark-dark.svg` — dark-background wordmark with tagline
-- `lanista.svg` — launcher icon
+- `lanista.svg` — future hub product icon (not shipped as an app)
 - `prosa.svg` — prose-writing icon
 - `drama.svg` — screenplay icon
 - `folia.svg` — presentation icon
@@ -27,9 +27,8 @@ The SVG wordmarks use an Inter-first system font stack. For exact rendering, ins
 
 ## In-app usage
 
-| App     | UI                                                                                | Favicon                                 |
-| ------- | --------------------------------------------------------------------------------- | --------------------------------------- |
-| Prosa   | Sidebar brand bar + `--scribo-prosa` accent via `apps/prosa/src/styles/brand.css` | `apps/prosa/public/brand/prosa.svg`     |
-| Lanista | Wordmark header + product row via `LanistaBrandHeader`                            | `apps/lanista/public/brand/lanista.svg` |
+| App   | UI                                                                                | Favicon                             |
+| ----- | --------------------------------------------------------------------------------- | ----------------------------------- |
+| Prosa | Sidebar brand bar + `--scribo-prosa` accent via `apps/prosa/src/styles/brand.css` | `apps/prosa/public/brand/prosa.svg` |
 
-Runtime SVG imports resolve from this folder (`?url` in Vite); copy favicon assets into each app’s `public/brand/` when icons change.
+Runtime SVG imports resolve from this folder (`?url` in Vite). Copy favicon assets into each shipped app’s `public/brand/` when icons change. Lanista assets are reserved for a future product — see [lanista-future.md](../../product/lanista-future.md).

@@ -39,7 +39,6 @@ export interface ManuscriptNavProps {
   onVersionControlError: (message: string) => void;
   onBeforeGitOperation: () => void | Promise<void>;
   onGitOperationComplete: (workspaceUpdated: boolean) => void | Promise<void>;
-  launchedFromLanista?: boolean;
 }
 
 export function ManuscriptNav({
@@ -70,7 +69,6 @@ export function ManuscriptNav({
   onVersionControlError,
   onBeforeGitOperation,
   onGitOperationComplete,
-  launchedFromLanista = false,
 }: ManuscriptNavProps) {
   const { adjustSidebarWidth, commitSidebarWidth } = useSidebarLayout();
   const showActivityBar = isTauriRuntime() && Boolean(libraryPath);
@@ -94,14 +92,11 @@ export function ManuscriptNav({
       <section className="sidebar-workspace" aria-label="Workspace">
         <div className="sidebar-zone-header">
           <span className="sidebar-zone-label">Workspace</span>
-          <span className="sidebar-zone-hint">
-            {launchedFromLanista ? "Opened from Scribo Lanista" : "Choose a project folder"}
-          </span>
+          <span className="sidebar-zone-hint">Choose a project folder</span>
         </div>
         <ProjectSwitcher
           currentRootPath={libraryPath}
           projectTitle={projectTitle}
-          launchedFromLanista={launchedFromLanista}
           onOpenProject={onChooseLibrary}
           onCreateProject={onCreateProject}
           onSwitchProject={onSwitchProject}

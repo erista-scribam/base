@@ -56,8 +56,9 @@ Start here for product and engineering knowledge. **One topic, one canonical fil
 | [plans/active/multi-application-architecture-roadmap.md](./plans/active/multi-application-architecture-roadmap.md) | R0–R8 adoption roadmap                                              |
 | [plans/active/project-format-and-storage.md](./plans/active/project-format-and-storage.md)                         | Manifest + layout v2 validation plan                                |
 | [plans/active/project-git-strategy.md](./plans/active/project-git-strategy.md)                                     | Unified vs split Git — decision experiments                         |
-| [plans/active/006-scribo-lanista-platform.md](./plans/active/006-scribo-lanista-platform.md)                       | Lanista execution track (align with family spec)                    |
-| [specs/lanista-platform-and-storage.md](./specs/lanista-platform-and-storage.md)                                   | Lanista detail stub (Phase A)                                       |
+| [product/lanista-future.md](./product/lanista-future.md)                                                           | Future paid Lanista hub (concept only)                              |
+| [plans/active/006-scribo-lanista-platform.md](./plans/active/006-scribo-lanista-platform.md)                       | **Withdrawn** historical Lanista MVP track                          |
+| [specs/lanista-platform-and-storage.md](./specs/lanista-platform-and-storage.md)                                   | Lanista detail stub (deferred)                                      |
 | [specs/project-architecture-and-storage.md](./specs/project-architecture-and-storage.md)                           | 005 audit baseline (project-root Git — paused)                      |
 | [plans/active/](./plans/active/)                                                                                   | In-flight implementation plans                                      |
 | [plans/completed/](./plans/completed/)                                                                             | Historical / finished plans                                         |

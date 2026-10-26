@@ -1,10 +1,10 @@
 # Plan 006 — Scribo Lanista platform, app sandbox, per-manuscript Git, `.mdprosa`
 
-**Status:** Active (execution track — align with [multi-application-project-architecture.md](../../specs/multi-application-project-architecture.md))  
-**Adopted:** 2026-10-26  
+**Status:** **Withdrawn** (2026-10-26) — Lanista is a **future paid product**; this monorepo ships **standalone apps only**. See [lanista-future.md](../../product/lanista-future.md).  
+**Adopted:** 2026-10-26 (historical)  
 **Pauses:** [005-project-workspace-and-git.md](./005-project-workspace-and-git.md) (project-root Git, Prosa-as-hub, `.md` manuscripts)
 
-**Note:** **Per-manuscript Git** in this plan is **deferred**. Execution uses **unified project Git (Option A)** per [project-git-strategy.md](./project-git-strategy.md). Lanista MVP shipped in `apps/lanista`.
+**Note:** **Per-manuscript Git** remains **deferred**. **Unified project Git (Option A)** per [project-git-strategy.md](./project-git-strategy.md). Any former `apps/lanista` MVP has been **removed**; brand kit + product concept remain.
 
 ## Executive summary
 

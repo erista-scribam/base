@@ -7,7 +7,6 @@ Scribo is a pnpm monorepo: desktop apps under `apps/`, shared TypeScript under `
 ```mermaid
 flowchart TB
   subgraph apps
-    Lanista["@scribo/lanista"]
     Prosa["@scribo/prosa"]
   end
   subgraph packages
@@ -26,9 +25,7 @@ flowchart TB
   DM --> Core
   PM --> Core
   MP --> Core
-  Lanista --> Prosa
   Prosa --> Tauri
-  Lanista --> Tauri
 ```
 
 | Layer                    | Responsibility                                                      |

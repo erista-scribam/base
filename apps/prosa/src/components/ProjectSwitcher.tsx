@@ -5,7 +5,6 @@ import { listProjects } from "../features/projects/project-catalog";
 export interface ProjectSwitcherProps {
   currentRootPath: string | null;
   projectTitle: string | null;
-  launchedFromLanista?: boolean;
   onOpenProject: () => void;
   onCreateProject: () => void;
   onSwitchProject: (rootPath: string) => void;
@@ -23,7 +22,6 @@ function formatProjectPath(path: string): string {
 export function ProjectSwitcher({
   currentRootPath,
   projectTitle,
-  launchedFromLanista = false,
   onOpenProject,
   onCreateProject,
   onSwitchProject,
@@ -101,52 +99,42 @@ export function ProjectSwitcher({
       </button>
       {open ? (
         <div className="project-switcher-menu" id={menuId} role="menu">
-          {!launchedFromLanista ? (
-            <>
-              <p className="project-switcher-menu-label">Recent projects</p>
-              <ul className="project-switcher-list">
-                {projects.length === 0 ? (
-                  <li className="project-switcher-empty">No recent projects yet.</li>
-                ) : (
-                  projects.map((project) => (
-                    <li key={project.rootPath}>
-                      <button
-                        type="button"
-                        role="menuitem"
-                        className="project-switcher-item"
-                        data-current={project.isCurrent ? "true" : undefined}
-                        onClick={() => {
-                          setOpen(false);
-                          if (!project.isCurrent) {
-                            onSwitchProject(project.rootPath);
-                          }
-                        }}
-                      >
-                        <span className="project-switcher-item-title">{project.title}</span>
-                        <span className="project-switcher-item-path">
-                          {formatProjectPath(project.rootPath)}
-                        </span>
-                      </button>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </>
-          ) : null}
-          {launchedFromLanista ? (
-            <p className="project-switcher-menu-hint">
-              Open or switch projects from Scribo Lanista.
-            </p>
-          ) : (
-            <div className="project-switcher-menu-actions">
-              <button type="button" className="sc-btn sc-btn-block" onClick={onOpenProject}>
-                Open project folder…
-              </button>
-              <button type="button" className="sc-btn sc-btn-block" onClick={onCreateProject}>
-                New project…
-              </button>
-            </div>
-          )}
+          <p className="project-switcher-menu-label">Recent projects</p>
+          <ul className="project-switcher-list">
+            {projects.length === 0 ? (
+              <li className="project-switcher-empty">No recent projects yet.</li>
+            ) : (
+              projects.map((project) => (
+                <li key={project.rootPath}>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="project-switcher-item"
+                    data-current={project.isCurrent ? "true" : undefined}
+                    onClick={() => {
+                      setOpen(false);
+                      if (!project.isCurrent) {
+                        onSwitchProject(project.rootPath);
+                      }
+                    }}
+                  >
+                    <span className="project-switcher-item-title">{project.title}</span>
+                    <span className="project-switcher-item-path">
+                      {formatProjectPath(project.rootPath)}
+                    </span>
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+          <div className="project-switcher-menu-actions">
+            <button type="button" className="sc-btn sc-btn-block" onClick={onOpenProject}>
+              Open project folder…
+            </button>
+            <button type="button" className="sc-btn sc-btn-block" onClick={onCreateProject}>
+              New project…
+            </button>
+          </div>
         </div>
       ) : null}
     </div>

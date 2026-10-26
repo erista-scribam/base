@@ -264,7 +264,7 @@ fn library_info_for_root(
     })
 }
 
-/// When Lanista (or dev) sets `SCRIBO_PROJECT_ROOT`, open that project instead of the catalog default.
+/// When `SCRIBO_PROJECT_ROOT` is set (dev/tests), open that project instead of the catalog default.
 pub fn open_library_from_env(app: &AppHandle) -> Option<Result<LibraryInfo, String>> {
     let root = std::env::var("SCRIBO_PROJECT_ROOT").ok()?;
     let trimmed = root.trim();

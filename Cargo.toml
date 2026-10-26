@@ -1,5 +1,5 @@
 [workspace]
-members = ["apps/prosa/src-tauri", "apps/lanista/src-tauri"]
+members = ["apps/prosa/src-tauri"]
 resolver = "2"
 
 [profile.release]

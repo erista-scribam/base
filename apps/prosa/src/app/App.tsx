@@ -32,7 +32,6 @@ import {
   deleteManuscript,
   getLibrary,
   importMarkdownFile,
-  getProsaLaunchContext,
   initLibrary,
   isLegacyInternalManuscriptId,
   listManuscripts,
@@ -74,7 +73,6 @@ export function App() {
   const [libraryPath, setLibraryPath] = useState<string | null>(null);
   const [homePath, setHomePath] = useState<string | null>(null);
   const [projectTitle, setProjectTitle] = useState<string | null>(null);
-  const [launchedFromLanista, setLaunchedFromLanista] = useState(false);
   const [versionControlRefreshKey, setVersionControlRefreshKey] = useState(0);
   const [explorerRefreshKey, setExplorerRefreshKey] = useState(0);
   const { theme, toggleTheme } = useTheme();
@@ -186,15 +184,14 @@ export function App() {
       return;
     }
     let cancelled = false;
-    void Promise.all([initLibrary(), getProsaLaunchContext()])
-      .then(async ([library, launchContext]) => {
+    void initLibrary()
+      .then(async (library) => {
         if (cancelled) {
           return;
         }
         setLibraryPath(library.rootPath);
         setHomePath(library.homePath);
         setProjectTitle(library.project?.title ?? null);
-        setLaunchedFromLanista(launchContext.launchedFromLanista);
         const migratedInternal = await migrateAllLegacyManuscriptsToLibrary().catch(() => 0);
         const migratedRoot = await migrateLegacyRootManuscriptsToContent().catch(() => 0);
         if (!cancelled && migratedInternal > 0) {
@@ -760,7 +757,6 @@ export function App() {
           onVersionControlError={(message) => setError(message)}
           onBeforeGitOperation={handleBeforeGitOperation}
           onGitOperationComplete={handleGitOperationComplete}
-          launchedFromLanista={launchedFromLanista}
         />
         <main className="app-main" data-editor-view={viewMode === "split" ? "markdown" : "classic"}>
           {openTabIds.length > 0 || document || activeDiffPath ? (
