@@ -9,9 +9,9 @@ Plan 003 defined writer-first product direction beyond the original MASTERPLAN s
 
 ## Decision
 
-Writer-centred principles, invariants, and phased roadmap live in `docs/product/` (codified from plan 003). `MASTERPLAN.md` remains stack and monorepo foundation.
+Writer-centred principles, invariants, and phased roadmap live in `docs/product/` (extracted from plan 003). `MASTERPLAN.md` remains stack and monorepo foundation. **Implementing** plan 003 phases 2–7 is separate and **not done** as of adoption.
 
 ## Consequences
 
 - Feature evaluation uses [philosophy.md](../../product/philosophy.md) feature gate.
-- Strategic essay retained in [plans/completed/003](../../plans/completed/003-prosa-deep-writing-features.md).
+- Full program document: [plans/active/003](../../plans/active/003-prosa-deep-writing-features.md).

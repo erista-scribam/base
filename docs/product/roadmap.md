@@ -3,7 +3,9 @@
 **Status:** Living document  
 **Constitution:** [philosophy.md](./philosophy.md)
 
-Dependency-oriented phases (from [003-prosa-deep-writing-features.md](../plans/completed/003-prosa-deep-writing-features.md)). Overlap is allowed when dependencies are satisfied. **Current focus** is completing Phase 0–1 evidence and specs, then **Revision History v1** (Phase 2).
+Dependency-oriented phases from [plan 003](../plans/active/003-prosa-deep-writing-features.md). **Execution status:** deep-writing phases **2–7 are not started**; phases 0–1 are partial (docs, friction log, reliability from plan 002 / issue fixes—not fulfillment of plan 003 exit conditions).
+
+**Current focus:** finish Phase 0 evidence, lock Revision History v1 spec, then begin **Phase 2** as the first real slice of plan 003.
 
 | Phase | Name                                 | Exit condition                                               | Status                                                                        |
 | ----- | ------------------------------------ | ------------------------------------------------------------ | ----------------------------------------------------------------------------- |
@@ -20,14 +22,15 @@ Dependency-oriented phases (from [003-prosa-deep-writing-features.md](../plans/c
 
 ## Immediate work queue
 
-**Product (plan 003):**
+**Plan 003 (deep writing) — execution:**
 
-1. ~~Product invariants~~ → [invariants.md](./invariants.md)
-2. **Research log** → [WRITING_FRICTION_LOG.md](../research/WRITING_FRICTION_LOG.md)
-3. ~~Architecture audit baseline~~ → [implementation-audit.md](../architecture/implementation-audit.md)
-4. **Revision history** — [spec](../specs/revision-history-v1.md) + [active plan](../plans/active/revision-history-v1.md) (implement after approval)
-5. Annotation contract — after Phase 2
-6. Source / project knowledge models — before Phase 4
+| Step                                                               | Doc / work                                                                                     | Execution             |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | --------------------- |
+| Principles & invariants written                                    | [philosophy.md](./philosophy.md), [invariants.md](./invariants.md)                             | **Docs only**         |
+| Friction log                                                       | [WRITING_FRICTION_LOG.md](../research/WRITING_FRICTION_LOG.md)                                 | **Open**              |
+| Architecture audit baseline                                        | [implementation-audit.md](../architecture/implementation-audit.md)                             | **Doc snapshot only** |
+| Revision history v1                                                | [spec](../specs/revision-history-v1.md), [active plan](../plans/active/revision-history-v1.md) | **Not implemented**   |
+| Phases 3–7 (analysis, research, knowledge, language, integrations) | [plan 003](../plans/active/003-prosa-deep-writing-features.md)                                 | **Not started**       |
 
 **Workflow (plan 004, adopted 2026-10-26):**
 

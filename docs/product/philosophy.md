@@ -1,6 +1,6 @@
 # Scribo product constitution
 
-**Status:** Active (adopted from [003-prosa-deep-writing-features.md](../plans/completed/003-prosa-deep-writing-features.md))  
+**Status:** Active product law (from [plan 003](../plans/active/003-prosa-deep-writing-features.md)). **Does not mean** deep features (revision history, research, analysis, etc.) are implemented—see [roadmap.md](./roadmap.md).  
 **Scope:** Scribo Prosa first; principles apply to the wider Scribo family unless a product explicitly diverges.
 
 This document is the **governing law** for product and engineering decisions. Detailed plans, specs, and roadmaps must not contradict it. When they conflict, update the plan or amend this document deliberately—not in code comments alone.
@@ -108,4 +108,4 @@ If a change fails this test, it does not belong in the product.
 | [../specs/revision-history-v1.md](../specs/revision-history-v1.md)                                             | Revision history spec         |
 | [../research/WRITING_FRICTION_LOG.md](../research/WRITING_FRICTION_LOG.md)                                     | Real-use friction log         |
 | [../../MASTERPLAN.md](../../MASTERPLAN.md)                                                                     | Stack and monorepo foundation |
-| [../plans/completed/003-prosa-deep-writing-features.md](../plans/completed/003-prosa-deep-writing-features.md) | Full strategy essay           |
+| [../plans/active/003-prosa-deep-writing-features.md](../plans/active/003-prosa-deep-writing-features.md) | Full deep-writing plan (active) |

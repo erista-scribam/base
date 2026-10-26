@@ -62,7 +62,7 @@ Test coverage: Vitest in `document-model`, `prosa` (persistence, markdown). Rust
 
 ## Open work at adoption
 
-See [product/roadmap.md](../product/roadmap.md). Next substantial feature: **Revision History v1** per [specs/revision-history-v1.md](../specs/revision-history-v1.md).
+See [product/roadmap.md](../product/roadmap.md). **Plan 003 deep features are not implemented**—only strategy docs and a revision-history spec draft. Next code target: **Revision History v1** after spec/plan approval.
 
 ---
 

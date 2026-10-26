@@ -11,11 +11,11 @@
 
 ## Completed numbered plans
 
-| Plan                                                                                 | Summary                                               |
-| ------------------------------------------------------------------------------------ | ----------------------------------------------------- |
-| [001-prosa-ui-overhaul.md](./completed/001-prosa-ui-overhaul.md)                     | UI overhaul direction                                 |
-| [002-prosa-data-quality.md](./completed/002-prosa-data-quality.md)                   | Reliability and persistence                           |
-| [003-prosa-deep-writing-features.md](./completed/003-prosa-deep-writing-features.md) | Writer-centred strategy (→ product docs)              |
-| [004-workflow-total-revamp.md](./completed/004-workflow-total-revamp.md)             | Repository-first operating model (→ engineering docs) |
+| Plan                                                                              | Summary                                                  |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [001-prosa-ui-overhaul.md](./completed/001-prosa-ui-overhaul.md)                  | UI overhaul direction                                    |
+| [002-prosa-data-quality.md](./completed/002-prosa-data-quality.md)                | Reliability and persistence                              |
+| [003-prosa-deep-writing-features.md](./active/003-prosa-deep-writing-features.md) | **Active** — deep-writing program (**not executed** yet) |
+| [004-workflow-total-revamp.md](./completed/004-workflow-total-revamp.md)          | Repository-first operating model (→ engineering docs)    |
 
 Do not treat completed plans as live specs—promote contracts to [specs/](../specs/) and decisions to [architecture/decisions/](../architecture/decisions/).

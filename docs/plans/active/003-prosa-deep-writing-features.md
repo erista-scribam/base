@@ -2,8 +2,8 @@
 
 ## Product Philosophy and Deep-Feature Plan
 
-**Status:** Completed — **codified** in [philosophy.md](../../product/philosophy.md), [invariants.md](../../product/invariants.md), [roadmap.md](../../product/roadmap.md)\
-**Location:** `docs/plans/completed/`\
+**Status:** **Active — not executed.** This document defines the deep-writing program (phases 0–7). Only preparatory docs exist so far ([philosophy.md](../../product/philosophy.md), [roadmap.md](../../product/roadmap.md), [revision-history spec](../../specs/revision-history-v1.md)). **No Phase 2–7 product work has shipped.**\
+**Location:** `docs/plans/active/`\
 **Product:** Scribo Prosa, with principles intended to guide the wider
 Scribo family\
 **Purpose:** Define what Scribo should optimize for before committing to

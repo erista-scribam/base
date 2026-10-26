@@ -18,7 +18,7 @@ These future products are part of the architectural vision, not part of the init
 
 ## 2. Core Product Philosophy
 
-For writer-centred product direction, see **`docs/product/philosophy.md`** and **`docs/product/roadmap.md`**. For engineering workflow, see **`docs/engineering/operating-model.md`** and **`AGENTS.md`**.
+For writer-centred product direction, see **`docs/product/philosophy.md`** and **`docs/product/roadmap.md`** (plan 003 **execution** is tracked in **`docs/plans/active/003-prosa-deep-writing-features.md`**—phases 2–7 not started). For engineering workflow, see **`docs/engineering/operating-model.md`** and **`AGENTS.md`**.
 
 Scribo separates content, document structure, and presentation.
 
