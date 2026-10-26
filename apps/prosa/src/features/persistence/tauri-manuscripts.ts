@@ -24,6 +24,10 @@ export interface LibraryInfo {
   project?: ScriboProjectManifest;
 }
 
+export interface ProsaLaunchContext {
+  launchedFromLanista: boolean;
+}
+
 interface LoadedManuscriptPayload {
   summary: ManuscriptSummary;
   documentJson?: string;
@@ -55,6 +59,10 @@ function documentFromPayload(payload: LoadedManuscriptPayload): ProsaDocument {
 
 export async function initLibrary(): Promise<LibraryInfo> {
   return invoke<LibraryInfo>("init_library");
+}
+
+export async function getProsaLaunchContext(): Promise<ProsaLaunchContext> {
+  return invoke<ProsaLaunchContext>("get_prosa_launch_context");
 }
 
 export async function getLibrary(): Promise<LibraryInfo> {

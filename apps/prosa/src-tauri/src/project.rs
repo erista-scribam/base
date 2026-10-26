@@ -8,7 +8,7 @@ use crate::atomic_io::atomic_write;
 
 pub const PROJECT_MANIFEST_FILE: &str = "scribo.project.json";
 const PROJECT_SCHEMA_VERSION: u32 = 1;
-pub const PROJECT_LAYOUT_VERSION: u32 = 1;
+pub const PROJECT_LAYOUT_VERSION: u32 = 2;
 const PROJECT_ID_PREFIX: &str = "proj_";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -83,14 +83,52 @@ pub fn ensure_project_layout(
     manifest: &mut ScriboProjectManifest,
 ) -> Result<bool, String> {
     fs::create_dir_all(root.join(".scribo/recovery")).map_err(|error| error.to_string())?;
-    crate::project_layout::ensure_v1_manuscripts_dir(root)?;
     ensure_workspace_stub(root)?;
+    ensure_multi_app_canon_dirs(root)?;
 
     if manifest.layout_version >= PROJECT_LAYOUT_VERSION {
+        if manifest.layout_version >= 2 {
+            crate::project_layout::ensure_v2_manuscripts_dir(root)?;
+        } else {
+            crate::project_layout::ensure_v1_manuscripts_dir(root)?;
+        }
         return Ok(false);
     }
+
+    if manifest.layout_version == 0 {
+        crate::project_layout::ensure_v2_manuscripts_dir(root)?;
+        manifest.layout_version = PROJECT_LAYOUT_VERSION;
+        return Ok(true);
+    }
+
+    if manifest.layout_version == 1 {
+        crate::project_layout::ensure_v1_manuscripts_dir(root)?;
+        return Ok(false);
+    }
+
+    crate::project_layout::ensure_v2_manuscripts_dir(root)?;
     manifest.layout_version = PROJECT_LAYOUT_VERSION;
     Ok(true)
+}
+
+fn ensure_multi_app_canon_dirs(root: &Path) -> Result<(), String> {
+    let _ = fs::create_dir_all(root.join("contents/canon/folia"));
+    let _ = fs::create_dir_all(root.join("contents/canon/drama"));
+    let _ = fs::create_dir_all(root.join("contents/shared/research"));
+    let _ = fs::create_dir_all(root.join("contents/shared/assets"));
+    Ok(())
+}
+
+pub fn apply_post_open_layout_migrations(root: &Path) -> Result<(), String> {
+    if crate::project_layout::migrate_manuscripts_tree_v1_to_v2(root)?
+        && let Some(mut manifest) = read_project_manifest(root)?
+        && manifest.layout_version < PROJECT_LAYOUT_VERSION
+    {
+        manifest.layout_version = PROJECT_LAYOUT_VERSION;
+        manifest.updated_at = Utc::now().to_rfc3339();
+        write_manifest(root, &manifest)?;
+    }
+    Ok(())
 }
 
 pub fn read_project_manifest(root: &Path) -> Result<Option<ScriboProjectManifest>, String> {

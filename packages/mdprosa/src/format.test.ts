@@ -9,7 +9,7 @@ describe("mdprosa format", () => {
   it("accepts md and mdprosa", () => {
     expect(isProsaManuscriptFileName("chapter.md")).toBe(true);
     expect(isProsaManuscriptFileName("chapter.mdprosa")).toBe(true);
-    expect(isProsaManuscriptFileName("deck.folio")).toBe(false);
+    expect(isProsaManuscriptFileName("deck.folia")).toBe(false);
   });
 
   it("strips extensions for display", () => {

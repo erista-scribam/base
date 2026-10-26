@@ -20,7 +20,7 @@ flowchart LR
   R5[R5 Git decision and scope]
   R6[R6 Lanista MVP]
   R7[R7 Prosa via Lanista]
-  R8[R8 Folio/Drama placeholders]
+  R8[R8 Folia/Drama placeholders]
   R0 --> R1 --> R2
   R0 --> R3 --> R2
   R1 --> R4 --> R5
@@ -62,10 +62,10 @@ flowchart LR
 **Status:** **Shipped (Rust + TS)** — `project_layout.rs` resolves v1/v2 manuscripts dir; explorer scoped to manuscripts tree.
 
 | Scope | Resolve paths: v1 `content/manuscripts` **or** v2 `contents/canon/manuscripts` |
-| Migration | Spec-only until wizard exists |
-| Retain | Current user projects on v1 |
+| Migration | Auto on `init_library`: `content/manuscripts` → `contents/canon/manuscripts`; new projects use v2 |
+| Retain | Dual-read v1 until migrated |
 
-**Acceptance:** Unit tests for path resolution; no user migration required yet.
+**Acceptance:** Unit tests for path resolution + migration; manifest `layoutVersion` bumped to 2.
 
 ---
 
@@ -115,16 +115,16 @@ flowchart LR
 
 ## Phase R7 — Prosa production entry
 
-**Status:** **Partial** — Prosa honors `SCRIBO_PROJECT_ROOT` on `init_library`; dual catalog (Lanista + Prosa `library.json`) until migration wizard.
+**Status:** **Partial** — Prosa honors `SCRIBO_PROJECT_ROOT`; `get_prosa_launch_context` limits hub switcher when spawned from Lanista; dual catalog (Lanista + Prosa `library.json`) remains.
 
-| Scope | Optional: hide hub switcher; “Return to Lanista” |
+| Scope | “Return to Lanista”; Lanista-only recents cutover |
 | Migration | Move `library.json` catalog duties to Lanista |
 
 **Gate:** R4 + R6 + user migration notes.
 
 ---
 
-## Phase R8 — Folio / Drama (future)
+## Phase R8 — Scribo Folia / Drama (future)
 
 **Status:** **Stub** — empty `contents/canon/folia`, `contents/canon/drama`, `contents/shared/*` created on new Lanista projects.
 
@@ -155,7 +155,7 @@ flowchart LR
 | Full layout v2 `contents/canon/manuscripts` | R2 adapter only            |
 | Prosa hub → Lanista-only catalog            | R7 partial                 |
 | Git split (if any)                          | R5 **deferred (Option A)** |
-| Folio/Drama apps                            | R8 stub dirs only          |
+| Folia/Drama apps                            | R8 stub dirs only          |
 
 ---
 

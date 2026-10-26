@@ -32,6 +32,7 @@ import {
   deleteManuscript,
   getLibrary,
   importMarkdownFile,
+  getProsaLaunchContext,
   initLibrary,
   isLegacyInternalManuscriptId,
   listManuscripts,
@@ -73,6 +74,7 @@ export function App() {
   const [libraryPath, setLibraryPath] = useState<string | null>(null);
   const [homePath, setHomePath] = useState<string | null>(null);
   const [projectTitle, setProjectTitle] = useState<string | null>(null);
+  const [launchedFromLanista, setLaunchedFromLanista] = useState(false);
   const [versionControlRefreshKey, setVersionControlRefreshKey] = useState(0);
   const [explorerRefreshKey, setExplorerRefreshKey] = useState(0);
   const { theme, toggleTheme } = useTheme();
@@ -184,22 +186,21 @@ export function App() {
       return;
     }
     let cancelled = false;
-    void initLibrary()
-      .then(async (library) => {
+    void Promise.all([initLibrary(), getProsaLaunchContext()])
+      .then(async ([library, launchContext]) => {
         if (cancelled) {
           return;
         }
         setLibraryPath(library.rootPath);
         setHomePath(library.homePath);
         setProjectTitle(library.project?.title ?? null);
+        setLaunchedFromLanista(launchContext.launchedFromLanista);
         const migratedInternal = await migrateAllLegacyManuscriptsToLibrary().catch(() => 0);
         const migratedRoot = await migrateLegacyRootManuscriptsToContent().catch(() => 0);
         if (!cancelled && migratedInternal > 0) {
           setNotice(`Moved ${migratedInternal} manuscript(s) into your library folder.`);
         } else if (!cancelled && migratedRoot > 0) {
-          setNotice(
-            `Moved ${migratedRoot} manuscript(s) into content/manuscripts/ (project layout).`,
-          );
+          setNotice(`Moved ${migratedRoot} manuscript(s) into the project manuscripts folder.`);
         }
         const items = await listManuscripts();
         if (!cancelled) {
@@ -759,6 +760,7 @@ export function App() {
           onVersionControlError={(message) => setError(message)}
           onBeforeGitOperation={handleBeforeGitOperation}
           onGitOperationComplete={handleGitOperationComplete}
+          launchedFromLanista={launchedFromLanista}
         />
         <main className="app-main" data-editor-view={viewMode === "split" ? "markdown" : "classic"}>
           {openTabIds.length > 0 || document || activeDiffPath ? (

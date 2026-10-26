@@ -23,6 +23,6 @@ describe("layout", () => {
   it("detects prosa manuscript relative paths", () => {
     expect(isProsaManuscriptRelativePath("content/manuscripts/ch.md")).toBe(true);
     expect(isProsaManuscriptRelativePath("contents/canon/manuscripts/a/b.mdprosa")).toBe(true);
-    expect(isProsaManuscriptRelativePath("contents/canon/folia/deck.folio")).toBe(false);
+    expect(isProsaManuscriptRelativePath("contents/canon/folia/deck.folia")).toBe(false);
   });
 });

@@ -16,7 +16,7 @@ export interface AppCapabilityDeclaration {
 
 export interface ProjectAppsBlock {
   prosa?: AppCapabilityDeclaration;
-  folio?: AppCapabilityDeclaration;
+  folia?: AppCapabilityDeclaration;
   drama?: AppCapabilityDeclaration;
 }
 

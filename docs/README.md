@@ -52,7 +52,7 @@ Start here for product and engineering knowledge. **One topic, one canonical fil
 | Path                                                                                                               | Purpose                                                             |
 | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
 | [specs/](./specs/)                                                                                                 | Feature contracts                                                   |
-| [specs/multi-application-project-architecture.md](./specs/multi-application-project-architecture.md)               | **Family architecture** — Lanista, Prosa, Folio, Drama, grants, Git |
+| [specs/multi-application-project-architecture.md](./specs/multi-application-project-architecture.md)               | **Family architecture** — Lanista, Prosa, Folia, Drama, grants, Git |
 | [plans/active/multi-application-architecture-roadmap.md](./plans/active/multi-application-architecture-roadmap.md) | R0–R8 adoption roadmap                                              |
 | [plans/active/project-format-and-storage.md](./plans/active/project-format-and-storage.md)                         | Manifest + layout v2 validation plan                                |
 | [plans/active/project-git-strategy.md](./plans/active/project-git-strategy.md)                                     | Unified vs split Git — decision experiments                         |

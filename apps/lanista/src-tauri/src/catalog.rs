@@ -116,7 +116,8 @@ fn discover_in_home(home: &Path) -> Vec<PathBuf> {
 }
 
 fn ensure_project_layout(root: &Path, title: &str) -> Result<(), String> {
-    fs::create_dir_all(root.join("content/manuscripts")).map_err(|error| error.to_string())?;
+    fs::create_dir_all(root.join("contents/canon/manuscripts"))
+        .map_err(|error| error.to_string())?;
     let _ = fs::create_dir_all(root.join("contents/canon/folia"));
     let _ = fs::create_dir_all(root.join("contents/canon/drama"));
     let _ = fs::create_dir_all(root.join("contents/shared/research"));
@@ -133,7 +134,7 @@ fn ensure_project_layout(root: &Path, title: &str) -> Result<(), String> {
         title: title.to_string(),
         created_at: now.clone(),
         updated_at: now,
-        layout_version: 1,
+        layout_version: 2,
     };
     let raw = serde_json::to_string_pretty(&manifest).map_err(|error| error.to_string())?;
     fs::write(manifest_path, raw).map_err(|error| error.to_string())

@@ -282,10 +282,16 @@ pub fn ensure_default_library(app: &AppHandle) -> Result<LibraryInfo, String> {
 }
 
 pub fn init_library(app: &AppHandle) -> Result<LibraryInfo, String> {
-    if let Some(result) = open_library_from_env(app) {
-        return result;
+    let info = if let Some(result) = open_library_from_env(app) {
+        result?
+    } else {
+        ensure_default_library(app)?
+    };
+    let root = info.root_path.clone();
+    if let Err(error) = crate::project::apply_post_open_layout_migrations(Path::new(&root)) {
+        eprintln!("Layout migration warning: {error}");
     }
-    ensure_default_library(app)
+    Ok(info)
 }
 
 pub fn get_library_info(app: &AppHandle) -> Result<LibraryInfo, String> {

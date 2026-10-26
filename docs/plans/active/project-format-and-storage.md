@@ -8,7 +8,7 @@
 
 Validate and specify the **project manifest**, **canonical content layout**, **format identification**, **schema versioning**, and **migration** from the verified v1 layout (`scribo.project.json` + `content/manuscripts/` + `.md`) to the multi-app v2 model (`contents/canon/*`, typed extensions, capabilities).
 
-**Non-goals:** Implement Lanista, Folio, or Drama apps; run migrations on user machines.
+**Non-goals:** Full Folia or Drama apps; mandatory migration wizard UI (auto migration on Prosa open is in scope).
 
 ---
 
@@ -18,7 +18,7 @@ Validate and specify the **project manifest**, **canonical content layout**, **f
 | --------------- | ----------------------------- | ------------------------------------------------ |
 | Manifest        | `scribo.project.json`         | `PROJECT_MANIFEST_FILE`, `ScriboProjectManifest` |
 | Manuscripts dir | `content/manuscripts`         | `CONTENT_MANUSCRIPTS_DIR`                        |
-| Layout version  | `layoutVersion: 1`            | `PROJECT_LAYOUT_VERSION`                         |
+| Layout version  | `layoutVersion: 1` or `2`     | `PROJECT_LAYOUT_VERSION` (2 for new projects)    |
 | Prose files     | `*.md`                        | `is_markdown_file` in `library.rs`               |
 | Recovery        | `.scribo/recovery/`           | `library_recovery_path`                          |
 | App catalog     | `library.json` (Prosa config) | `LibraryConfig` with `home_path`, `root_path`    |
@@ -29,7 +29,7 @@ Validate and specify the **project manifest**, **canonical content layout**, **f
 
 | Topic           | Proposal                                                           | Validation activity                                               |
 | --------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| Manifest        | `projectSchemaVersion: 2`, `apps.{prosa,folio,drama}` capabilities | JSON Schema draft + fixture round-trip                            |
+| Manifest        | `projectSchemaVersion: 2`, `apps.{prosa,folia,drama}` capabilities | JSON Schema draft + fixture round-trip                            |
 | Tree            | `contents/canon/manuscripts`, `contents/shared/{research,assets}`  | Path constant table in `@scribo/project-model`                    |
 | Prosa format    | `.mdprosa` + `scribo-format-version`                               | [mdprosa-format-v1.md](../../specs/mdprosa-format-v1.md) approval |
 | Filename        | Keep `scribo.project.json` vs rename                               | ADR + migration alias read                                        |
