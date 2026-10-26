@@ -1,4 +1,10 @@
-import { Decoration, EditorView, MatchDecorator, ViewPlugin, type DecorationSet } from "@codemirror/view";
+import {
+  Decoration,
+  EditorView,
+  MatchDecorator,
+  ViewPlugin,
+  type DecorationSet,
+} from "@codemirror/view";
 
 const dialogMark = Decoration.mark({ class: "cm-md-dialog" });
 
