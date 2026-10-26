@@ -26,13 +26,10 @@ export function ChangedFilesList({ files, refreshKey, onOpenInEditor }: ChangedF
   } | null>(null);
 
   const activePath = useMemo(() => {
-    if (files.length === 0) {
+    if (!selectedPath || files.length === 0) {
       return null;
     }
-    if (selectedPath && files.some((file) => file.path === selectedPath)) {
-      return selectedPath;
-    }
-    return files[0]?.path ?? null;
+    return files.some((file) => file.path === selectedPath) ? selectedPath : null;
   }, [files, selectedPath]);
 
   const previewLoading =
@@ -89,7 +86,10 @@ export function ChangedFilesList({ files, refreshKey, onOpenInEditor }: ChangedF
                 className="changed-files-row"
                 data-selected={activePath === file.path ? "true" : undefined}
                 title={`${gitFileStatusTitle(file.status)}: ${file.path}`}
-                onClick={() => setSelectedPath(file.path)}
+                onClick={() => {
+                  setSelectedPath(file.path);
+                  setLoadedPreview(null);
+                }}
                 onDoubleClick={() => onOpenInEditor(file.path)}
               >
                 <GitFileStatusBadge status={file.status} />
@@ -124,7 +124,9 @@ export function ChangedFilesList({ files, refreshKey, onOpenInEditor }: ChangedF
             </button>
           </>
         ) : (
-          <p className="changed-files-diff-placeholder">Select a file to compare versions.</p>
+          <p className="changed-files-diff-placeholder">
+            Click a changed file to compare HEAD with your working copy.
+          </p>
         )}
       </div>
     </section>

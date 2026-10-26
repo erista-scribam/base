@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Editor } from "@tiptap/core";
 import type { ManuscriptSummary } from "@scribo/core";
 import type { ProsaDocument } from "@scribo/document-model";
 import { ManuscriptNav } from "../components/ManuscriptNav";
 import { MergeConflictOverlay } from "../components/MergeConflictOverlay";
+import { EditorTabBar } from "../components/EditorTabBar";
 import { EditorToolbar } from "../components/EditorToolbar";
 import { EmptyWorkspace } from "../components/EmptyWorkspace";
 import {
@@ -46,6 +47,7 @@ import { manuscriptIdForPath } from "../features/persistence/manuscript-path-id"
 import { openProject } from "../features/projects/project-catalog";
 import { GitBranchChip } from "../components/GitBranchChip";
 import { useProjectGitStatus } from "../hooks/useProjectGitStatus";
+import { useEditorTabs } from "../hooks/useEditorTabs";
 import { useSidebarProjectView } from "../hooks/useSidebarProjectView";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
 
@@ -80,11 +82,18 @@ export function App() {
   } = useProjectGitStatus(versionControlRefreshKey, saveState);
   const { markdownPreviewVisible, toggleMarkdownPreview } = useMarkdownPreviewVisible();
   const { zoom, zoomIn, zoomOut, resetZoom, canZoomIn, canZoomOut } = useEditorZoom();
+  const { openTabIds, registerTab, unregisterTab, replaceTabId, pickAdjacentTabId, setOpenTabIds } =
+    useEditorTabs();
 
   const activeSummary = manuscripts.find((item) => item.id === activeId) ?? null;
+  const manuscriptsById = useMemo(
+    () => new Map(manuscripts.map((item) => [item.id, item])),
+    [manuscripts],
+  );
   const workspaceRef = useRef<EditorWorkspaceHandle>(null);
   const editorDocumentRef = useRef(document);
   const saveStateRef = useRef(saveState);
+  const flushNowRef = useRef<() => Promise<void>>(async () => {});
 
   useEffect(() => {
     editorDocumentRef.current = document;
@@ -242,6 +251,9 @@ export function App() {
       }
       setExternalChange(false);
       try {
+        if (activeId && activeId !== id) {
+          await flushNowRef.current();
+        }
         let resolvedId = id;
         if (isTauriRuntime() && isLegacyInternalManuscriptId(id)) {
           const migrated = await migrateLegacyManuscriptToLibrary(id);
@@ -262,9 +274,11 @@ export function App() {
           }
           documentToOpen = decision.document;
         }
+        registerTab(resolvedId);
         setActiveId(resolvedId);
         setDocument(documentToOpen);
         setSaveState("idle");
+        setSidebarCollapsed(false);
         if (isTauriRuntime()) {
           const diskRevision = await getManuscriptDiskRevision(resolvedId);
           setDiskRevisionAtOpen(diskRevision);
@@ -273,7 +287,7 @@ export function App() {
         setError(cause instanceof Error ? cause.message : "Failed to open manuscript");
       }
     },
-    [refreshList],
+    [activeId, refreshList, registerTab],
   );
 
   const handleCreateFile = useCallback(
@@ -284,6 +298,7 @@ export function App() {
       setError(null);
       const created = await createManuscript(title, parentRelative);
       await refreshList();
+      registerTab(created.summary.id);
       setActiveId(created.summary.id);
       setDocument(created.document);
       setSaveState("idle");
@@ -292,7 +307,7 @@ export function App() {
       setViewMode("classic");
       setVersionControlRefreshKey((value) => value + 1);
     },
-    [refreshList],
+    [refreshList, registerTab],
   );
 
   const handleCreateFolder = useCallback(
@@ -341,6 +356,10 @@ export function App() {
     async (saved: ManuscriptSummary, savedFromManuscriptId: string) => {
       await refreshList();
       setManuscripts((prev) => prev.map((item) => (item.id === saved.id ? saved : item)));
+      if (savedFromManuscriptId !== saved.id) {
+        replaceTabId(savedFromManuscriptId, saved.id);
+      }
+      registerTab(saved.id);
       setActiveId((current) =>
         current === savedFromManuscriptId || current === saved.id ? saved.id : current,
       );
@@ -351,7 +370,7 @@ export function App() {
         setVersionControlRefreshKey((value) => value + 1);
       }
     },
-    [refreshList],
+    [refreshList, registerTab, replaceTabId],
   );
 
   const { notifyDocumentChange, setDocumentRef, flushNow } = useManuscriptPersistence(
@@ -362,9 +381,47 @@ export function App() {
     (message) => setError(message),
   );
 
+  useEffect(() => {
+    flushNowRef.current = flushNow;
+  }, [flushNow]);
+
   const handleBeforeGitOperation = useCallback(async () => {
     await flushNow();
   }, [flushNow]);
+
+  const switchEditorTab = useCallback(
+    (id: string) => {
+      if (id === activeId) {
+        return;
+      }
+      void openManuscript(id);
+    },
+    [activeId, openManuscript],
+  );
+
+  const closeEditorTab = useCallback(
+    (id: string) => {
+      void (async () => {
+        if (activeId === id) {
+          await flushNow();
+        }
+        const nextId = pickAdjacentTabId(id);
+        unregisterTab(id);
+        if (activeId !== id) {
+          return;
+        }
+        if (nextId) {
+          await openManuscript(nextId);
+        } else {
+          setActiveId(null);
+          setDocument(null);
+          setSaveState("idle");
+          setExternalChange(false);
+        }
+      })();
+    },
+    [activeId, flushNow, openManuscript, pickAdjacentTabId, unregisterTab],
+  );
 
   const handleGitOperationComplete = useCallback(
     async (workspaceUpdated: boolean) => {
@@ -408,6 +465,7 @@ export function App() {
   const applyProjectLibrary = useCallback(
     async (library: { rootPath: string; project?: { title: string } | null }) => {
       await flushNow();
+      setOpenTabIds([]);
       setLibraryPath(library.rootPath);
       setProjectTitle(library.project?.title ?? null);
       setActiveId(null);
@@ -416,7 +474,7 @@ export function App() {
       setVersionControlRefreshKey((value) => value + 1);
       await refreshList();
     },
-    [flushNow, refreshList],
+    [flushNow, refreshList, setOpenTabIds],
   );
 
   const handleChooseLibrary = useCallback(async () => {
@@ -481,6 +539,7 @@ export function App() {
     try {
       const loaded = await importMarkdownFile(selected);
       await refreshList();
+      registerTab(loaded.summary.id);
       setActiveId(loaded.summary.id);
       setDocument(loaded.document);
       setSaveState("idle");
@@ -488,7 +547,7 @@ export function App() {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Failed to open file");
     }
-  }, [refreshList]);
+  }, [refreshList, registerTab]);
 
   const handleRevealLibrary = useCallback(() => {
     if (!isTauriRuntime()) {
@@ -569,11 +628,17 @@ export function App() {
             await flushNow();
           }
           await deleteManuscript(id);
+          const nextId = id === activeId ? pickAdjacentTabId(id) : null;
+          unregisterTab(id);
           if (id === activeId) {
-            setActiveId(null);
-            setDocument(null);
-            setSaveState("idle");
-            setExternalChange(false);
+            if (nextId) {
+              await openManuscript(nextId);
+            } else {
+              setActiveId(null);
+              setDocument(null);
+              setSaveState("idle");
+              setExternalChange(false);
+            }
           }
           await refreshList();
         } catch (cause) {
@@ -581,7 +646,15 @@ export function App() {
         }
       })();
     },
-    [activeId, flushNow, manuscripts, refreshList],
+    [
+      activeId,
+      flushNow,
+      manuscripts,
+      openManuscript,
+      pickAdjacentTabId,
+      refreshList,
+      unregisterTab,
+    ],
   );
 
   return (
@@ -651,6 +724,14 @@ export function App() {
         <main className="app-main" data-editor-view={viewMode === "split" ? "markdown" : "classic"}>
           {document ? (
             <>
+              <EditorTabBar
+                openTabIds={openTabIds}
+                activeId={activeId}
+                manuscriptsById={manuscriptsById}
+                saveState={saveState}
+                onSelectTab={switchEditorTab}
+                onCloseTab={closeEditorTab}
+              />
               <EditorToolbar
                 title={document.title}
                 onTitleChange={handleTitleChange}
