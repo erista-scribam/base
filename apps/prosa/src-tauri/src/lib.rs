@@ -30,9 +30,9 @@ use std::process::Command;
 
 #[cfg(feature = "git-vcs")]
 use project_git::{
-    ProjectVersionControl, checkout_project_branch as git_checkout_branch,
+    GitGraphCommit, ProjectVersionControl, checkout_project_branch as git_checkout_branch,
     commit_project_checkpoint as git_commit_checkpoint, create_project_branch as git_create_branch,
-    project_version_control as git_project_status,
+    project_git_graph as git_project_graph, project_version_control as git_project_status,
 };
 
 #[derive(Serialize)]
@@ -126,6 +126,16 @@ fn checkout_project_branch(
     name: String,
 ) -> Result<ProjectVersionControl, String> {
     git_checkout_branch(&library_root_path(&app)?, &name)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn get_project_git_graph(
+    app: tauri::AppHandle,
+    limit: Option<u32>,
+) -> Result<Vec<GitGraphCommit>, String> {
+    let limit = limit.unwrap_or(40) as usize;
+    git_project_graph(&library_root_path(&app)?, limit)
 }
 
 #[tauri::command]
@@ -399,7 +409,8 @@ pub fn run() {
             get_project_version_control,
             commit_project_checkpoint,
             create_project_branch,
-            checkout_project_branch
+            checkout_project_branch,
+            get_project_git_graph
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

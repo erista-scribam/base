@@ -1,6 +1,6 @@
 import type { ManuscriptSummary } from "@scribo/core";
 import type { LibraryViewMode } from "../hooks/useLibraryViewMode";
-import { VersionControlPanel } from "./VersionControlPanel";
+import { SourceControlPanel } from "./SourceControlPanel";
 import {
   formatCompactMeta,
   formatManuscriptEdited,
@@ -24,7 +24,8 @@ export interface ManuscriptNavProps {
   onDelete: (id: string) => void;
   versionControlRefreshKey: number;
   onVersionControlError: (message: string) => void;
-  onVersionControlChanged: () => void;
+  onBeforeGitOperation: () => void | Promise<void>;
+  onGitOperationComplete: (workspaceUpdated: boolean) => void | Promise<void>;
 }
 
 const VIEW_LABELS: Record<LibraryViewMode, string> = {
@@ -57,7 +58,8 @@ export function ManuscriptNav({
   onDelete,
   versionControlRefreshKey,
   onVersionControlError,
-  onVersionControlChanged,
+  onBeforeGitOperation,
+  onGitOperationComplete,
 }: ManuscriptNavProps) {
   return (
     <aside className="app-sidebar" aria-label="Library">
@@ -119,6 +121,15 @@ export function ManuscriptNav({
           </button>
         </div>
       ) : null}
+
+      <SourceControlPanel
+        refreshKey={versionControlRefreshKey}
+        onError={onVersionControlError}
+        onBeforeGitOperation={onBeforeGitOperation}
+        onGitOperationComplete={async (result) => {
+          await onGitOperationComplete(result.workspaceUpdated === true);
+        }}
+      />
 
       <ul className="app-sidebar-list" data-library-view={libraryViewMode}>
         {manuscripts.length === 0 ? (
@@ -184,12 +195,6 @@ export function ManuscriptNav({
           ))
         )}
       </ul>
-
-      <VersionControlPanel
-        refreshKey={versionControlRefreshKey}
-        onError={onVersionControlError}
-        onProjectChanged={onVersionControlChanged}
-      />
 
       {activeId ? (
         <div className="app-sidebar-footer">

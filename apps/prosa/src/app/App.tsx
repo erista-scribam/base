@@ -215,9 +215,11 @@ export function App() {
   });
 
   const openManuscript = useCallback(
-    async (id: string) => {
+    async (id: string, options?: { preferDisk?: boolean }) => {
       setError(null);
-      setNotice(null);
+      if (!options?.preferDisk) {
+        setNotice(null);
+      }
       setExternalChange(false);
       try {
         let resolvedId = id;
@@ -227,13 +229,21 @@ export function App() {
           await refreshList();
         }
         const loaded = await loadManuscript(resolvedId);
-        const recovery = await loadRecoveryCandidate(resolvedId);
-        const decision = resolveRecoveryOnOpen(loaded.document, loaded.summary.updatedAt, recovery);
-        if (decision.kind === "use_recovery") {
-          setNotice("Restored unsaved edits from recovery.");
+        let documentToOpen = loaded.document;
+        if (!options?.preferDisk) {
+          const recovery = await loadRecoveryCandidate(resolvedId);
+          const decision = resolveRecoveryOnOpen(
+            loaded.document,
+            loaded.summary.updatedAt,
+            recovery,
+          );
+          if (decision.kind === "use_recovery") {
+            setNotice("Restored unsaved edits from recovery.");
+          }
+          documentToOpen = decision.document;
         }
         setActiveId(resolvedId);
-        setDocument(decision.document);
+        setDocument(documentToOpen);
         setSaveState("idle");
         if (isTauriRuntime()) {
           const diskRevision = await getManuscriptDiskRevision(resolvedId);
@@ -275,17 +285,28 @@ export function App() {
     [refreshList],
   );
 
-  const handleVersionControlChanged = useCallback(() => {
-    void refreshList();
-    setVersionControlRefreshKey((value) => value + 1);
-  }, [refreshList]);
-
   const { notifyDocumentChange, setDocumentRef, flushNow } = useManuscriptPersistence(
     activeId,
     activeSummary,
     setSaveState,
     (saved, savedFromManuscriptId) => void handleSaved(saved, savedFromManuscriptId),
     (message) => setError(message),
+  );
+
+  const handleBeforeGitOperation = useCallback(async () => {
+    await flushNow();
+  }, [flushNow]);
+
+  const handleGitOperationComplete = useCallback(
+    async (workspaceUpdated: boolean) => {
+      await refreshList();
+      setVersionControlRefreshKey((value) => value + 1);
+      if (workspaceUpdated && activeId) {
+        await openManuscript(activeId, { preferDisk: true });
+        setNotice("Branch switched — manuscript reloaded from disk.");
+      }
+    },
+    [activeId, openManuscript, refreshList],
   );
 
   const handleDocumentChange = useCallback(
@@ -481,7 +502,8 @@ export function App() {
           onDelete={handleDeleteManuscript}
           versionControlRefreshKey={versionControlRefreshKey}
           onVersionControlError={(message) => setError(message)}
-          onVersionControlChanged={handleVersionControlChanged}
+          onBeforeGitOperation={handleBeforeGitOperation}
+          onGitOperationComplete={handleGitOperationComplete}
         />
         <main className="app-main" data-editor-view={viewMode === "split" ? "markdown" : "classic"}>
           {document ? (

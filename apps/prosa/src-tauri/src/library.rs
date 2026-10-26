@@ -450,6 +450,22 @@ pub fn clear_library_recovery(app: &AppHandle, path_key: &str) -> Result<(), Str
     Ok(())
 }
 
+/// Wipe crash-recovery sidecars after Git checkout so editors reload branch files from disk.
+pub fn clear_all_library_recovery_at_root(root: &Path) -> Result<(), String> {
+    let dir = root.join(".scribo/recovery");
+    if !dir.exists() {
+        return Ok(());
+    }
+    for entry in fs::read_dir(&dir).map_err(|error| error.to_string())? {
+        let entry = entry.map_err(|error| error.to_string())?;
+        let path = entry.path();
+        if path.is_file() {
+            fs::remove_file(&path).map_err(|error| error.to_string())?;
+        }
+    }
+    Ok(())
+}
+
 fn unique_markdown_path(
     library_root: &Path,
     parent: &Path,

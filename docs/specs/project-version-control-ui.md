@@ -7,15 +7,15 @@ Git is **not** an invisible sync layer. Writers must see and control narrative l
 
 ## Non-negotiables
 
-| Requirement                                                    | Phase                       |
-| -------------------------------------------------------------- | --------------------------- |
-| **Current branch** visible at all times in the project chrome  | 4 (shipped incrementally)   |
-| **Branch list** + create + switch (with dirty-tree guard)      | 5                           |
-| **Checkpoint / commit** with human-readable message            | 4                           |
-| **History list** (recent commits, newest first)                | 4                           |
-| **Diff + restore** from a commit (manuscript or project scope) | 4 → 5                       |
-| **Merge conflicts** surfaced in editor with accept/keep-both   | 5                           |
-| Raw Git porcelain, SHA-only UI, or terminal workflow           | **Never** as the primary UX |
+| Requirement                                                     | Phase                       |
+| --------------------------------------------------------------- | --------------------------- |
+| **Current branch** visible at all times in the project chrome   | 4 (shipped incrementally)   |
+| **Searchable branch picker** + create; switch when checkpointed | 4–5                         |
+| **Timeline graph** (commits, branch tip nodes)                  | 4                           |
+| **Checkpoint / commit** with human-readable message             | 4                           |
+| **Diff + restore** from a commit (manuscript or project scope)  | 4 → 5                       |
+| **Merge conflicts** surfaced in editor with accept/keep-both    | 5                           |
+| Raw Git porcelain, SHA-only UI, or terminal workflow            | **Never** as the primary UX |
 
 ## Phase map (user-visible)
 
