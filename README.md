@@ -1,8 +1,8 @@
 # Scribam
 
-**Scribam** (_scribam_ — “let me write”) is structured writing software—**let me write**, not edit by default. We build for the writer, not the document editor as the product. **Scribam Prosa** is the first app: a local-first desktop client for prose manuscripts (novels, essays, memoir, and similar forms). Brand reference: [docs/brands/scribam-brand-kit/](docs/brands/scribam-brand-kit/).
+Opinionated, structured writing software. **Scribam Prosa** is the first product: a local-first desktop app for prose manuscripts (novels, essays, memoir, and similar forms).
 
-Scribam owns the **structure** of the writing; the application owns **presentation**. Full product law: [docs/product/philosophy.md](docs/product/philosophy.md).
+Scribam owns the **structure** of the writing; the application owns **presentation**. Product law: [docs/product/philosophy.md](docs/product/philosophy.md). Brand assets: [docs/brands/scribam-brand-kit/](docs/brands/scribam-brand-kit/).
 
 **License:** [AGPL-3.0-or-later](LICENSE) ([open core & premium](docs/product/licensing.md)) · **Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · **Security:** [SECURITY.md](SECURITY.md)
 

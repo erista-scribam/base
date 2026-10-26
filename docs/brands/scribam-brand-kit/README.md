@@ -38,7 +38,7 @@ Vector assets and tokens aligned with the [brand sheet](./brand-sheet-v1.jpg). *
 | Markdown / code           | **JetBrains Mono**    |
 | Screenplay (future Drama) | **Courier Prime**     |
 
-Wordmark SVGs reference these families; install or load via Google Fonts for pixel-accurate export. Prosa loads the full stack in `apps/prosa/index.html`.
+Wordmark SVGs reference these families for **export and marketing** lockups. The **Prosa app** keeps its own reading typography (Literata for manuscripts, system UI sans, system monospace)—see `apps/prosa/src/styles/tokens.css`.
 
 ## Brand essence (from sheet)
 

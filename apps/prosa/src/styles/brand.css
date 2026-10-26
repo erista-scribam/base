@@ -43,30 +43,15 @@
 }
 
 .prosa-brand-bar-kicker {
-  font-family: var(--scribam-font-brand);
-  font-size: 0.8125rem;
+  font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--scribam-ui-text);
-}
-
-.prosa-brand-bar-tagline {
-  font-size: 0.5625rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--scribam-ui-muted);
 }
 
-.prosa-brand-bar-tagline-secondary {
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: color-mix(in srgb, var(--scribam-ui-muted) 85%, transparent);
-}
-
 .prosa-brand-bar-title {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--scribam-prosa);
+  color: var(--scribam-ui-text);
 }
