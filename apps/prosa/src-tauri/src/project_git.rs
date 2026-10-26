@@ -309,7 +309,7 @@ pub fn project_git_graph(root: &Path, limit: usize) -> Result<Vec<GitGraphCommit
     }
 
     let mut walk = repo.revwalk().map_err(|error| error.to_string())?;
-    walk.set_sorting(Sort::TIME)
+    walk.set_sorting(Sort::TOPOLOGICAL | Sort::TIME)
         .map_err(|error| error.to_string())?;
 
     if tips_by_oid.is_empty() {

@@ -141,10 +141,15 @@
 
 /* GitHub Desktop–style source control (sidebar) */
 .source-control {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
   flex-shrink: 0;
   margin: 0 var(--scribo-space-3) var(--scribo-space-3);
   padding-bottom: var(--scribo-space-3);
   border-bottom: 1px solid var(--scribo-ui-border-subtle);
+  overflow: visible;
 }
 
 .sc-branch-switcher {
@@ -395,6 +400,118 @@
 }
 
 .sc-history-meta code {
+  font-family: var(--scribo-font-mono, ui-monospace, monospace);
+}
+
+.sc-graph-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sc-graph-panel .commit-graph {
+  min-height: 9rem;
+  max-height: min(28rem, 42vh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--scribo-ui-border-subtle);
+  border-radius: var(--scribo-radius-sm);
+  background: var(--scribo-ui-canvas);
+  min-width: 0;
+}
+
+.commit-graph-empty {
+  margin: 0;
+  padding: var(--scribo-space-2) 0;
+  font-size: 0.75rem;
+  color: var(--scribo-ui-muted);
+}
+
+.commit-graph-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.commit-graph-item {
+  display: flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  border-bottom: 1px solid color-mix(in srgb, var(--scribo-ui-border-subtle) 50%, transparent);
+}
+
+.commit-graph-item:last-child {
+  border-bottom: none;
+}
+
+.commit-graph-gutter {
+  flex-shrink: 0;
+  display: block;
+  overflow: visible;
+}
+
+.commit-graph-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.commit-graph-node {
+  paint-order: stroke fill;
+}
+
+.commit-graph-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.25rem 0.5rem 0.25rem 0.125rem;
+  gap: 0.125rem;
+}
+
+.commit-graph-branches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.commit-graph-branch {
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 0 0.3125rem;
+  border-left: 2px solid;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commit-graph-branch[data-current="true"] {
+  font-weight: 700;
+}
+
+.commit-graph-summary {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  font-weight: 500;
+  color: var(--scribo-ui-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commit-graph-meta {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.625rem;
+  color: var(--scribo-ui-muted);
+}
+
+.commit-graph-meta code {
   font-family: var(--scribo-font-mono, ui-monospace, monospace);
 }
 

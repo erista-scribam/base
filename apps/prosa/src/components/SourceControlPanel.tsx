@@ -3,30 +3,20 @@ import {
   checkoutProjectBranch,
   commitProjectCheckpoint,
   createProjectBranch,
+  getProjectGitGraph,
   getProjectVersionControl,
   type GitBranchSummary,
+  type GitGraphCommit,
   type ProjectVersionControl,
 } from "../features/version-control/project-version-control";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
+import { CommitGraphView } from "./version-control/CommitGraphView";
 
 export interface SourceControlPanelProps {
   refreshKey: number;
   onError: (message: string) => void;
   onGitOperationComplete: (result: ProjectVersionControl) => void | Promise<void>;
   onBeforeGitOperation: () => void | Promise<void>;
-}
-
-function formatCommitTime(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) {
-    return iso;
-  }
-  return date.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
 }
 
 function BranchSwitcher({
@@ -173,17 +163,19 @@ export function SourceControlPanel({
   const [status, setStatus] = useState<ProjectVersionControl | null>(null);
   const [summary, setSummary] = useState("");
   const [busy, setBusy] = useState(false);
-  const [tab, setTab] = useState<"changes" | "history">("changes");
+  const [tab, setTab] = useState<"changes" | "graph">("changes");
+  const [graphCommits, setGraphCommits] = useState<GitGraphCommit[]>([]);
 
   useEffect(() => {
     if (!isTauriRuntime()) {
       return;
     }
     let cancelled = false;
-    void getProjectVersionControl()
-      .then((next) => {
+    void Promise.all([getProjectVersionControl(), getProjectGitGraph(50)])
+      .then(([nextStatus, nextGraph]) => {
         if (!cancelled) {
-          setStatus(next);
+          setStatus(nextStatus);
+          setGraphCommits(nextGraph);
         }
       })
       .catch((cause) => {
@@ -203,6 +195,8 @@ export function SourceControlPanel({
         await onBeforeGitOperation();
         const next = await action();
         setStatus(next);
+        const nextGraph = await getProjectGitGraph(50);
+        setGraphCommits(nextGraph);
         await onGitOperationComplete(next);
       } catch (cause) {
         onError(cause instanceof Error ? cause.message : "Git operation failed");
@@ -247,10 +241,10 @@ export function SourceControlPanel({
           type="button"
           role="tab"
           className="sc-tab"
-          aria-selected={tab === "history"}
-          onClick={() => setTab("history")}
+          aria-selected={tab === "graph"}
+          onClick={() => setTab("graph")}
         >
-          History
+          Graph
         </button>
       </div>
 
@@ -292,21 +286,9 @@ export function SourceControlPanel({
           </button>
         </div>
       ) : (
-        <ul className="sc-history" role="tabpanel">
-          {status.recentCommits.length === 0 ? (
-            <li className="sc-history-empty">No checkpoints yet on this branch.</li>
-          ) : (
-            status.recentCommits.map((commit) => (
-              <li key={commit.id} className="sc-history-item">
-                <div className="sc-history-summary">{commit.message || "Checkpoint"}</div>
-                <div className="sc-history-meta">
-                  <code>{commit.id.slice(0, 7)}</code>
-                  <span>{formatCommitTime(commit.committedAt)}</span>
-                </div>
-              </li>
-            ))
-          )}
-        </ul>
+        <div className="sc-graph-panel" role="tabpanel">
+          <CommitGraphView commits={graphCommits} currentBranch={current} />
+        </div>
       )}
     </section>
   );

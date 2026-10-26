@@ -27,14 +27,14 @@ flowchart LR
   P5 --> |merge conflict UI| Writer[Writer trust]
 ```
 
-- **Phase 4:** Main branch history, manual checkpoints, dirty indicator, commit list in sidebar panel.
+- **Phase 4:** Main branch history, manual checkpoints, dirty indicator; sidebar **Changes / Graph** tabs (unified row graph: colored lanes + branch tips + summary, SourceTree-style layout).
 - **Phase 5:** Named branches, switch branch, merge with conflict markers resolved in UI.
 - **Phase 6+:** Workspace shell may embed the same panel; do not duplicate a second hidden Git UX.
 
 ## Acceptance (Phase 4 MVP)
 
 1. Opening a project shows whether Git is initialized and the **current branch name**.
-2. User can create a **checkpoint** after save; commit appears in **history** without restarting the app.
+2. User can create a **checkpoint** after save; commit appears in the **Graph** tab without restarting the app.
 3. Uncommitted disk changes show **unsaved / uncheckpointed** state distinct from editor dirty state.
 4. All actions fail loudly (toast/error)—no silent Git failures.
 
