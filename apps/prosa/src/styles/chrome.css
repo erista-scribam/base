@@ -139,6 +139,124 @@
   color: var(--scribo-ui-muted);
 }
 
+.version-panel {
+  margin: 0 var(--scribo-space-2) var(--scribo-space-2);
+  padding: var(--scribo-space-2);
+  border: 1px solid var(--scribo-ui-border-subtle);
+  border-radius: var(--scribo-radius-sm);
+  background: color-mix(in srgb, var(--scribo-ui-canvas) 85%, transparent);
+}
+
+.version-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--scribo-space-2);
+  margin-bottom: var(--scribo-space-2);
+}
+
+.version-panel-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--scribo-ui-text-secondary);
+}
+
+.version-panel-badge {
+  font-size: 0.625rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--scribo-radius-sm);
+  background: color-mix(in srgb, var(--scribo-ui-warn, #c97) 25%, transparent);
+  color: var(--scribo-ui-text);
+}
+
+.version-panel-field-label {
+  display: block;
+  font-size: 0.625rem;
+  color: var(--scribo-ui-muted);
+  margin-bottom: 0.25rem;
+}
+
+.version-panel-branch-row {
+  display: flex;
+  align-items: center;
+  gap: var(--scribo-space-1);
+}
+
+.version-panel-select {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.375rem;
+  border-radius: var(--scribo-radius-sm);
+  border: 1px solid var(--scribo-ui-border-subtle);
+  background: var(--scribo-ui-canvas);
+  color: var(--scribo-ui-text);
+}
+
+.version-panel-new-branch {
+  flex-shrink: 0;
+  font-size: 0.6875rem;
+}
+
+.version-panel-checkpoint {
+  margin-top: var(--scribo-space-2);
+}
+
+.version-panel-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 0.75rem;
+  padding: 0.375rem 0.5rem;
+  margin-bottom: var(--scribo-space-1);
+  border-radius: var(--scribo-radius-sm);
+  border: 1px solid var(--scribo-ui-border-subtle);
+  background: var(--scribo-ui-canvas);
+  color: var(--scribo-ui-text);
+}
+
+.version-panel-checkpoint-btn {
+  width: 100%;
+}
+
+.version-panel-history {
+  list-style: none;
+  margin: var(--scribo-space-2) 0 0;
+  padding: 0;
+  max-height: 10rem;
+  overflow-y: auto;
+  border-top: 1px solid var(--scribo-ui-border-subtle);
+  padding-top: var(--scribo-space-1);
+}
+
+.version-panel-history-empty {
+  font-size: 0.6875rem;
+  color: var(--scribo-ui-muted);
+  padding: var(--scribo-space-1) 0;
+}
+
+.version-panel-commit {
+  padding: var(--scribo-space-1) 0;
+  border-bottom: 1px solid var(--scribo-ui-border-subtle);
+}
+
+.version-panel-commit:last-child {
+  border-bottom: none;
+}
+
+.version-panel-commit-message {
+  font-size: 0.75rem;
+  color: var(--scribo-ui-text);
+  line-height: 1.35;
+}
+
+.version-panel-commit-meta {
+  font-size: 0.625rem;
+  color: var(--scribo-ui-muted);
+  margin-top: 0.125rem;
+}
+
 .app-sidebar-footer {
   flex-shrink: 0;
   padding: var(--scribo-space-3) var(--scribo-space-4) var(--scribo-space-4);

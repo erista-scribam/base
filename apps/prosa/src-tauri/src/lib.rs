@@ -4,6 +4,8 @@ mod git_spike;
 mod library;
 mod persistence;
 mod project;
+#[cfg(feature = "git-vcs")]
+mod project_git;
 mod recovery;
 
 use crate::atomic_io::atomic_write;
@@ -23,7 +25,15 @@ use persistence::{
 };
 use recovery::{parse_recovery, wrap_recovery};
 use serde::Serialize;
+use std::path::Path;
 use std::process::Command;
+
+#[cfg(feature = "git-vcs")]
+use project_git::{
+    ProjectVersionControl, checkout_project_branch as git_checkout_branch,
+    commit_project_checkpoint as git_commit_checkpoint, create_project_branch as git_create_branch,
+    project_version_control as git_project_status,
+};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -78,6 +88,44 @@ fn init_library(app: tauri::AppHandle) -> Result<LibraryInfo, String> {
 fn migrate_legacy_root_manuscripts(app: tauri::AppHandle) -> Result<u32, String> {
     ensure_default_library(&app)?;
     migrate_legacy_root_markdown(&app)
+}
+
+fn library_root_path(app: &tauri::AppHandle) -> Result<std::path::PathBuf, String> {
+    let info = ensure_default_library(app)?;
+    Ok(Path::new(&info.root_path).to_path_buf())
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn get_project_version_control(app: tauri::AppHandle) -> Result<ProjectVersionControl, String> {
+    git_project_status(&library_root_path(&app)?)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn commit_project_checkpoint(
+    app: tauri::AppHandle,
+    message: String,
+) -> Result<ProjectVersionControl, String> {
+    git_commit_checkpoint(&library_root_path(&app)?, &message)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn create_project_branch(
+    app: tauri::AppHandle,
+    name: String,
+) -> Result<ProjectVersionControl, String> {
+    git_create_branch(&library_root_path(&app)?, &name)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn checkout_project_branch(
+    app: tauri::AppHandle,
+    name: String,
+) -> Result<ProjectVersionControl, String> {
+    git_checkout_branch(&library_root_path(&app)?, &name)
 }
 
 #[tauri::command]
@@ -347,7 +395,11 @@ pub fn run() {
             clear_recovery_snapshot,
             delete_manuscript,
             get_manuscript_disk_revision,
-            migrate_legacy_root_manuscripts
+            migrate_legacy_root_manuscripts,
+            get_project_version_control,
+            commit_project_checkpoint,
+            create_project_branch,
+            checkout_project_branch
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

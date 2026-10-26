@@ -62,6 +62,7 @@ export function App() {
   const [layoutKey, setLayoutKey] = useState(0);
   const [libraryPath, setLibraryPath] = useState<string | null>(null);
   const [projectTitle, setProjectTitle] = useState<string | null>(null);
+  const [versionControlRefreshKey, setVersionControlRefreshKey] = useState(0);
   const { theme, toggleTheme } = useTheme();
   const { libraryViewMode, setLibraryViewMode } = useLibraryViewMode();
   const { markdownPreviewVisible, toggleMarkdownPreview } = useMarkdownPreviewVisible();
@@ -163,6 +164,7 @@ export function App() {
         const items = await listManuscripts();
         if (!cancelled) {
           setManuscripts(items);
+          setVersionControlRefreshKey((value) => value + 1);
         }
       })
       .catch(() => {
@@ -267,10 +269,16 @@ export function App() {
         const diskRevision = await getManuscriptDiskRevision(saved.id);
         setDiskRevisionAtOpen(diskRevision);
         setExternalChange(false);
+        setVersionControlRefreshKey((value) => value + 1);
       }
     },
     [refreshList],
   );
+
+  const handleVersionControlChanged = useCallback(() => {
+    void refreshList();
+    setVersionControlRefreshKey((value) => value + 1);
+  }, [refreshList]);
 
   const { notifyDocumentChange, setDocumentRef, flushNow } = useManuscriptPersistence(
     activeId,
@@ -471,6 +479,9 @@ export function App() {
           onRevealLibrary={handleRevealLibrary}
           onRevealActive={handleRevealActive}
           onDelete={handleDeleteManuscript}
+          versionControlRefreshKey={versionControlRefreshKey}
+          onVersionControlError={(message) => setError(message)}
+          onVersionControlChanged={handleVersionControlChanged}
         />
         <main className="app-main" data-editor-view={viewMode === "split" ? "markdown" : "classic"}>
           {document ? (

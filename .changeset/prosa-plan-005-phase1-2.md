@@ -2,4 +2,4 @@
 "@scribo/prosa": patch
 ---
 
-Stable block IDs in saved markdown, project layout under `content/manuscripts/`, automatic migration of legacy root markdown on launch, and Git feasibility spike tests (`pnpm verify:git-spike`).
+Stable block IDs, project layout, legacy markdown migration, and sidebar **Version** panel (branches, checkpoints, commit history) backed by embedded Git.

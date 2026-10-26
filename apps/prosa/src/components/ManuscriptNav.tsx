@@ -1,5 +1,6 @@
 import type { ManuscriptSummary } from "@scribo/core";
 import type { LibraryViewMode } from "../hooks/useLibraryViewMode";
+import { VersionControlPanel } from "./VersionControlPanel";
 import {
   formatCompactMeta,
   formatManuscriptEdited,
@@ -21,6 +22,9 @@ export interface ManuscriptNavProps {
   onRevealLibrary: () => void;
   onRevealActive: () => void;
   onDelete: (id: string) => void;
+  versionControlRefreshKey: number;
+  onVersionControlError: (message: string) => void;
+  onVersionControlChanged: () => void;
 }
 
 const VIEW_LABELS: Record<LibraryViewMode, string> = {
@@ -51,6 +55,9 @@ export function ManuscriptNav({
   onRevealLibrary,
   onRevealActive,
   onDelete,
+  versionControlRefreshKey,
+  onVersionControlError,
+  onVersionControlChanged,
 }: ManuscriptNavProps) {
   return (
     <aside className="app-sidebar" aria-label="Library">
@@ -177,6 +184,12 @@ export function ManuscriptNav({
           ))
         )}
       </ul>
+
+      <VersionControlPanel
+        refreshKey={versionControlRefreshKey}
+        onError={onVersionControlError}
+        onProjectChanged={onVersionControlChanged}
+      />
 
       {activeId ? (
         <div className="app-sidebar-footer">

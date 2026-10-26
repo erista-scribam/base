@@ -11,7 +11,7 @@ Plan 003 remains the **philosophy and capability vision** ([completed archive](.
 1. **Review** [project-architecture-and-storage.md](../specs/project-architecture-and-storage.md).
 2. **Approve** open decisions in [pending-decisions.md](../architecture/decisions/pending-decisions.md).
 3. **Run** [Git feasibility spike](../plans/active/git-integration-feasibility.md) (after approval).
-4. **Build** Phase 1 stable IDs → Phase 2 project directory → Phase 4 Git MVP (see architecture roadmap).
+4. **Build** Phase 4–5 **writer-visible** Git ([UI spec](../specs/project-version-control-ui.md)): history panel, branches, then merge UI.
 
 ## Capability map (plan 003 → plan 005)
 

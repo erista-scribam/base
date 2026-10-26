@@ -18,8 +18,9 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [features]
-default = []
-git-spike = ["dep:git2"]
+default = ["git-vcs"]
+git-vcs = ["dep:git2"]
+git-spike = ["git-vcs"]
 
 [dependencies]
 git2 = { version = "0.20", optional = true }

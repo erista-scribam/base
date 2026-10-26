@@ -63,20 +63,23 @@ flowchart TB
 
 ## Phase 4 — Git history MVP
 
-|                |                                                          |
-| -------------- | -------------------------------------------------------- |
-| **User value** | Commits, history list, diff, restore                     |
-| **Scope**      | Main branch only; manual or auto-commit policy           |
-| **Non-goals**  | Branches                                                 |
-| **Acceptance** | No data loss in interrupt tests; diff at paragraph level |
+|                   |                                                                                                                            |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **User value**    | Commits, history list, diff, restore                                                                                       |
+| **Scope**         | Main branch only; manual or auto-commit policy                                                                             |
+| **Non-goals**     | Multi-branch merge (Phase 5)                                                                                               |
+| **UI (required)** | [Version control panel spec](../../specs/project-version-control-ui.md): branch name, dirty state, checkpoint, commit list |
+| **Acceptance**    | No data loss in interrupt tests; diff at paragraph level; writer sees history without external tools                       |
+| **Status**        | **Started:** sidebar Version panel + Rust Git commands                                                                     |
 
 ## Phase 5 — Branches, merge, conflicts
 
-|                |                                              |
-| -------------- | -------------------------------------------- |
-| **User value** | Alternative versions, merge with conflict UI |
-| **Depends on** | Phase 1 IDs, Phase 4                         |
-| **Acceptance** | Scripted merge fixtures pass                 |
+|                   |                                                                                     |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| **User value**    | Alternative versions, merge with conflict UI                                        |
+| **Depends on**    | Phase 1 IDs, Phase 4                                                                |
+| **UI (required)** | Branch create/switch in panel; merge + conflict resolution (not raw `<<<<<<<` only) |
+| **Acceptance**    | Scripted merge fixtures pass                                                        |
 
 ## Phase 6 — Workspace shell
 

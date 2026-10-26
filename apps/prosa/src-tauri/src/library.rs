@@ -68,6 +68,10 @@ pub fn default_library_root(app: &AppHandle) -> Result<PathBuf, String> {
 fn library_info_for_root(root: PathBuf, existed_before: bool) -> Result<LibraryInfo, String> {
     fs::create_dir_all(&root).map_err(|error| error.to_string())?;
     let project = Some(ensure_project_manifest(&root)?);
+    #[cfg(feature = "git-vcs")]
+    {
+        let _ = crate::project_git::ensure_project_git(&root);
+    }
     Ok(LibraryInfo {
         root_path: root.to_string_lossy().into_owned(),
         exists: existed_before,
