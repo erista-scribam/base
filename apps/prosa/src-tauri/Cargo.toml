@@ -23,7 +23,7 @@ git-vcs = ["dep:git2"]
 git-spike = ["git-vcs"]
 
 [dependencies]
-git2 = { version = "0.20", optional = true }
+git2 = { version = "0.21", optional = true }
 tauri = { version = "2", features = [] }
 tauri-plugin-dialog = "2"
 tauri-plugin-opener = "2"
