@@ -33,24 +33,24 @@ flowchart TB
 
 ## Phase 1 — Stable identity
 
-|                |                                                          |
-| -------------- | -------------------------------------------------------- |
-| **Objective**  | Block/manuscript IDs survive edit round-trips            |
-| **Scope**      | Markdown anchor convention; TipTap convert preserves IDs |
-| **Non-goals**  | Git                                                      |
-| **Depends on** | Phase 0 approval                                         |
-| **Risk**       | High—touches editor core                                 |
-| **Status**     | **Shipped (2026-10-26):** comment anchors, markdown + TipTap convert   |
+|                |                                                                      |
+| -------------- | -------------------------------------------------------------------- |
+| **Objective**  | Block/manuscript IDs survive edit round-trips                        |
+| **Scope**      | Markdown anchor convention; TipTap convert preserves IDs             |
+| **Non-goals**  | Git                                                                  |
+| **Depends on** | Phase 0 approval                                                     |
+| **Risk**       | High—touches editor core                                             |
+| **Status**     | **Shipped (2026-10-26):** comment anchors, markdown + TipTap convert |
 
 ## Phase 2 — Project directory + legacy migration
 
-|                  |                                                                        |
-| ---------------- | ---------------------------------------------------------------------- |
-| **Objective**    | Open/create `scribo.project.json` + `content/`; import current library |
-| **Deliverables** | Rust project module; Tauri commands; UI “Open project”                 |
-| **Acceptance**   | Existing library imports; single-manuscript project works without Git  |
-| **Migration**    | Read-only legacy library path still supported one release              |
-| **Status**       | **Started:** manifest auto-create on library init; `content/` + UI TBD |
+|                  |                                                                                                                              |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Objective**    | Open/create `scribo.project.json` + `content/`; import current library                                                       |
+| **Deliverables** | Rust project module; Tauri commands; UI “Open project”                                                                       |
+| **Acceptance**   | Existing library imports; single-manuscript project works without Git                                                        |
+| **Migration**    | Read-only legacy library path still supported one release                                                                    |
+| **Status**       | **In progress:** manifest + `content/manuscripts/`; new docs there; legacy root `.md` still listed; project title in sidebar |
 
 ## Phase 3 — Git feasibility spike
 

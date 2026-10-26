@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -7,7 +7,10 @@ use serde::{Deserialize, Serialize};
 use crate::atomic_io::atomic_write;
 
 pub const PROJECT_MANIFEST_FILE: &str = "scribo.project.json";
+pub const CONTENT_MANUSCRIPTS_DIR: &str = "content/manuscripts";
+
 const PROJECT_SCHEMA_VERSION: u32 = 1;
+pub const PROJECT_LAYOUT_VERSION: u32 = 1;
 const PROJECT_ID_PREFIX: &str = "proj_";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -18,6 +21,8 @@ pub struct ScriboProjectManifest {
     pub title: String,
     pub created_at: String,
     pub updated_at: String,
+    #[serde(default)]
+    pub layout_version: u32,
 }
 
 fn new_project_id() -> String {
@@ -32,6 +37,43 @@ fn default_title_from_root(root: &Path) -> String {
         .to_string()
 }
 
+pub fn manuscripts_dir(root: &Path) -> PathBuf {
+    root.join(CONTENT_MANUSCRIPTS_DIR)
+}
+
+fn write_manifest(root: &Path, manifest: &ScriboProjectManifest) -> Result<(), String> {
+    let path = root.join(PROJECT_MANIFEST_FILE);
+    let raw = serde_json::to_string_pretty(manifest).map_err(|error| error.to_string())?;
+    atomic_write(&path, &raw)
+}
+
+fn new_manifest(root: &Path) -> ScriboProjectManifest {
+    let now = Utc::now().to_rfc3339();
+    ScriboProjectManifest {
+        project_schema_version: PROJECT_SCHEMA_VERSION,
+        id: new_project_id(),
+        title: default_title_from_root(root),
+        created_at: now.clone(),
+        updated_at: now,
+        layout_version: 0,
+    }
+}
+
+/// Creates `.scribo/recovery` and `content/manuscripts`; bumps `layoutVersion` when needed.
+pub fn ensure_project_layout(
+    root: &Path,
+    manifest: &mut ScriboProjectManifest,
+) -> Result<bool, String> {
+    fs::create_dir_all(root.join(".scribo/recovery")).map_err(|error| error.to_string())?;
+    fs::create_dir_all(manuscripts_dir(root)).map_err(|error| error.to_string())?;
+
+    if manifest.layout_version >= PROJECT_LAYOUT_VERSION {
+        return Ok(false);
+    }
+    manifest.layout_version = PROJECT_LAYOUT_VERSION;
+    Ok(true)
+}
+
 pub fn read_project_manifest(root: &Path) -> Result<Option<ScriboProjectManifest>, String> {
     let path = root.join(PROJECT_MANIFEST_FILE);
     if !path.exists() {
@@ -42,20 +84,55 @@ pub fn read_project_manifest(root: &Path) -> Result<Option<ScriboProjectManifest
 }
 
 pub fn ensure_project_manifest(root: &Path) -> Result<ScriboProjectManifest, String> {
-    if let Some(existing) = read_project_manifest(root)? {
-        return Ok(existing);
+    let manifest_path = root.join(PROJECT_MANIFEST_FILE);
+    let is_new = !manifest_path.exists();
+    let mut manifest = read_project_manifest(root)?.unwrap_or_else(|| new_manifest(root));
+
+    let layout_changed = ensure_project_layout(root, &mut manifest)?;
+    if is_new || layout_changed {
+        manifest.updated_at = Utc::now().to_rfc3339();
+        write_manifest(root, &manifest)?;
     }
 
-    let now = Utc::now().to_rfc3339();
-    let manifest = ScriboProjectManifest {
-        project_schema_version: PROJECT_SCHEMA_VERSION,
-        id: new_project_id(),
-        title: default_title_from_root(root),
-        created_at: now.clone(),
-        updated_at: now,
-    };
-    let path = root.join(PROJECT_MANIFEST_FILE);
-    let raw = serde_json::to_string_pretty(&manifest).map_err(|error| error.to_string())?;
-    atomic_write(&path, &raw)?;
     Ok(manifest)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn ensure_project_manifest_creates_layout_dirs() {
+        let root = std::env::temp_dir().join(format!("scribo-proj-test-{}", uuid::Uuid::new_v4()));
+        fs::create_dir_all(&root).unwrap();
+
+        let manifest = ensure_project_manifest(&root).unwrap();
+        assert_eq!(manifest.layout_version, PROJECT_LAYOUT_VERSION);
+        assert!(root.join(PROJECT_MANIFEST_FILE).exists());
+        assert!(manuscripts_dir(&root).is_dir());
+        assert!(root.join(".scribo/recovery").is_dir());
+
+        fs::remove_dir_all(&root).ok();
+    }
+
+    #[test]
+    fn ensure_project_manifest_upgrades_legacy_layout_version() {
+        let root = std::env::temp_dir().join(format!("scribo-proj-test-{}", uuid::Uuid::new_v4()));
+        fs::create_dir_all(&root).unwrap();
+        let legacy = ScriboProjectManifest {
+            project_schema_version: 1,
+            id: "proj_legacy".into(),
+            title: "Legacy".into(),
+            created_at: Utc::now().to_rfc3339(),
+            updated_at: Utc::now().to_rfc3339(),
+            layout_version: 0,
+        };
+        write_manifest(&root, &legacy).unwrap();
+
+        let manifest = ensure_project_manifest(&root).unwrap();
+        assert_eq!(manifest.layout_version, PROJECT_LAYOUT_VERSION);
+        assert!(manuscripts_dir(&root).is_dir());
+
+        fs::remove_dir_all(&root).ok();
+    }
 }

@@ -3,6 +3,9 @@ export type ProjectId = string & { readonly __brand: "ProjectId" };
 export const PROJECT_SCHEMA_VERSION = 1 as const;
 export type ProjectSchemaVersion = typeof PROJECT_SCHEMA_VERSION;
 
+export const PROJECT_LAYOUT_VERSION = 1 as const;
+export type ProjectLayoutVersion = typeof PROJECT_LAYOUT_VERSION;
+
 const PROJECT_ID_PREFIX = "proj_";
 
 export function createProjectId(value?: string): ProjectId {
@@ -24,4 +27,6 @@ export interface ScriboProjectManifest {
   title: string;
   createdAt: string;
   updatedAt: string;
+  /** `content/manuscripts` layout; 0 = legacy flat library root only. */
+  layoutVersion?: ProjectLayoutVersion;
 }

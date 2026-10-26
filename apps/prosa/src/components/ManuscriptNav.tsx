@@ -11,6 +11,7 @@ export interface ManuscriptNavProps {
   manuscripts: ManuscriptSummary[];
   activeId: string | null;
   libraryPath: string | null;
+  projectTitle: string | null;
   libraryViewMode: LibraryViewMode;
   onLibraryViewModeChange: (mode: LibraryViewMode) => void;
   onSelect: (id: string) => void;
@@ -40,6 +41,7 @@ export function ManuscriptNav({
   manuscripts,
   activeId,
   libraryPath,
+  projectTitle,
   libraryViewMode,
   onLibraryViewModeChange,
   onSelect,
@@ -86,6 +88,11 @@ export function ManuscriptNav({
 
       {libraryPath ? (
         <div className="library-folder">
+          {projectTitle ? (
+            <span className="library-project-title" title={projectTitle}>
+              {projectTitle}
+            </span>
+          ) : null}
           <button
             type="button"
             className="library-folder-path"

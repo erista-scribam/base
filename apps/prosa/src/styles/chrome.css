@@ -89,6 +89,7 @@
 
 .library-folder {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--scribo-space-1);
   margin: 0 var(--scribo-space-2) var(--scribo-space-2);
@@ -96,6 +97,18 @@
   border: 1px solid var(--scribo-ui-border-subtle);
   border-radius: var(--scribo-radius-sm);
   background: color-mix(in srgb, var(--scribo-ui-canvas) 70%, transparent);
+}
+
+.library-project-title {
+  flex: 1 1 100%;
+  min-width: 0;
+  padding: 0 var(--scribo-space-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--scribo-ui-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .library-folder-path {

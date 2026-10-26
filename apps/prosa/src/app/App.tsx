@@ -60,6 +60,7 @@ export function App() {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [layoutKey, setLayoutKey] = useState(0);
   const [libraryPath, setLibraryPath] = useState<string | null>(null);
+  const [projectTitle, setProjectTitle] = useState<string | null>(null);
   const { theme, toggleTheme } = useTheme();
   const { libraryViewMode, setLibraryViewMode } = useLibraryViewMode();
   const { markdownPreviewVisible, toggleMarkdownPreview } = useMarkdownPreviewVisible();
@@ -148,6 +149,7 @@ export function App() {
           return;
         }
         setLibraryPath(library.rootPath);
+        setProjectTitle(library.project?.title ?? null);
         const migrated = await migrateAllLegacyManuscriptsToLibrary().catch(() => 0);
         if (!cancelled && migrated > 0) {
           setNotice(`Moved ${migrated} manuscript(s) into your library folder.`);
@@ -160,7 +162,10 @@ export function App() {
       .catch(() => {
         if (!cancelled) {
           void getLibrary()
-            .then((library) => setLibraryPath(library.rootPath))
+            .then((library) => {
+              setLibraryPath(library.rootPath);
+              setProjectTitle(library.project?.title ?? null);
+            })
             .catch(() => undefined);
         }
       })
@@ -303,13 +308,14 @@ export function App() {
     const selected = await open({
       directory: true,
       multiple: false,
-      title: "Choose library folder",
+      title: "Choose project folder",
     });
     if (typeof selected !== "string") {
       return;
     }
     const library = await setLibraryRoot(selected);
     setLibraryPath(library.rootPath);
+    setProjectTitle(library.project?.title ?? null);
     await refreshList();
   }, [refreshList]);
 
@@ -449,6 +455,7 @@ export function App() {
           manuscripts={manuscripts}
           activeId={activeId}
           libraryPath={libraryPath}
+          projectTitle={projectTitle}
           libraryViewMode={libraryViewMode}
           onLibraryViewModeChange={setLibraryViewMode}
           onSelect={(id) => void openManuscript(id)}

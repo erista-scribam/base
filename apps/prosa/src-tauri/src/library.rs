@@ -10,7 +10,9 @@ use tauri::Manager;
 
 use crate::atomic_io::atomic_write;
 use crate::persistence::ManuscriptSummary;
-use crate::project::{ScriboProjectManifest, ensure_project_manifest, read_project_manifest};
+use crate::project::{
+    ScriboProjectManifest, ensure_project_manifest, manuscripts_dir, read_project_manifest,
+};
 
 const LIBRARY_DIR_NAME: &str = "Scribo Prosa";
 const PATH_ID_PREFIX: &str = "ms_path_";
@@ -183,16 +185,17 @@ fn walk_markdown_files(
     for entry in fs::read_dir(dir).map_err(|error| error.to_string())? {
         let entry = entry.map_err(|error| error.to_string())?;
         let path = entry.path();
-        if path
-            .file_name()
-            .and_then(|name| name.to_str())
-            .is_some_and(|name| name.starts_with('.') || name == ".scribo")
-        {
+        if path.file_name().is_some_and(|name| {
+            name == ".scribo" || name == ".git" || name.to_str().is_some_and(|n| n.starts_with('.'))
+        }) {
             continue;
         }
         let file_type = entry.file_type().map_err(|error| error.to_string())?;
         if file_type.is_dir() {
-            if path.file_name().is_some_and(|name| name == ".scribo") {
+            if path
+                .file_name()
+                .is_some_and(|name| name == ".scribo" || name == ".git")
+            {
                 continue;
             }
             walk_markdown_files(root, &path, entries)?;
@@ -387,18 +390,22 @@ pub fn clear_library_recovery(app: &AppHandle, path_key: &str) -> Result<(), Str
     Ok(())
 }
 
-fn unique_markdown_path(root: &Path, title: &str) -> Result<(PathBuf, String), String> {
+fn unique_markdown_path(
+    library_root: &Path,
+    parent: &Path,
+    title: &str,
+) -> Result<(PathBuf, String), String> {
     let base_name = sanitize_title_for_filename(title);
 
-    let mut candidate = root.join(format!("{base_name}.md"));
+    let mut candidate = parent.join(format!("{base_name}.md"));
     let mut counter = 2;
     while candidate.exists() {
-        candidate = root.join(format!("{base_name} {counter}.md"));
+        candidate = parent.join(format!("{base_name} {counter}.md"));
         counter += 1;
     }
 
     let rel = candidate
-        .strip_prefix(root)
+        .strip_prefix(library_root)
         .map_err(|error| error.to_string())?
         .to_string_lossy()
         .into_owned();
@@ -418,9 +425,10 @@ pub fn create_library_markdown_with_content(
     markdown: String,
 ) -> Result<(ManuscriptSummary, String), String> {
     let config = read_config(app)?.ok_or("Library is not configured")?;
-    fs::create_dir_all(&config.root_path).map_err(|error| error.to_string())?;
+    let parent = manuscripts_dir(&config.root_path);
+    fs::create_dir_all(&parent).map_err(|error| error.to_string())?;
 
-    let (path, rel) = unique_markdown_path(&config.root_path, &title)?;
+    let (path, rel) = unique_markdown_path(&config.root_path, &parent, &title)?;
     atomic_write(&path, &markdown)?;
     let (created, modified) = file_created_modified(&path);
     Ok((
