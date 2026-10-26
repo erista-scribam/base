@@ -42,7 +42,10 @@ import {
   revealManuscriptInFileManager,
 } from "../features/persistence/tauri-manuscripts";
 import { openProject } from "../features/projects/project-catalog";
+import { GitBranchChip } from "../components/GitBranchChip";
 import { useLibraryViewMode } from "../hooks/useLibraryViewMode";
+import { useProjectGitStatus } from "../hooks/useProjectGitStatus";
+import { useSidebarProjectView } from "../hooks/useSidebarProjectView";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
 
 export function App() {
@@ -66,6 +69,14 @@ export function App() {
   const [versionControlRefreshKey, setVersionControlRefreshKey] = useState(0);
   const { theme, toggleTheme } = useTheme();
   const { libraryViewMode, setLibraryViewMode } = useLibraryViewMode();
+  const { sidebarProjectView, setSidebarProjectView, showSourceControl } = useSidebarProjectView();
+  const {
+    initialized: gitInitialized,
+    currentBranch,
+    changedFiles,
+    changeCount,
+    mergeInProgress,
+  } = useProjectGitStatus(versionControlRefreshKey, saveState);
   const { markdownPreviewVisible, toggleMarkdownPreview } = useMarkdownPreviewVisible();
   const { zoom, zoomIn, zoomOut, resetZoom, canZoomIn, canZoomOut } = useEditorZoom();
 
@@ -81,6 +92,12 @@ export function App() {
   useEffect(() => {
     saveStateRef.current = saveState;
   }, [saveState]);
+
+  const openSourceControlSidebar = useCallback(() => {
+    setSidebarCollapsed(false);
+    setFocusMode(false);
+    showSourceControl();
+  }, [showSourceControl]);
 
   const restoreChromeAfterWindowChange = useCallback(() => {
     setLayoutKey((value) => value + 1);
@@ -558,6 +575,17 @@ export function App() {
           onOpenFile={handleOpenConflictFile}
         />
       ) : null}
+      {focusMode && gitInitialized && currentBranch ? (
+        <div className="focus-mode-git-bar">
+          <GitBranchChip
+            branchName={currentBranch}
+            changeCount={changeCount}
+            mergeInProgress={mergeInProgress}
+            compact
+            onClick={openSourceControlSidebar}
+          />
+        </div>
+      ) : null}
       <div className="app-body" key={layoutKey}>
         <ManuscriptNav
           manuscripts={manuscripts}
@@ -566,6 +594,11 @@ export function App() {
           projectTitle={projectTitle}
           libraryViewMode={libraryViewMode}
           onLibraryViewModeChange={setLibraryViewMode}
+          sidebarProjectView={sidebarProjectView}
+          onSidebarProjectViewChange={setSidebarProjectView}
+          changedFiles={changedFiles}
+          changeCount={changeCount}
+          mergeInProgress={mergeInProgress}
           onSelect={(id) => void openManuscript(id)}
           onCreate={() => void handleCreate()}
           onOpenFile={() => void handleOpenFile()}
@@ -605,6 +638,10 @@ export function App() {
                 onZoomOut={zoomOut}
                 onZoomReset={resetZoom}
                 onMarkdownFormat={viewMode === "split" ? handleMarkdownFormat : undefined}
+                gitBranch={gitInitialized ? currentBranch : null}
+                gitChangeCount={changeCount}
+                gitMergeInProgress={mergeInProgress}
+                onGitBranchClick={openSourceControlSidebar}
               />
               <div
                 className="editor-scroll"

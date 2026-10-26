@@ -5,6 +5,7 @@ import { editorZoomLabel } from "../hooks/useEditorZoom";
 import { FormatToolbar, MarkdownFormatToolbar } from "./FormatToolbar";
 import type { MarkdownFormatAction } from "../features/markdown/markdown-source-format";
 import { IconButton } from "./IconButton";
+import { GitBranchChip } from "./GitBranchChip";
 
 export interface EditorToolbarProps {
   title: string;
@@ -28,6 +29,10 @@ export interface EditorToolbarProps {
   onZoomOut: () => void;
   onZoomReset: () => void;
   onMarkdownFormat?: (action: MarkdownFormatAction) => void;
+  gitBranch?: string | null;
+  gitChangeCount?: number;
+  gitMergeInProgress?: boolean;
+  onGitBranchClick?: () => void;
 }
 
 function IconSidebar() {
@@ -124,6 +129,10 @@ export function EditorToolbar({
   onZoomOut,
   onZoomReset,
   onMarkdownFormat,
+  gitBranch,
+  gitChangeCount = 0,
+  gitMergeInProgress = false,
+  onGitBranchClick,
 }: EditorToolbarProps) {
   const isMarkdown = viewMode === "split";
   const statusLabel =
@@ -147,6 +156,14 @@ export function EditorToolbar({
         >
           <IconSidebar />
         </IconButton>
+        {gitBranch ? (
+          <GitBranchChip
+            branchName={gitBranch}
+            changeCount={gitChangeCount}
+            mergeInProgress={gitMergeInProgress}
+            onClick={onGitBranchClick}
+          />
+        ) : null}
         <input
           type="text"
           value={title}

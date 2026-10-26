@@ -13,6 +13,7 @@ import {
   type ProjectVersionControl,
 } from "../features/version-control/project-version-control";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
+import { GitFileStatusBadge } from "./GitFileStatusBadge";
 import { CommitGraphView } from "./version-control/CommitGraphView";
 
 export interface SourceControlPanelProps {
@@ -292,6 +293,16 @@ export function SourceControlPanel({
           ) : (
             <p className="sc-changes-hint sc-changes-hint-muted">No uncheckpointed changes.</p>
           )}
+          {(status.changedFiles ?? []).length > 0 ? (
+            <ul className="sc-changed-files" aria-label="Changed files">
+              {(status.changedFiles ?? []).map((file) => (
+                <li key={file.path} className="sc-changed-file">
+                  <GitFileStatusBadge status={file.status} />
+                  <span className="sc-changed-file-path">{file.path}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
           <label className="sc-label" htmlFor="sc-summary">
             Summary
           </label>

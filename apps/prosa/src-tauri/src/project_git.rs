@@ -4,7 +4,7 @@ use std::path::Path;
 
 use git2::{
     AnnotatedCommit, BranchType, IndexAddOption, MergeOptions, Repository, ResetType, Signature,
-    Sort, StatusOptions,
+    Sort, Status, StatusOptions,
 };
 use serde::Serialize;
 
@@ -48,10 +48,19 @@ pub struct ProjectMergeStatus {
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct GitChangedFile {
+    pub path: String,
+    /// untracked | added | modified | deleted | renamed | conflicted
+    pub status: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ProjectVersionControl {
     pub initialized: bool,
     pub current_branch: Option<String>,
     pub dirty: bool,
+    pub changed_files: Vec<GitChangedFile>,
     pub branches: Vec<GitBranchSummary>,
     pub recent_commits: Vec<GitCommitSummary>,
     pub merge: ProjectMergeStatus,
@@ -147,18 +156,64 @@ pub fn ensure_project_git(root: &Path) -> Result<bool, String> {
     Ok(true)
 }
 
-pub fn is_worktree_dirty(root: &Path) -> Result<bool, String> {
+fn git_file_status_label(flags: Status) -> Option<&'static str> {
+    if flags.intersects(Status::CONFLICTED) {
+        return Some("conflicted");
+    }
+    if flags.intersects(Status::WT_DELETED | Status::INDEX_DELETED) {
+        return Some("deleted");
+    }
+    if flags.intersects(Status::WT_NEW) && !flags.intersects(Status::INDEX_NEW) {
+        return Some("untracked");
+    }
+    if flags.intersects(Status::INDEX_NEW) {
+        return Some("added");
+    }
+    if flags.intersects(Status::WT_MODIFIED | Status::INDEX_MODIFIED) {
+        return Some("modified");
+    }
+    if flags.intersects(Status::WT_RENAMED | Status::INDEX_RENAMED) {
+        return Some("renamed");
+    }
+    if flags.is_empty() {
+        return None;
+    }
+    Some("modified")
+}
+
+pub fn list_changed_files(root: &Path) -> Result<Vec<GitChangedFile>, String> {
     if !root.join(".git").exists() {
-        return Ok(false);
+        return Ok(Vec::new());
     }
     let repo = open_repo(root)?;
     let mut opts = StatusOptions::new();
     opts.include_untracked(true);
     opts.recurse_untracked_dirs(true);
+    opts.renames_head_to_index(true);
+    opts.renames_index_to_workdir(true);
     let statuses = repo
         .statuses(Some(&mut opts))
         .map_err(|error| error.to_string())?;
-    Ok(!statuses.is_empty())
+    let mut files = Vec::new();
+    for entry in statuses.iter() {
+        let Some(path) = entry.path() else {
+            continue;
+        };
+        let Some(status) = git_file_status_label(entry.status()) else {
+            continue;
+        };
+        files.push(GitChangedFile {
+            path: path.replace('\\', "/"),
+            status: status.to_string(),
+        });
+    }
+    files.sort_by(|a, b| a.path.cmp(&b.path));
+    files.dedup_by(|a, b| a.path == b.path);
+    Ok(files)
+}
+
+pub fn is_worktree_dirty(root: &Path) -> Result<bool, String> {
+    Ok(!list_changed_files(root)?.is_empty())
 }
 
 pub fn project_version_control(root: &Path) -> Result<ProjectVersionControl, String> {
@@ -167,6 +222,7 @@ pub fn project_version_control(root: &Path) -> Result<ProjectVersionControl, Str
             initialized: false,
             current_branch: None,
             dirty: false,
+            changed_files: Vec::new(),
             branches: Vec::new(),
             recent_commits: Vec::new(),
             merge: empty_merge_status(),
@@ -211,7 +267,8 @@ pub fn project_version_control(root: &Path) -> Result<ProjectVersionControl, Str
         }
     }
 
-    let dirty = is_worktree_dirty(root)?;
+    let changed_files = list_changed_files(root)?;
+    let dirty = !changed_files.is_empty();
 
     let merge = read_merge_status(root, &repo)?;
 
@@ -219,6 +276,7 @@ pub fn project_version_control(root: &Path) -> Result<ProjectVersionControl, Str
         initialized: true,
         current_branch,
         dirty,
+        changed_files,
         branches,
         recent_commits,
         merge,

@@ -17,10 +17,19 @@ export interface ProjectMergeStatus {
   conflictedPaths: string[];
 }
 
+export type GitFileChangeStatus =
+  "untracked" | "added" | "modified" | "deleted" | "renamed" | "conflicted";
+
+export interface GitChangedFile {
+  path: string;
+  status: GitFileChangeStatus;
+}
+
 export interface ProjectVersionControl {
   initialized: boolean;
   currentBranch: string | null;
   dirty: boolean;
+  changedFiles: GitChangedFile[];
   branches: GitBranchSummary[];
   recentCommits: GitCommitSummary[];
   merge: ProjectMergeStatus;
