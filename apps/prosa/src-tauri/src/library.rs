@@ -11,7 +11,8 @@ use tauri::Manager;
 use crate::atomic_io::atomic_write;
 use crate::persistence::ManuscriptSummary;
 use crate::project::{
-    ScriboProjectManifest, ensure_project_manifest, manuscripts_dir, read_project_manifest,
+    PROJECT_MANIFEST_FILE, ScriboProjectManifest, ensure_project_manifest, manuscripts_dir,
+    read_project_manifest,
 };
 
 const LIBRARY_DIR_NAME: &str = "Scribo Prosa";
@@ -29,7 +30,11 @@ struct RecentProjectEntry {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct LibraryConfig {
+    /// Active project root (Git, manuscripts, explorer).
     root_path: PathBuf,
+    /// Prosa container folder (Documents/Scribo Prosa); projects live in subfolders.
+    #[serde(default)]
+    home_path: Option<PathBuf>,
     #[serde(default)]
     recent_projects: Vec<RecentProjectEntry>,
 }
@@ -48,6 +53,7 @@ pub struct ProjectSummary {
 #[serde(rename_all = "camelCase")]
 pub struct LibraryInfo {
     pub root_path: String,
+    pub home_path: String,
     pub exists: bool,
     pub project: Option<ScriboProjectManifest>,
 }
@@ -114,7 +120,134 @@ fn project_title_for_root(root: &Path) -> String {
         })
 }
 
-fn library_info_for_root(root: PathBuf, existed_before: bool) -> Result<LibraryInfo, String> {
+fn paths_equal(a: &Path, b: &Path) -> bool {
+    match (fs::canonicalize(a), fs::canonicalize(b)) {
+        (Ok(a), Ok(b)) => a == b,
+        _ => a == b,
+    }
+}
+
+fn is_project_directory(path: &Path) -> bool {
+    path.join(PROJECT_MANIFEST_FILE).is_file()
+}
+
+fn resolve_home_path(app: &AppHandle, config: &LibraryConfig) -> Result<PathBuf, String> {
+    Ok(config
+        .home_path
+        .clone()
+        .unwrap_or_else(|| default_library_root(app).unwrap_or_else(|_| config.root_path.clone())))
+}
+
+fn bootstrap_first_project(home: &Path) -> Result<PathBuf, String> {
+    fs::create_dir_all(home).map_err(|error| error.to_string())?;
+    let dest = unique_folder_path(home, "Untitled");
+    fs::create_dir_all(&dest).map_err(|error| error.to_string())?;
+    ensure_project_manifest(&dest)?;
+    Ok(dest)
+}
+
+fn remap_recent_paths_from_home(config: &mut LibraryConfig, home: &Path, new_project: &Path) {
+    for entry in &mut config.recent_projects {
+        if paths_equal(&entry.root_path, home) {
+            entry.root_path = new_project.to_path_buf();
+        }
+    }
+}
+
+/// Moves a legacy project that lived at the Prosa home root into `home/<title>/`.
+fn migrate_embedded_project_from_home(home: &Path) -> Result<PathBuf, String> {
+    let manifest = read_project_manifest(home)?.ok_or("Expected project manifest at Prosa home")?;
+    let dest = unique_folder_path(home, &manifest.title);
+    fs::create_dir_all(&dest).map_err(|error| error.to_string())?;
+
+    for name in ["scribo.project.json", "content", ".git", ".scribo"] {
+        let src = home.join(name);
+        if src.exists() {
+            fs::rename(&src, dest.join(name))
+                .map_err(|error| format!("Failed to move {name}: {error}"))?;
+        }
+    }
+
+    for entry in fs::read_dir(home).map_err(|error| error.to_string())? {
+        let entry = entry.map_err(|error| error.to_string())?;
+        let path = entry.path();
+        if path.is_file() && is_markdown_file(&path) {
+            fs::rename(&path, dest.join(entry.file_name())).map_err(|error| error.to_string())?;
+        }
+    }
+
+    Ok(dest)
+}
+
+fn discover_projects_in_home(home: &Path) -> Vec<PathBuf> {
+    let mut paths = Vec::new();
+    let entries = match fs::read_dir(home) {
+        Ok(entries) => entries,
+        Err(_) => return paths,
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_dir() && is_project_directory(&path) {
+            paths.push(path);
+        }
+    }
+    paths.sort_by(|a, b| a.file_name().cmp(&b.file_name()));
+    paths
+}
+
+fn ensure_config_normalized(app: &AppHandle) -> Result<LibraryConfig, String> {
+    let default_home = default_library_root(app)?;
+
+    let mut config = match read_config(app)? {
+        Some(mut existing) => {
+            if existing.home_path.is_none() {
+                existing.home_path = Some(default_home.clone());
+            }
+            existing
+        }
+        None => {
+            fs::create_dir_all(&default_home).map_err(|error| error.to_string())?;
+            let project = bootstrap_first_project(&default_home)?;
+            let mut fresh = LibraryConfig {
+                home_path: Some(default_home.clone()),
+                root_path: project.clone(),
+                recent_projects: Vec::new(),
+            };
+            touch_recent_project(&mut fresh, &project);
+            write_config(app, &fresh)?;
+            return Ok(fresh);
+        }
+    };
+
+    let home = config
+        .home_path
+        .clone()
+        .unwrap_or_else(|| default_home.clone());
+    fs::create_dir_all(&home).map_err(|error| error.to_string())?;
+
+    let active_is_home = paths_equal(&config.root_path, &home);
+
+    if active_is_home && is_project_directory(&home) {
+        let migrated = migrate_embedded_project_from_home(&home)?;
+        config.root_path = migrated.clone();
+        remap_recent_paths_from_home(&mut config, &home, &migrated);
+        touch_recent_project(&mut config, &migrated);
+        write_config(app, &config)?;
+    } else if active_is_home && !is_project_directory(&home) {
+        let project = bootstrap_first_project(&home)?;
+        config.root_path = project.clone();
+        touch_recent_project(&mut config, &project);
+        write_config(app, &config)?;
+    }
+
+    Ok(config)
+}
+
+fn library_info_for_root(
+    root: PathBuf,
+    home: PathBuf,
+    existed_before: bool,
+) -> Result<LibraryInfo, String> {
     fs::create_dir_all(&root).map_err(|error| error.to_string())?;
     let project = Some(ensure_project_manifest(&root)?);
     #[cfg(feature = "git-vcs")]
@@ -123,47 +256,28 @@ fn library_info_for_root(root: PathBuf, existed_before: bool) -> Result<LibraryI
     }
     Ok(LibraryInfo {
         root_path: root.to_string_lossy().into_owned(),
+        home_path: home.to_string_lossy().into_owned(),
         exists: existed_before,
         project,
     })
 }
 
 pub fn ensure_default_library(app: &AppHandle) -> Result<LibraryInfo, String> {
-    if let Some(config) = read_config(app)? {
-        let existed = config.root_path.exists();
-        return library_info_for_root(config.root_path, existed);
-    }
-
-    let root = default_library_root(app)?;
-    write_config(
-        app,
-        &LibraryConfig {
-            root_path: root.clone(),
-            recent_projects: Vec::new(),
-        },
-    )?;
-    library_info_for_root(root, true)
+    let config = ensure_config_normalized(app)?;
+    let home = resolve_home_path(app, &config)?;
+    let existed = config.root_path.exists();
+    library_info_for_root(config.root_path, home, existed)
 }
 
 pub fn get_library_info(app: &AppHandle) -> Result<LibraryInfo, String> {
-    if let Some(config) = read_config(app)? {
-        let root = config.root_path;
-        let project = read_project_manifest(&root)?;
-        return Ok(LibraryInfo {
-            root_path: root.to_string_lossy().into_owned(),
-            exists: root.exists(),
-            project,
-        });
-    }
-    let root = default_library_root(app)?;
+    let config = ensure_config_normalized(app)?;
+    let home = resolve_home_path(app, &config)?;
+    let project = read_project_manifest(&config.root_path)?;
     Ok(LibraryInfo {
-        root_path: root.to_string_lossy().into_owned(),
-        exists: root.exists(),
-        project: if root.exists() {
-            read_project_manifest(&root)?
-        } else {
-            None
-        },
+        root_path: config.root_path.to_string_lossy().into_owned(),
+        home_path: home.to_string_lossy().into_owned(),
+        exists: config.root_path.exists(),
+        project,
     })
 }
 
@@ -228,14 +342,12 @@ pub fn set_library_root(app: &AppHandle, root_path: String) -> Result<LibraryInf
 }
 
 pub fn open_project_root(app: &AppHandle, path: PathBuf) -> Result<LibraryInfo, String> {
-    let mut config = read_config(app)?.unwrap_or(LibraryConfig {
-        root_path: path.clone(),
-        recent_projects: Vec::new(),
-    });
+    let mut config = ensure_config_normalized(app)?;
     config.root_path = path.clone();
     touch_recent_project(&mut config, &path);
     write_config(app, &config)?;
-    library_info_for_root(path, true)
+    let home = resolve_home_path(app, &config)?;
+    library_info_for_root(path, home, true)
 }
 
 pub fn create_project_root(
@@ -250,46 +362,67 @@ pub fn create_project_root(
     if trimmed.contains('/') || trimmed.contains('\\') {
         return Err("Project name cannot contain path separators".into());
     }
-    let root = PathBuf::from(parent_path).join(trimmed);
-    if root.exists() {
-        return Err("A folder with that name already exists".into());
-    }
+    let config = ensure_config_normalized(app)?;
+    let parent = if parent_path.trim().is_empty() {
+        resolve_home_path(app, &config)?
+    } else {
+        PathBuf::from(parent_path)
+    };
+    fs::create_dir_all(&parent).map_err(|error| error.to_string())?;
+    let root = unique_folder_path(&parent, trimmed);
     fs::create_dir_all(&root).map_err(|error| error.to_string())?;
     open_project_root(app, root)
 }
 
 pub fn list_projects(app: &AppHandle) -> Result<Vec<ProjectSummary>, String> {
-    let config = read_config(app)?;
-    let current_root = config.as_ref().map(|value| value.root_path.clone());
+    let config = ensure_config_normalized(app)?;
+    let current_root = Some(config.root_path.clone());
+    let home = resolve_home_path(app, &config)?;
     let mut entries: Vec<ProjectSummary> = Vec::new();
     let mut seen = std::collections::HashSet::new();
 
-    if let Some(config) = config {
-        for recent in config.recent_projects {
-            let root = recent.root_path;
-            if !seen.insert(root.clone()) {
-                continue;
-            }
-            let title = if root.exists() {
-                project_title_for_root(&root)
-            } else {
-                root.file_name()
-                    .and_then(|value| value.to_str())
-                    .unwrap_or("Missing project")
-                    .to_string()
-            };
-            let id = read_project_manifest(&root)
-                .ok()
-                .flatten()
-                .map(|manifest| manifest.id);
-            entries.push(ProjectSummary {
-                root_path: root.to_string_lossy().into_owned(),
-                title,
-                id,
-                last_opened_at: recent.last_opened_at,
-                is_current: current_root.as_deref() == Some(root.as_path()),
-            });
+    for recent in config.recent_projects {
+        let root = recent.root_path;
+        if !seen.insert(root.clone()) {
+            continue;
         }
+        let title = if root.exists() {
+            project_title_for_root(&root)
+        } else {
+            root.file_name()
+                .and_then(|value| value.to_str())
+                .unwrap_or("Missing project")
+                .to_string()
+        };
+        let id = read_project_manifest(&root)
+            .ok()
+            .flatten()
+            .map(|manifest| manifest.id);
+        entries.push(ProjectSummary {
+            root_path: root.to_string_lossy().into_owned(),
+            title,
+            id,
+            last_opened_at: recent.last_opened_at,
+            is_current: current_root.as_deref() == Some(root.as_path()),
+        });
+    }
+
+    for root in discover_projects_in_home(&home) {
+        if !seen.insert(root.clone()) {
+            continue;
+        }
+        let title = project_title_for_root(&root);
+        let id = read_project_manifest(&root)
+            .ok()
+            .flatten()
+            .map(|manifest| manifest.id);
+        entries.push(ProjectSummary {
+            root_path: root.to_string_lossy().into_owned(),
+            title,
+            id,
+            last_opened_at: Utc::now().to_rfc3339(),
+            is_current: current_root.as_deref() == Some(root.as_path()),
+        });
     }
 
     if let Some(current) = current_root.as_deref()
@@ -875,6 +1008,27 @@ mod tests {
         );
         assert_eq!(sanitize_title_for_filename("   "), "Untitled");
         assert_eq!(sanitize_title_for_filename("bad/name"), "bad name");
+    }
+
+    #[test]
+    fn migrate_embedded_project_from_home_moves_manifest_and_content() {
+        let home =
+            std::env::temp_dir().join(format!("scribo-home-migrate-{}", uuid::Uuid::new_v4()));
+        fs::create_dir_all(&home).unwrap();
+        ensure_project_manifest(&home).unwrap();
+        fs::create_dir_all(home.join("content/manuscripts")).unwrap();
+        fs::write(home.join("content/manuscripts/intro.md"), "# hi").unwrap();
+        fs::write(home.join("orphan-at-root.md"), "# root").unwrap();
+
+        let dest = migrate_embedded_project_from_home(&home).unwrap();
+        assert!(dest.starts_with(&home));
+        assert!(dest.join("scribo.project.json").is_file());
+        assert!(dest.join("content/manuscripts/intro.md").is_file());
+        assert!(dest.join("orphan-at-root.md").is_file());
+        assert!(!home.join("scribo.project.json").exists());
+        assert!(!home.join("content").exists());
+
+        fs::remove_dir_all(&home).ok();
     }
 
     #[test]

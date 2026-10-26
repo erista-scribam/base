@@ -1,7 +1,7 @@
 # Prosa shell, IDE affordances, and project storage
 
 **Status:** Active product direction  
-**Authority:** [philosophy.md](./philosophy.md) · **Execution:** [plan 005](../plans/active/005-project-workspace-and-git.md)
+**Authority:** [philosophy.md](./philosophy.md) · **Execution:** [plan 006](../plans/active/006-scribo-lanista-platform.md) (005 paused)
 
 This document states how Scribo Prosa relates to “IDE-like” software, what we are **not** building, and where projects live on disk.
 
@@ -27,13 +27,14 @@ We **reuse open-source components and libraries** where they fit our stack and l
 
 ### Target model
 
-| Layer                 | Role                                                                                                                                                                                                                                                     |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Scribo Prosa home** | Default app root on disk (e.g. `Documents/Scribo Prosa/`). Holds **multiple** writing projects and is the normal place new work is created.                                                                                                              |
-| **Project folder**    | One subdirectory per project (e.g. `Documents/Scribo Prosa/My Novel/`). Contains `scribo.project.json`, `content/`, optional `.git/`, `.scribo/` recovery, etc. See [project-architecture-and-storage.md](../specs/project-architecture-and-storage.md). |
-| **App config**        | Tauri app config (e.g. `library.json`) stores the **home path**, recent projects, and session state—not the authoritative copy of manuscripts.                                                                                                           |
+| Layer                   | Role                                                                                                                                                                                                                    |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Scribo Lanista home** | Default platform root on disk (e.g. `Documents/Scribo/` — name TBD). Holds **multiple** projects; **Lanista** is the app that creates, lists, and opens them.                                                           |
+| **Project folder**      | One subdirectory per project. Contains `scribo.project.json`, `content/manuscripts/` (Prosa), optional future subtrees for other apps. See [lanista-platform-and-storage.md](../specs/lanista-platform-and-storage.md). |
+| **Scribo Prosa**        | Satellite writing app; may only access **`content/manuscripts/`** inside an opened project (filesystem grants). Launched from Lanista with a capability grant.                                                          |
+| **App config**          | **Lanista** owns catalog/recents; Prosa holds session/editor state—not authoritative manuscripts.                                                                                                                       |
 
-User-facing mental model: **open Scribo Prosa → pick or create a project folder inside your Prosa home** (or another allowed location), same as opening a folder in an IDE—but the folder is a **writing project**, not a code repository template.
+User-facing mental model (target): **open Lanista → pick or create a project → open in Prosa** to write. Prosa keeps IDE-like navigation **inside** the granted manuscript tree—not as the platform hub.
 
 ### Current implementation (transitional)
 
@@ -43,7 +44,7 @@ Today `library.json` may point **directly** at a single project root (the home f
 
 ## 4. Related decisions
 
-- **Local-first, Git as engine:** Writer-visible checkpoints and diffs; not raw Git porcelain. Plan [005](../plans/active/005-project-workspace-and-git.md).
+- **Local-first, Git as engine:** Writer-visible checkpoints and diffs **per manuscript** (not project-wide). Plan [006](../plans/active/006-scribo-lanista-platform.md).
 - **Future sync:** “GitHub for writing” spinoff mirrors on-disk projects—Phase 9 in [project-architecture-roadmap.md](../plans/active/project-architecture-roadmap.md)—does not replace the home + project folder layout.
 
 ---

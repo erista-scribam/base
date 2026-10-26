@@ -1,9 +1,9 @@
 # Project architecture implementation roadmap
 
-**Status:** Draft  
-**Depends on:** [project-architecture-and-storage.md](../../specs/project-architecture-and-storage.md), [git-integration-feasibility.md](./git-integration-feasibility.md)
+**Status:** Draft — **005 execution paused**; new work follows [006-scribo-lanista-platform.md](./006-scribo-lanista-platform.md) phases  
+**Depends on:** [project-architecture-and-storage.md](../../specs/project-architecture-and-storage.md) (audit), [lanista-platform-and-storage.md](../../specs/lanista-platform-and-storage.md) (forward)
 
-Phases replace the old linear “revision history v1” track. Plan 003 **product capabilities** arrive **after** foundations here.
+Phases below describe the **005** track. **Do not start Phase 4–8 extensions** until 006 Phase A specs are approved. Shipped Phase 1–2 remain; project-root Git UI is **legacy** pending per-manuscript migration (006).
 
 ```mermaid
 flowchart TB
@@ -65,14 +65,14 @@ flowchart TB
 
 ## Phase 4 — Git history MVP
 
-|                   |                                                                                                                            |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| **User value**    | Commits, history list, diff, restore                                                                                       |
-| **Scope**         | Main branch only; manual or auto-commit policy                                                                             |
-| **Non-goals**     | Multi-branch merge (Phase 5)                                                                                               |
-| **UI (required)** | [Version control panel spec](../../specs/project-version-control-ui.md): branch name, dirty state, checkpoint, commit list |
-| **Acceptance**    | No data loss in interrupt tests; diff at paragraph level; writer sees history without external tools                       |
-| **Status**        | **Started:** sidebar Version panel + Rust Git commands                                                                     |
+|                   |                                                                                                                                    |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **User value**    | Commits, history list, diff, restore                                                                                               |
+| **Scope**         | Main branch only; manual or auto-commit policy                                                                                     |
+| **Non-goals**     | Multi-branch merge (Phase 5)                                                                                                       |
+| **UI (required)** | [Version control panel spec](../../specs/project-version-control-ui.md): branch name, dirty state, checkpoint, commit list         |
+| **Acceptance**    | No data loss in interrupt tests; diff at paragraph level; writer sees history without external tools                               |
+| **Status**        | **Started (legacy):** project-root Git — **frozen** under 006; migrate to [manuscript-git-v1.md](../../specs/manuscript-git-v1.md) |
 
 ## Phase 5 — Branches, merge, conflicts
 

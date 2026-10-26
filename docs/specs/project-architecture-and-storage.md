@@ -1,7 +1,7 @@
 # Project architecture and storage specification
 
-**Status:** Draft — awaiting architectural review  
-**Plan:** [005-project-workspace-and-git.md](../plans/active/005-project-workspace-and-git.md)  
+**Status:** Draft — **historical / audit baseline**; **execution** moved to [006-scribo-lanista-platform.md](../plans/active/006-scribo-lanista-platform.md) and [lanista-platform-and-storage.md](./lanista-platform-and-storage.md)  
+**Plan:** [005-project-workspace-and-git.md](../plans/active/005-project-workspace-and-git.md) (paused)  
 **Philosophy:** [philosophy.md](../product/philosophy.md)
 
 **Legend:** **Verified** = inspected in repo; **Documented** = docs only; **Recommended** = proposal; **Assumption** = needs spike.

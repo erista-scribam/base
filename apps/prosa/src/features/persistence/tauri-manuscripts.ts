@@ -19,6 +19,7 @@ export interface LoadedManuscript {
 
 export interface LibraryInfo {
   rootPath: string;
+  homePath: string;
   exists: boolean;
   project?: ScriboProjectManifest;
 }

@@ -45,7 +45,7 @@ import {
   revealManuscriptInFileManager,
 } from "../features/persistence/tauri-manuscripts";
 import { manuscriptIdForPath } from "../features/persistence/manuscript-path-id";
-import { openProject } from "../features/projects/project-catalog";
+import { createProject, openProject } from "../features/projects/project-catalog";
 import { isMarkdownRepoPath } from "../features/projects/manuscript-file-name";
 import { GitBranchChip } from "../components/GitBranchChip";
 import { useProjectGitStatus } from "../hooks/useProjectGitStatus";
@@ -71,6 +71,7 @@ export function App() {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [layoutKey, setLayoutKey] = useState(0);
   const [libraryPath, setLibraryPath] = useState<string | null>(null);
+  const [homePath, setHomePath] = useState<string | null>(null);
   const [projectTitle, setProjectTitle] = useState<string | null>(null);
   const [versionControlRefreshKey, setVersionControlRefreshKey] = useState(0);
   const [explorerRefreshKey, setExplorerRefreshKey] = useState(0);
@@ -189,6 +190,7 @@ export function App() {
           return;
         }
         setLibraryPath(library.rootPath);
+        setHomePath(library.homePath);
         setProjectTitle(library.project?.title ?? null);
         const migratedInternal = await migrateAllLegacyManuscriptsToLibrary().catch(() => 0);
         const migratedRoot = await migrateLegacyRootManuscriptsToContent().catch(() => 0);
@@ -210,6 +212,7 @@ export function App() {
           void getLibrary()
             .then((library) => {
               setLibraryPath(library.rootPath);
+              setHomePath(library.homePath);
               setProjectTitle(library.project?.title ?? null);
             })
             .catch(() => undefined);
@@ -505,10 +508,11 @@ export function App() {
   }, []);
 
   const applyProjectLibrary = useCallback(
-    async (library: { rootPath: string; project?: { title: string } | null }) => {
+    async (library: { rootPath: string; homePath: string; project?: { title: string } | null }) => {
       await flushNow();
       setOpenTabIds([]);
       setLibraryPath(library.rootPath);
+      setHomePath(library.homePath);
       setProjectTitle(library.project?.title ?? null);
       setActiveId(null);
       setDocument(null);
@@ -551,19 +555,10 @@ export function App() {
     if (!isTauriRuntime()) {
       return;
     }
-    const root = await open({
-      directory: true,
-      multiple: false,
-      title: "Choose or create project folder",
-      canCreateDirectories: true,
-    });
-    if (typeof root !== "string") {
-      return;
-    }
-    const library = await openProject(root);
+    const library = await createProject(homePath ?? "", "Untitled project");
     await applyProjectLibrary(library);
     setNotice(`Created project “${library.project?.title ?? "Untitled"}”.`);
-  }, [applyProjectLibrary]);
+  }, [applyProjectLibrary, homePath]);
 
   const handleOpenFile = useCallback(async () => {
     if (!isTauriRuntime()) {

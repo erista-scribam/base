@@ -1,6 +1,6 @@
 # Plan 005 — Project workspace, Git, and unified storage
 
-**Status:** Active (supersedes [003](../completed/003-prosa-deep-writing-features.md) for **execution**)  
+**Status:** **Paused** (2026-10-26) — execution superseded by [006-scribo-lanista-platform.md](./006-scribo-lanista-platform.md). Shipped Phase 1–2 (and partial Phase 4) remain in the codebase until migrated under 006.  
 **Adopted:** 2026-10-26
 
 ## What changed from plan 003
@@ -13,7 +13,11 @@ Plan 005 adds an **ambitious architectural foundation** before feature sprints:
 2. **Unified Scribo project** (multi-manuscript, workspace entities, one coherent unit).
 3. **Extensible workspace** (tasks, issues, milestones, knowledge—without becoming Jira).
 
-**Product shape (acknowledged):** Prosa converges on **IDE-like navigation** (explorer, tabs, SCM, diffs) while remaining a **writing app first**—not a fork of any IDE; we integrate OSS libraries (Git, editors) in our own shell. **Storage:** default **Scribo Prosa home** contains **project subfolders**; see [prosa-shell-and-projects.md](../../product/prosa-shell-and-projects.md).
+**Product shape (acknowledged):** Prosa converges on **IDE-like navigation** (explorer, tabs, SCM, diffs) while remaining a **writing app first**—not a fork of any IDE; we integrate OSS libraries (Git, editors) in our own shell. **Storage (paused direction):** Prosa-as-hub and **project-root Git**—replaced by **Lanista hub**, **per-manuscript Git**, and **`.mdprosa`** in [006](./006-scribo-lanista-platform.md). Interim home → project subfolders may remain until Lanista migration.
+
+## Pause note
+
+Do **not** extend project-wide Git branches/merge or workspace entities under this plan. New architectural work goes to **006** and its specs ([lanista-platform-and-storage.md](../../specs/lanista-platform-and-storage.md)).
 
 ## Canonical deliverables (this plan)
 
