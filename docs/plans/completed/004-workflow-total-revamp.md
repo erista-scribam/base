@@ -2,7 +2,7 @@
 
 ## Repository-First Knowledge, GitHub Coordination, and Historical Baseline
 
-**Status:** Proposed operating policy\
+**Status:** Adopted 2026-10-26 — living summary in [operating-model.md](../../engineering/operating-model.md), baseline in [project-baseline.md](../../engineering/project-baseline.md)\
 **Applies to:** Scribo monorepo, Scribo Prosa, shared packages, AI
 coding agents, and future contributors\
 **Decision:** Repository-first, GitHub-enabled, with an explicit

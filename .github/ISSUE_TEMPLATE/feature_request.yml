@@ -1,0 +1,41 @@
+name: Feature request
+description: Propose a writer-facing improvement
+title: "[feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Align with [docs/product/philosophy.md](../../docs/product/philosophy.md). Large or risky work should start as a spec or plan in `docs/specs/` or `docs/plans/active/`.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Writer problem
+      description: What are you trying to accomplish?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed direction
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: gates
+    attributes:
+      label: Philosophy check (optional)
+      options:
+        - label: Protects or preserves the writer's work
+          required: false
+        - label: Reduces friction without adding permanent dashboard noise
+          required: false

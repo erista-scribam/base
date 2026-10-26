@@ -2,7 +2,7 @@
 
 **Status:** Draft v0.1 (design before implementation)  
 **Roadmap:** Phase 2  
-**Constitution:** [PRODUCT_CONSTITUTION.md](../PRODUCT_CONSTITUTION.md) · [PRODUCT_INVARIANTS.md](../PRODUCT_INVARIANTS.md)
+**Constitution:** [philosophy.md](../product/philosophy.md) · [invariants.md](../product/invariants.md)
 
 **Non-goals for v1:** Branching, merge, three-way sync, cloud replication, Git semantics.
 
@@ -189,4 +189,4 @@ Implementation lives in Rust under `library.rs` or new `revisions.rs` module; TS
 - [ ] Hook checkpoint after successful `write_library_markdown`
 - [ ] UI: revision list + diff preview + restore confirm
 - [ ] Tests per §11
-- [ ] Update [ARCHITECTURE_AUDIT.md](../ARCHITECTURE_AUDIT.md)
+- [ ] Update [implementation-audit.md](../architecture/implementation-audit.md)

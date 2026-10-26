@@ -4,12 +4,15 @@ Opinionated, structured writing software. **Scribo Prosa** is the first product:
 
 Scribo owns the **structure** of the writing; the application owns **presentation**.
 
+**License:** [MIT](LICENSE) · **Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · **Security:** [SECURITY.md](SECURITY.md)
+
 ## Repository layout
 
 - `apps/prosa` — Tauri 2 desktop app (React + TypeScript + Vite)
 - `packages/core` — Domain IDs, metadata contracts, errors
 - `packages/document-model` — Canonical Prosa document schema and validation
-- `docs/` — Architecture, constitution, roadmap, specs, and numbered `plans/` (001–003)
+- `docs/` — [Documentation index](docs/README.md): product, engineering, architecture, specs, plans
+- `AGENTS.md` — Instructions for AI coding agents
 - `MASTERPLAN.md` — Stack, monorepo, and Prosa schema foundation
 
 ## Prerequisites
@@ -62,8 +65,8 @@ pnpm tauri:build
 
 ## Version control & releases
 
-- **Changesets:** `pnpm changeset` on feature PRs; releases are automated from `main` (see `docs/RELEASE.md`)
-- Branching and hooks: `docs/VERSION_CONTROL.md`
+- **Changesets:** `pnpm changeset` on feature PRs; releases are automated from `main` (see [docs/engineering/release-process.md](docs/engineering/release-process.md))
+- Branching and hooks: [docs/engineering/version-control.md](docs/engineering/version-control.md)
 - Changelog: `CHANGELOG.md`
 
 ## Milestone status
@@ -72,6 +75,6 @@ This repository implements the **initial architectural milestone** from `MASTERP
 
 Not included yet: DOCX/PDF, cloud sync, full export pipeline, and additional Scribo product lines (Drama, Versus, Academia).
 
-**Governance:** [docs/PRODUCT_CONSTITUTION.md](docs/PRODUCT_CONSTITUTION.md) · [docs/ROADMAP.md](docs/ROADMAP.md) · [docs/PRODUCT_INVARIANTS.md](docs/PRODUCT_INVARIANTS.md)
+**Governance:** [philosophy](docs/product/philosophy.md) · [roadmap](docs/product/roadmap.md) · [invariants](docs/product/invariants.md) · [operating model](docs/engineering/operating-model.md)
 
-See `docs/ARCHITECTURE.md`, `docs/ARCHITECTURE_AUDIT.md`, and `docs/DECISIONS.md` for structure, baseline audit, and known limits.
+Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)

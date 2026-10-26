@@ -9,7 +9,7 @@ Copy the template below. One entry per distinct problem. Link manuscripts or ste
 **Distinguish:**
 
 - **Process problem** — The writer's workflow needs support (revision compare, research recall, …).
-- **Implementation bug** — Current Prosa behavior is wrong vs [PRODUCT_INVARIANTS.md](../PRODUCT_INVARIANTS.md).
+- **Implementation bug** — Current Prosa behavior is wrong vs [invariants.md](../product/invariants.md).
 
 ---
 

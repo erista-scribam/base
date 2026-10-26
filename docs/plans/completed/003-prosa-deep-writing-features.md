@@ -2,8 +2,8 @@
 
 ## Product Philosophy and Deep-Feature Plan
 
-**Status:** Strategic working document — **codified** in [PRODUCT_CONSTITUTION.md](../PRODUCT_CONSTITUTION.md), [PRODUCT_INVARIANTS.md](../PRODUCT_INVARIANTS.md), [ROADMAP.md](../ROADMAP.md) (implementation tracks those files)\
-**Location:** `docs/plans/` (numbered plans index: [README.md](./README.md))\
+**Status:** Completed — **codified** in [philosophy.md](../../product/philosophy.md), [invariants.md](../../product/invariants.md), [roadmap.md](../../product/roadmap.md)\
+**Location:** `docs/plans/completed/`\
 **Product:** Scribo Prosa, with principles intended to guide the wider
 Scribo family\
 **Purpose:** Define what Scribo should optimize for before committing to
