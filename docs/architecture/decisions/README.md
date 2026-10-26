@@ -13,6 +13,7 @@ Consequential choices that future maintainers should not have to reconstruct fro
 | [0007](./0007-pnpm-hoisting.md)                 | pnpm hoisting for Vite           |
 | [0008](./0008-writer-centred-governance.md)     | Writer-centred governance docs   |
 | [0009](./0009-repository-operating-model.md)    | Repository-first operating model |
+| [0010](./0010-agpl-open-core-license.md)        | AGPL open-core license           |
 
 **Superseded ADRs:** Mark status and link the replacement; do not rewrite history.
 

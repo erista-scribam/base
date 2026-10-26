@@ -4,7 +4,7 @@ Opinionated, structured writing software. **Scribo Prosa** is the first product:
 
 Scribo owns the **structure** of the writing; the application owns **presentation**.
 
-**License:** [MIT](LICENSE) · **Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · **Security:** [SECURITY.md](SECURITY.md)
+**License:** [AGPL-3.0-or-later](LICENSE) ([open core & premium](docs/product/licensing.md)) · **Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · **Security:** [SECURITY.md](SECURITY.md)
 
 ## Repository layout
 

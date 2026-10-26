@@ -103,6 +103,7 @@ If a change fails this test, it does not belong in the product.
 | [invariants.md](./invariants.md)                                                                               | Must-always-be-true rules     |
 | [roadmap.md](./roadmap.md)                                                                                     | Phased delivery               |
 | [known-limitations.md](./known-limitations.md)                                                                 | Current product gaps          |
+| [licensing.md](./licensing.md)                                                                                 | AGPL open core vs premium     |
 | [../architecture/implementation-audit.md](../architecture/implementation-audit.md)                             | Code vs target subsystems     |
 | [../specs/revision-history-v1.md](../specs/revision-history-v1.md)                                             | Revision history spec         |
 | [../research/WRITING_FRICTION_LOG.md](../research/WRITING_FRICTION_LOG.md)                                     | Real-use friction log         |

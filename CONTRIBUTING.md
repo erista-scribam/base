@@ -59,6 +59,10 @@ Nontrivial features: plan in `docs/plans/active/` and get approval before large 
 
 See [MASTERPLAN.md](MASTERPLAN.md) and [docs/architecture/system-overview.md](docs/architecture/system-overview.md) for stack and layering.
 
+## License
+
+Contributions are licensed under **[AGPL-3.0-or-later](LICENSE)** unless otherwise agreed in writing. See [docs/product/licensing.md](docs/product/licensing.md).
+
 ## Community
 
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)

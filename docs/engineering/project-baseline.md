@@ -68,18 +68,18 @@ See [product/roadmap.md](../product/roadmap.md). Next substantial feature: **Rev
 
 ## Public-readiness checklist (plan 004 §12)
 
-| Item                                             | Status                                           |
-| ------------------------------------------------ | ------------------------------------------------ |
-| LICENSE (MIT)                                    | **Done**                                         |
-| README + build instructions                      | **Done** (review before announce)                |
-| CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT | **Done**                                         |
-| AGENTS.md                                        | **Done**                                         |
-| Issue / PR templates                             | **Done**                                         |
-| CI on `main` / `development`                     | **Verified** (`.github/workflows/ci.yml`)        |
-| Dependabot                                       | **Documented** (`.github/dependabot.yml`)        |
-| Branch protection / required checks              | **Maintainer** — configure on GitHub when public |
-| Replace placeholder org URLs                     | **Done** (generic GitHub wording)                |
-| Privacy-safe fixtures only                       | **Policy** — enforce in reviews                  |
+| Item                                                                  | Status                                           |
+| --------------------------------------------------------------------- | ------------------------------------------------ |
+| LICENSE (AGPL-3.0-or-later) + [licensing.md](../product/licensing.md) | **Done**                                         |
+| README + build instructions                                           | **Done** (review before announce)                |
+| CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT                      | **Done**                                         |
+| AGENTS.md                                                             | **Done**                                         |
+| Issue / PR templates                                                  | **Done**                                         |
+| CI on `main` / `development`                                          | **Verified** (`.github/workflows/ci.yml`)        |
+| Dependabot                                                            | **Documented** (`.github/dependabot.yml`)        |
+| Branch protection / required checks                                   | **Maintainer** — configure on GitHub when public |
+| Replace placeholder org URLs                                          | **Done** (generic GitHub wording)                |
+| Privacy-safe fixtures only                                            | **Policy** — enforce in reviews                  |
 
 ---
 

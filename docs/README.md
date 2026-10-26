@@ -16,6 +16,7 @@ Start here for product and engineering knowledge. **One topic, one canonical fil
 | [product/invariants.md](./product/invariants.md)               | Integrity and portability rules        |
 | [product/roadmap.md](./product/roadmap.md)                     | Phased delivery                        |
 | [product/known-limitations.md](./product/known-limitations.md) | Current gaps                           |
+| [product/licensing.md](./product/licensing.md)                 | Open core (AGPL) vs premium services   |
 
 ## Engineering
 
