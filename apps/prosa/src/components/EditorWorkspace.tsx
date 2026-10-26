@@ -15,7 +15,7 @@ import { MarkdownSectionOutline } from "./MarkdownSectionOutline";
 import { MarkdownSourceEditor, type MarkdownSourceEditorHandle } from "./MarkdownSourceEditor";
 import {
   markdownToProsaDocument,
-  prosaDocumentToMarkdown,
+  prosaDocumentToAuthorMarkdown,
 } from "../features/markdown/prosa-markdown";
 import { useMarkdownRuler } from "../hooks/useMarkdownRuler";
 import type { MarkdownFormatAction } from "../features/markdown/markdown-source-format";
@@ -50,7 +50,7 @@ export const EditorWorkspace = forwardRef<EditorWorkspaceHandle, EditorWorkspace
     },
     ref,
   ) {
-    const [markdown, setMarkdown] = useState(() => prosaDocumentToMarkdown(document));
+    const [markdown, setMarkdown] = useState(() => prosaDocumentToAuthorMarkdown(document));
     const [sideTab, setSideTab] = useState<MarkdownSideTab>("sections");
     const [cursorLine, setCursorLine] = useState<number | null>(null);
     const markdownEditorRef = useRef<MarkdownSourceEditorHandle>(null);
@@ -87,7 +87,7 @@ export const EditorWorkspace = forwardRef<EditorWorkspaceHandle, EditorWorkspace
         return;
       }
       // Source of truth when opening markdown: serialize the structured doc once per manuscript/mode.
-      setMarkdown(prosaDocumentToMarkdown(documentRef.current));
+      setMarkdown(prosaDocumentToAuthorMarkdown(documentRef.current));
     }, [document.id, viewMode]);
 
     useEffect(

@@ -3,6 +3,12 @@ import { PROSA_SCHEMA_VERSION, tryValidateProsaDocument } from "@scribo/document
 import { isSceneBreakLineRaw, stripLegacySourceIndent } from "./markdown-source-layout";
 import { parseInlineMarkdown, serializeInline } from "./markdown-inline";
 import { formatBlockIdComment, parseBlockIdComment } from "./markdown-block-ids";
+import { preserveBlockIdsFromBase } from "./markdown-block-id-reconcile";
+
+export type ProsaMarkdownSerializeOptions = {
+  /** Embed `<!-- scribo:block=... -->` anchors for on-disk / Git stability. Default true. */
+  embedBlockIds?: boolean;
+};
 
 function blockId(): string {
   return `blk_${crypto.randomUUID()}`;
@@ -179,24 +185,38 @@ function parseHeadingLine(line: string): { level: 1 | 2 | 3 | 4 | 5 | 6; text: s
   };
 }
 
-function pushBlockWithId(lines: string[], blockId: string, contentLines: string[]): void {
-  lines.push(formatBlockIdComment(blockId));
+function pushBlockWithId(
+  lines: string[],
+  blockId: string,
+  contentLines: string[],
+  embedBlockIds: boolean,
+): void {
+  if (embedBlockIds) {
+    lines.push(formatBlockIdComment(blockId));
+  }
   lines.push(...contentLines);
 }
 
-export function prosaDocumentToMarkdown(document: ProsaDocument): string {
+export function prosaDocumentToMarkdown(
+  document: ProsaDocument,
+  options: ProsaMarkdownSerializeOptions = {},
+): string {
+  const embedBlockIds = options.embedBlockIds !== false;
   const lines: string[] = [];
   for (const block of document.blocks) {
     switch (block.type) {
       case "heading":
-        pushBlockWithId(lines, block.id, [
-          `${"#".repeat(block.level)} ${serializeInline(block.content)}`,
-        ]);
+        pushBlockWithId(
+          lines,
+          block.id,
+          [`${"#".repeat(block.level)} ${serializeInline(block.content)}`],
+          embedBlockIds,
+        );
         break;
       case "paragraph": {
         const text = serializeInline(block.content);
         if (text.length) {
-          pushBlockWithId(lines, block.id, [text]);
+          pushBlockWithId(lines, block.id, [text], embedBlockIds);
         }
         break;
       }
@@ -205,15 +225,20 @@ export function prosaDocumentToMarkdown(document: ProsaDocument): string {
         for (const line of serializeInline(block.content).split("\n")) {
           quoteLines.push(`> ${line}`);
         }
-        pushBlockWithId(lines, block.id, quoteLines);
+        pushBlockWithId(lines, block.id, quoteLines, embedBlockIds);
         break;
       }
       case "scene_break":
-        pushBlockWithId(lines, block.id, ["* * *"]);
+        pushBlockWithId(lines, block.id, ["* * *"], embedBlockIds);
         break;
       case "code_block": {
         const lang = block.language ?? "";
-        pushBlockWithId(lines, block.id, [`\`\`\`${lang}`.trimEnd(), block.text, "```"]);
+        pushBlockWithId(
+          lines,
+          block.id,
+          [`\`\`\`${lang}`.trimEnd(), block.text, "```"],
+          embedBlockIds,
+        );
         break;
       }
       case "list": {
@@ -231,7 +256,7 @@ export function prosaDocumentToMarkdown(document: ProsaDocument): string {
             listLines.push(`${pad}- ${text}`);
           }
         });
-        pushBlockWithId(lines, block.id, listLines);
+        pushBlockWithId(lines, block.id, listLines, embedBlockIds);
         break;
       }
       default:
@@ -239,6 +264,11 @@ export function prosaDocumentToMarkdown(document: ProsaDocument): string {
     }
   }
   return lines.join("\n");
+}
+
+/** Markdown shown in the editor — same prose, no block-id HTML comments. */
+export function prosaDocumentToAuthorMarkdown(document: ProsaDocument): string {
+  return prosaDocumentToMarkdown(document, { embedBlockIds: false });
 }
 
 export function markdownToProsaDocument(base: ProsaDocument, markdown: string): ProsaDocument {
@@ -369,5 +399,6 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
     index += 1;
   }
 
-  return coerceMarkdownDocument(base, blocks);
+  const coerced = coerceMarkdownDocument(base, blocks);
+  return { ...coerced, blocks: preserveBlockIdsFromBase(base.blocks, coerced.blocks) };
 }

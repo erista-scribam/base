@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { createEmptyProsaDocument } from "@scribo/document-model";
-import { markdownToProsaDocument, prosaDocumentToMarkdown } from "./prosa-markdown";
+import {
+  markdownToProsaDocument,
+  prosaDocumentToAuthorMarkdown,
+  prosaDocumentToMarkdown,
+} from "./prosa-markdown";
 
 describe("prosa-markdown", () => {
   it("round-trips headings, paragraphs, and ordered lists", () => {
@@ -64,6 +68,21 @@ Meh`;
       "paragraph",
       "paragraph",
     ]);
+    expect(roundTrip.blocks.map((block) => block.id)).toEqual(doc.blocks.map((block) => block.id));
+  });
+
+  it("hides block id comments in author markdown but keeps them on disk export", () => {
+    const base = createEmptyProsaDocument("Test");
+    const md = `<!-- scribo:block=blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee -->
+# Title
+
+Body line`;
+    const doc = markdownToProsaDocument(base, md);
+    const author = prosaDocumentToAuthorMarkdown(doc);
+    expect(author).not.toContain("scribo:block");
+    expect(author).toContain("# Title");
+    expect(prosaDocumentToMarkdown(doc)).toContain("blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+    const roundTrip = markdownToProsaDocument(doc, author);
     expect(roundTrip.blocks.map((block) => block.id)).toEqual(doc.blocks.map((block) => block.id));
   });
 

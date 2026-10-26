@@ -17,3 +17,15 @@ export function parseBlockIdComment(line: string): string | null {
 export function isBlockIdCommentLine(line: string): boolean {
   return parseBlockIdComment(line) != null;
 }
+
+/** Writer-visible markdown: strip machine anchors while keeping them on disk. */
+export function stripBlockIdComments(markdown: string): string {
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  const kept: string[] = [];
+  for (const line of lines) {
+    if (!isBlockIdCommentLine(line)) {
+      kept.push(line);
+    }
+  }
+  return kept.join("\n");
+}

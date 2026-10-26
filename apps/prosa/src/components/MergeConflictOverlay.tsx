@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { stripBlockIdComments } from "../features/markdown/markdown-block-ids";
 import {
   abortProjectMerge,
   completeProjectMerge,
@@ -204,11 +205,11 @@ export function MergeConflictOverlay({
                 <div className="merge-conflict-compare">
                   <div className="merge-conflict-pane">
                     <h3>{currentBranch}</h3>
-                    <pre>{region.ours || "(empty)"}</pre>
+                    <pre>{stripBlockIdComments(region.ours) || "(empty)"}</pre>
                   </div>
                   <div className="merge-conflict-pane merge-conflict-pane-incoming">
                     <h3>{source}</h3>
-                    <pre>{region.theirs || "(empty)"}</pre>
+                    <pre>{stripBlockIdComments(region.theirs) || "(empty)"}</pre>
                   </div>
                 </div>
               ) : (
