@@ -1,20 +1,5 @@
-# Revision History v1 — implementation plan
+# Revision History v1 — withdrawn
 
-**Status:** Awaiting approval (do not implement until approved)  
-**Spec (canonical contract):** [specs/revision-history-v1.md](../../specs/revision-history-v1.md)  
-**Roadmap:** Phase 2 in [product/roadmap.md](../../product/roadmap.md)
+**Status:** **Withdrawn** — superseded by [005-project-workspace-and-git.md](./005-project-workspace-and-git.md) and [project-architecture-roadmap.md](./project-architecture-roadmap.md).
 
-## Problem
-
-Writers need trustworthy history, diff, and restore—not only crash recovery.
-
-## Next steps after approval
-
-1. Resolve open decisions in the spec (retention, checkpoint interval, UI placement).
-2. Implement Rust `revisions` module + post-save checkpoints.
-3. UI: list, diff preview, restore with `pre_restore` semantics.
-4. Tests per spec §11; update [implementation-audit.md](../../architecture/implementation-audit.md).
-
-## Non-goals
-
-Branching, merge, cloud sync (v1).
+Linear checkpoint storage ([revision-history-v1 spec](../../specs/revision-history-v1.md)) is no longer the chosen path. Use Git feasibility + project architecture instead.

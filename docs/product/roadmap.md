@@ -1,48 +1,34 @@
 # Scribo Prosa roadmap
 
 **Status:** Living document  
-**Constitution:** [philosophy.md](./philosophy.md)
+**Constitution:** [philosophy.md](./philosophy.md)  
+**Execution:** [005-project-workspace-and-git.md](../plans/active/005-project-workspace-and-git.md) · [project-architecture-roadmap.md](../plans/active/project-architecture-roadmap.md)
 
-Dependency-oriented phases from [plan 003](../plans/active/003-prosa-deep-writing-features.md). **Execution status:** deep-writing phases **2–7 are not started**; phases 0–1 are partial (docs, friction log, reliability from plan 002 / issue fixes—not fulfillment of plan 003 exit conditions).
+Plan 003 remains the **philosophy and capability vision** ([completed archive](../plans/completed/003-prosa-deep-writing-features.md)). **Implementation** now flows through **plan 005** (Git + project + workspace), not the old linear revision-checkpoint design.
 
-**Current focus:** finish Phase 0 evidence, lock Revision History v1 spec, then begin **Phase 2** as the first real slice of plan 003.
+## Current focus
 
-| Phase | Name                                 | Exit condition                                               | Status                                                                        |
-| ----- | ------------------------------------ | ------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| **0** | Validate philosophy through real use | Prioritized problem list from actual writing                 | **In progress** — [friction log](../research/WRITING_FRICTION_LOG.md)         |
-| **1** | Reliability & document invariants    | Failure scenarios with tests & expected behavior             | **Largely addressed** — plan 002 work, library + recovery; ongoing regression |
-| **2** | Revision history                     | Inspect & restore earlier work without risking current draft | **Next** — [spec](../specs/revision-history-v1.md)                            |
-| **3** | Annotation & structural analysis     | Analysis useful, explainable, separate from source of truth  | Not started                                                                   |
-| **4** | Research library                     | Sources, excerpts, citations traceable to passages           | Not started                                                                   |
-| **5** | Project knowledge & continuity       | Entities, consistency checks without auto-truth              | Not started                                                                   |
-| **6** | Language-aware revision assistance   | Opt-in, scoped, measured false positives                     | Not started                                                                   |
-| **7** | Integrations & broader platforms     | Adapters; core remains local-first                           | Not started                                                                   |
+1. **Review** [project-architecture-and-storage.md](../specs/project-architecture-and-storage.md).
+2. **Approve** open decisions in [pending-decisions.md](../architecture/decisions/pending-decisions.md).
+3. **Run** [Git feasibility spike](../plans/active/git-integration-feasibility.md) (after approval).
+4. **Build** Phase 1 stable IDs → Phase 2 project directory → Phase 4 Git MVP (see architecture roadmap).
 
----
+## Capability map (plan 003 → plan 005)
 
-## Immediate work queue
+| Vision (003)                   | Delivery vehicle (005+)                     |
+| ------------------------------ | ------------------------------------------- |
+| Revision history & compare     | Git commits, branches, merge UI             |
+| Research library               | `knowledge/` + project manifest             |
+| Analysis modes                 | Workspace panel + non-mutating overlays     |
+| Project knowledge / continuity | `knowledge/entities.json` + indexes         |
+| Integrations / premium sync    | Phase 8+ adapters; AGPL open core unchanged |
 
-**Plan 003 (deep writing) — execution:**
+## Evidence (Phase 0)
 
-| Step                                                               | Doc / work                                                                                     | Execution             |
-| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | --------------------- |
-| Principles & invariants written                                    | [philosophy.md](./philosophy.md), [invariants.md](./invariants.md)                             | **Docs only**         |
-| Friction log                                                       | [WRITING_FRICTION_LOG.md](../research/WRITING_FRICTION_LOG.md)                                 | **Open**              |
-| Architecture audit baseline                                        | [implementation-audit.md](../architecture/implementation-audit.md)                             | **Doc snapshot only** |
-| Revision history v1                                                | [spec](../specs/revision-history-v1.md), [active plan](../plans/active/revision-history-v1.md) | **Not implemented**   |
-| Phases 3–7 (analysis, research, knowledge, language, integrations) | [plan 003](../plans/active/003-prosa-deep-writing-features.md)                                 | **Not started**       |
-
-**Workflow (plan 004, adopted 2026-10-26):**
-
-- ~~Operating model, baseline, public doc skeleton~~ → [operating-model.md](../engineering/operating-model.md), [project-baseline.md](../engineering/project-baseline.md)
-- **GitHub:** branch protection + required CI when the repo is public
-- **First feature under new workflow:** Revision History v1
-
----
+[WRITING_FRICTION_LOG.md](../research/WRITING_FRICTION_LOG.md) — still open.
 
 ## How to propose work
 
-1. Check the feature gate in [philosophy.md](./philosophy.md).
-2. Note which roadmap phase and invariants apply.
-3. Prefer a spec or ADR in `docs/` for cross-cutting behavior.
-4. Ship with tests for trust-related behavior.
+1. Feature gate in [philosophy.md](./philosophy.md).
+2. Align with [project-architecture-roadmap.md](../plans/active/project-architecture-roadmap.md) phase.
+3. Spec or pending ADR for cross-cutting changes.

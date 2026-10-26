@@ -1,7 +1,7 @@
 # Revision History v1 — technical specification (draft)
 
-**Status:** Draft v0.1 (design before implementation)  
-**Roadmap:** Phase 2  
+**Status:** **Superseded** — replaced by Git-based history in [project-architecture-and-storage.md](./project-architecture-and-storage.md) (plan 005). Retained as historical alternative (linear `.scribo/revisions/`).  
+**Roadmap:** Was Phase 2 under plan 003  
 **Constitution:** [philosophy.md](../product/philosophy.md) · [invariants.md](../product/invariants.md)
 
 **Non-goals for v1:** Branching, merge, three-way sync, cloud replication, Git semantics.

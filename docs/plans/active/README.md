@@ -1,10 +1,12 @@
 # Active plans
 
-Plans here are **approved or in-progress** work—not finished execution.
+| Plan                                                                       | Status                                                      |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| **[005-project-workspace-and-git.md](./005-project-workspace-and-git.md)** | **Master execution plan** — Git, unified project, workspace |
+| [project-architecture-roadmap.md](./project-architecture-roadmap.md)       | Phased implementation                                       |
+| [git-integration-feasibility.md](./git-integration-feasibility.md)         | Bounded Git spike (not run)                                 |
+| [revision-history-v1.md](./revision-history-v1.md)                         | Withdrawn                                                   |
 
-| Plan                                                                       | Status                                                                        |
-| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| [003-prosa-deep-writing-features.md](./003-prosa-deep-writing-features.md) | **Strategy + roadmap source; deep features not implemented yet** (phases 2–7) |
-| [revision-history-v1.md](./revision-history-v1.md)                         | First Phase 2 slice — awaiting approval to implement                          |
+**Architecture spec:** [specs/project-architecture-and-storage.md](../../specs/project-architecture-and-storage.md)
 
-When a plan’s **implementation** is finished, archive the plan to [completed/](../completed/) only if it remains useful as history; live truth stays in specs, ADRs, and code.
+**Superseded strategy:** [003](../completed/003-prosa-deep-writing-features.md) (philosophy only—features re-scoped under 005).

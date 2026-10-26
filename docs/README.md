@@ -51,6 +51,7 @@ Start here for product and engineering knowledge. **One topic, one canonical fil
 | Path                                                                   | Purpose                        |
 | ---------------------------------------------------------------------- | ------------------------------ |
 | [specs/](./specs/)                                                     | Feature contracts              |
+| [specs/project-architecture-and-storage.md](./specs/project-architecture-and-storage.md) | Project + Git architecture (plan 005) |
 | [plans/active/](./plans/active/)                                       | In-flight implementation plans |
 | [plans/completed/](./plans/completed/)                                 | Historical / finished plans    |
 | [research/WRITING_FRICTION_LOG.md](./research/WRITING_FRICTION_LOG.md) | Real-use evidence              |
