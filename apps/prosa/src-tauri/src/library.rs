@@ -244,14 +244,19 @@ pub fn read_library_markdown(app: &AppHandle, path_key: String) -> Result<String
     fs::read_to_string(path).map_err(|error| error.to_string())
 }
 
+fn is_forbidden_filename_char(ch: char) -> bool {
+    matches!(ch, '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|') || ch.is_control()
+}
+
+/// Filesystem-safe stem: keep punctuation such as `(Draft)`; strip path separators only.
 fn sanitize_title_for_filename(title: &str) -> String {
     let base_name = title
         .chars()
         .map(|ch| {
-            if ch.is_ascii_alphanumeric() || ch == ' ' || ch == '-' || ch == '_' {
-                ch
-            } else {
+            if is_forbidden_filename_char(ch) {
                 ' '
+            } else {
+                ch
             }
         })
         .collect::<String>()
@@ -449,9 +454,14 @@ mod tests {
     fn sanitize_title_for_filename_strips_unsafe_chars() {
         assert_eq!(
             sanitize_title_for_filename("  Hello: World!!  "),
-            "Hello World"
+            "Hello World!!"
+        );
+        assert_eq!(
+            sanitize_title_for_filename("Bianglala (Draft)"),
+            "Bianglala (Draft)"
         );
         assert_eq!(sanitize_title_for_filename("   "), "Untitled");
+        assert_eq!(sanitize_title_for_filename("bad/name"), "bad name");
     }
 
     #[test]

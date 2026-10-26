@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { syncNativeWindowTheme } from "../features/shell/sync-native-window-theme";
 
 export type ThemeMode = "light" | "dark";
 
@@ -16,6 +17,7 @@ function readStoredTheme(): ThemeMode {
 export function applyTheme(mode: ThemeMode) {
   document.documentElement.dataset.theme = mode;
   document.documentElement.style.colorScheme = mode;
+  void syncNativeWindowTheme(mode);
 }
 
 export function initThemeFromStorage() {
