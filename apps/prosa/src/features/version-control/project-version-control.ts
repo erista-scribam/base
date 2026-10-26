@@ -105,3 +105,15 @@ export async function getMergeConflictPreview(
 ): Promise<MergeConflictFilePreview> {
   return invoke<MergeConflictFilePreview>("get_merge_conflict_preview", { relativePath });
 }
+
+export interface ChangedFilePreview {
+  relativePath: string;
+  leftLabel: string;
+  rightLabel: string;
+  leftText: string;
+  rightText: string;
+}
+
+export async function getChangedFilePreview(relativePath: string): Promise<ChangedFilePreview> {
+  return invoke<ChangedFilePreview>("get_changed_file_preview", { relativePath });
+}

@@ -497,33 +497,37 @@ export function App() {
     void revealLibraryFolder().catch(console.error);
   }, []);
 
-  const handleRevealActive = useCallback(() => {
-    if (!activeId || !isTauriRuntime()) {
-      return;
-    }
-    void (async () => {
-      try {
-        let id = activeId;
-        if (isLegacyInternalManuscriptId(activeId)) {
-          const migrated = await migrateLegacyManuscriptToLibrary(activeId);
-          id = migrated.summary.id;
-          setActiveId(id);
-          setDocument(migrated.document);
-          await refreshList();
-        }
-        await revealManuscriptInFileManager(id);
-      } catch (cause) {
-        const message = cause instanceof Error ? cause.message : "Could not reveal file";
-        if (message.includes("legacy_internal")) {
-          setError(
-            "This manuscript is still in app storage. It will move to the library on next launch.",
-          );
-          return;
-        }
-        setError(message);
+  const handleRevealActive = useCallback(
+    (manuscriptId?: string) => {
+      const targetId = manuscriptId ?? activeId;
+      if (!targetId || !isTauriRuntime()) {
+        return;
       }
-    })();
-  }, [activeId, refreshList]);
+      void (async () => {
+        try {
+          let id = targetId;
+          if (isLegacyInternalManuscriptId(id)) {
+            const migrated = await migrateLegacyManuscriptToLibrary(id);
+            id = migrated.summary.id;
+            setActiveId(id);
+            setDocument(migrated.document);
+            await refreshList();
+          }
+          await revealManuscriptInFileManager(id);
+        } catch (cause) {
+          const message = cause instanceof Error ? cause.message : "Could not reveal file";
+          if (message.includes("legacy_internal")) {
+            setError(
+              "This manuscript is still in app storage. It will move to the library on next launch.",
+            );
+            return;
+          }
+          setError(message);
+        }
+      })();
+    },
+    [activeId, refreshList],
+  );
 
   useEffect(() => {
     setDocumentRef(document);
@@ -632,12 +636,12 @@ export function App() {
           onCreateFile={(parent, title) => void handleCreateFile(parent, title)}
           onCreateFolder={(parent, name) => void handleCreateFolder(parent, name)}
           onOpenRepoPath={handleOpenRepoPath}
-          onOpenFile={() => void handleOpenFile()}
           onChooseLibrary={() => void handleChooseLibrary()}
           onCreateProject={() => void handleCreateProject()}
           onSwitchProject={(path) => void handleSwitchProject(path)}
           onRevealLibrary={handleRevealLibrary}
-          onRevealActive={handleRevealActive}
+          onRevealManuscript={(id) => handleRevealActive(id)}
+          onImportMarkdown={() => void handleOpenFile()}
           onDelete={handleDeleteManuscript}
           versionControlRefreshKey={versionControlRefreshKey}
           onVersionControlError={(message) => setError(message)}

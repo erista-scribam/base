@@ -4,6 +4,7 @@ export interface SidebarResizeSashProps {
   orientation: "horizontal" | "vertical";
   ariaLabel: string;
   onDelta: (deltaPx: number) => void;
+  onCommit?: () => void;
   className?: string;
 }
 
@@ -11,16 +12,20 @@ export function SidebarResizeSash({
   orientation,
   ariaLabel,
   onDelta,
+  onCommit,
   className,
 }: SidebarResizeSashProps) {
   const draggingRef = useRef(false);
   const lastPosRef = useRef(0);
 
   const endDrag = useCallback(() => {
+    if (draggingRef.current) {
+      onCommit?.();
+    }
     draggingRef.current = false;
     document.body.style.removeProperty("cursor");
     document.body.style.removeProperty("user-select");
-  }, []);
+  }, [onCommit]);
 
   const onPointerDown = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {

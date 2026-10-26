@@ -1,17 +1,34 @@
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import type { ManuscriptSummary } from "@scribo/core";
 import type { GitChangedFile } from "../features/version-control/project-version-control";
 import { gitStatusForManuscriptPath } from "../features/version-control/git-file-status";
 import {
   buildProjectTree,
   listProjectTree,
+  splitRepoPath,
   type ProjectTreeNode,
 } from "../features/projects/project-tree";
 import { GitFileStatusBadge } from "./GitFileStatusBadge";
 
-/** Horizontal inset per tree level (px), matched in CSS via the same calc. */
 const TREE_INDENT_PX = 12;
 const TREE_BASE_PADDING_PX = 6;
+
+type PendingCreate = { kind: "file" | "folder"; parentRelative: string | null };
+
+type ContextMenuState = {
+  x: number;
+  y: number;
+  parentRelative: string | null;
+  fileId: string | null;
+  fileLabel: string | null;
+};
 
 export interface ProjectFilesExplorerProps {
   refreshKey: number;
@@ -20,7 +37,11 @@ export interface ProjectFilesExplorerProps {
   selectedFolderPath: string | null;
   onSelectFolder: (relativePath: string | null) => void;
   onSelectManuscript: (id: string) => void;
+  onCreateFile: (parentRelative: string | null, title: string) => void;
+  onCreateFolder: (parentRelative: string | null, folderName: string) => void;
+  onRevealManuscript: (id: string) => void;
   onDelete: (id: string) => void;
+  onImportMarkdown: () => void;
   manuscriptsById: Map<string, ManuscriptSummary>;
 }
 
@@ -31,12 +52,19 @@ export function ProjectFilesExplorer({
   selectedFolderPath,
   onSelectFolder,
   onSelectManuscript,
+  onCreateFile,
+  onCreateFolder,
+  onRevealManuscript,
   onDelete,
+  onImportMarkdown,
   manuscriptsById,
 }: ProjectFilesExplorerProps) {
   const [roots, setRoots] = useState<ProjectTreeNode[]>([]);
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [pendingCreate, setPendingCreate] = useState<PendingCreate | null>(null);
+  const [createName, setCreateName] = useState("");
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,6 +86,21 @@ export function ProjectFilesExplorer({
     };
   }, [refreshKey]);
 
+  useEffect(() => {
+    if (!contextMenu) {
+      return;
+    }
+    const close = () => setContextMenu(null);
+    window.addEventListener("click", close);
+    window.addEventListener("contextmenu", close);
+    window.addEventListener("scroll", close, true);
+    return () => {
+      window.removeEventListener("click", close);
+      window.removeEventListener("contextmenu", close);
+      window.removeEventListener("scroll", close, true);
+    };
+  }, [contextMenu]);
+
   const toggleCollapsed = useCallback((path: string) => {
     setCollapsed((current) => {
       const next = new Set(current);
@@ -70,44 +113,251 @@ export function ProjectFilesExplorer({
     });
   }, []);
 
+  const openContextMenu = useCallback(
+    (
+      event: ReactMouseEvent,
+      target: { parentRelative: string | null; fileId?: string | null; fileLabel?: string | null },
+    ) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setContextMenu({
+        x: event.clientX,
+        y: event.clientY,
+        parentRelative: target.parentRelative,
+        fileId: target.fileId ?? null,
+        fileLabel: target.fileLabel ?? null,
+      });
+    },
+    [],
+  );
+
+  const beginCreate = useCallback(
+    (kind: "file" | "folder", parentRelative: string | null) => {
+      setContextMenu(null);
+      if (parentRelative) {
+        setCollapsed((current) => {
+          const next = new Set(current);
+          next.delete(parentRelative);
+          return next;
+        });
+        onSelectFolder(parentRelative);
+      } else {
+        onSelectFolder(null);
+      }
+      setPendingCreate({ kind, parentRelative });
+      setCreateName(kind === "file" ? "untitled.md" : "new-folder");
+    },
+    [onSelectFolder],
+  );
+
+  const submitCreate = useCallback(() => {
+    const trimmed = createName.trim();
+    if (!trimmed || !pendingCreate) {
+      return;
+    }
+    if (pendingCreate.kind === "file") {
+      onCreateFile(pendingCreate.parentRelative, trimmed);
+    } else {
+      onCreateFolder(pendingCreate.parentRelative, trimmed);
+    }
+    setPendingCreate(null);
+    setCreateName("");
+  }, [createName, onCreateFile, onCreateFolder, pendingCreate]);
+
+  const cancelCreate = useCallback(() => {
+    setPendingCreate(null);
+    setCreateName("");
+  }, []);
+
   const tree = useMemo(() => roots, [roots]);
 
   if (loadError) {
     return <p className="app-sidebar-empty">{loadError}</p>;
   }
 
-  if (tree.length === 0) {
-    return (
-      <p className="app-sidebar-empty">
-        No files yet. Create a folder or markdown file to start writing.
-      </p>
-    );
-  }
+  const treeProps = {
+    collapsed,
+    onToggleCollapsed: toggleCollapsed,
+    activeId,
+    selectedFolderPath,
+    changedFiles,
+    manuscriptsById,
+    onSelectFolder,
+    onSelectManuscript,
+    onRevealManuscript,
+    pendingCreate,
+    createName,
+    setCreateName,
+    submitCreate,
+    cancelCreate,
+    openContextMenu,
+  };
 
   return (
-    <ul className="project-tree" role="tree">
-      {tree.map((node) => (
-        <TreeNodeRow
-          key={node.relativePath}
-          node={node}
-          depth={0}
-          collapsed={collapsed}
-          onToggleCollapsed={toggleCollapsed}
-          activeId={activeId}
-          selectedFolderPath={selectedFolderPath}
-          changedFiles={changedFiles}
-          manuscriptsById={manuscriptsById}
-          onSelectFolder={onSelectFolder}
-          onSelectManuscript={onSelectManuscript}
-          onDelete={onDelete}
-        />
-      ))}
-    </ul>
+    <div className="project-tree-shell">
+      {tree.length === 0 && !pendingCreate ? (
+        <p
+          className="app-sidebar-empty project-tree-empty"
+          onContextMenu={(event) => openContextMenu(event, { parentRelative: null })}
+        >
+          Right-click to add a file or folder.
+        </p>
+      ) : (
+        <ul
+          className="project-tree"
+          role="tree"
+          onContextMenu={(event) => {
+            if (event.target === event.currentTarget) {
+              openContextMenu(event, { parentRelative: null });
+            }
+          }}
+        >
+          {pendingCreate?.parentRelative === null ? (
+            <InlineCreateRow
+              depth={0}
+              pendingCreate={pendingCreate}
+              createName={createName}
+              setCreateName={setCreateName}
+              onSubmit={submitCreate}
+              onCancel={cancelCreate}
+            />
+          ) : null}
+          {tree.map((node) => (
+            <TreeNodeRow key={node.relativePath} node={node} depth={0} {...treeProps} />
+          ))}
+        </ul>
+      )}
+
+      {contextMenu ? (
+        <div
+          className="explorer-context-menu"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          role="menu"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <button
+            type="button"
+            role="menuitem"
+            className="explorer-context-menu-item"
+            onClick={() => beginCreate("file", contextMenu.parentRelative)}
+          >
+            New File
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className="explorer-context-menu-item"
+            onClick={() => beginCreate("folder", contextMenu.parentRelative)}
+          >
+            New Folder
+          </button>
+          {!contextMenu.fileId && contextMenu.parentRelative === null ? (
+            <>
+              <div className="explorer-context-menu-sep" role="separator" />
+              <button
+                type="button"
+                role="menuitem"
+                className="explorer-context-menu-item"
+                onClick={() => {
+                  setContextMenu(null);
+                  onImportMarkdown();
+                }}
+              >
+                Import Markdown…
+              </button>
+            </>
+          ) : null}
+          {contextMenu.fileId ? (
+            <>
+              <div className="explorer-context-menu-sep" role="separator" />
+              <button
+                type="button"
+                role="menuitem"
+                className="explorer-context-menu-item"
+                onClick={() => {
+                  setContextMenu(null);
+                  onSelectManuscript(contextMenu.fileId!);
+                }}
+              >
+                Open
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                className="explorer-context-menu-item"
+                onClick={() => {
+                  setContextMenu(null);
+                  onRevealManuscript(contextMenu.fileId!);
+                }}
+              >
+                Reveal in Finder
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                className="explorer-context-menu-item explorer-context-menu-danger"
+                onClick={() => {
+                  setContextMenu(null);
+                  onDelete(contextMenu.fileId!);
+                }}
+              >
+                Delete
+              </button>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
 function treePadding(depth: number): CSSProperties {
   return { paddingLeft: `${TREE_BASE_PADDING_PX + depth * TREE_INDENT_PX}px` };
+}
+
+function InlineCreateRow({
+  depth,
+  pendingCreate,
+  createName,
+  setCreateName,
+  onSubmit,
+  onCancel,
+}: {
+  depth: number;
+  pendingCreate: PendingCreate;
+  createName: string;
+  setCreateName: (value: string) => void;
+  onSubmit: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <li className="project-tree-node project-tree-create-node" role="none">
+      <form
+        className="project-tree-row project-tree-create-row"
+        style={treePadding(depth)}
+        onSubmit={(event) => {
+          event.preventDefault();
+          onSubmit();
+        }}
+      >
+        <span className="project-tree-disclosure project-tree-disclosure-spacer" aria-hidden />
+        <input
+          type="text"
+          className="project-tree-create-input"
+          value={createName}
+          placeholder={pendingCreate.kind === "file" ? "File name" : "Folder name"}
+          autoFocus
+          onChange={(event) => setCreateName(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              onCancel();
+            }
+          }}
+        />
+      </form>
+    </li>
+  );
 }
 
 function TreeNodeRow({
@@ -121,7 +371,13 @@ function TreeNodeRow({
   manuscriptsById,
   onSelectFolder,
   onSelectManuscript,
-  onDelete,
+  onRevealManuscript,
+  pendingCreate,
+  createName,
+  setCreateName,
+  submitCreate,
+  cancelCreate,
+  openContextMenu,
 }: {
   node: ProjectTreeNode;
   depth: number;
@@ -133,7 +389,16 @@ function TreeNodeRow({
   manuscriptsById: Map<string, ManuscriptSummary>;
   onSelectFolder: (relativePath: string | null) => void;
   onSelectManuscript: (id: string) => void;
-  onDelete: (id: string) => void;
+  onRevealManuscript: (id: string) => void;
+  pendingCreate: PendingCreate | null;
+  createName: string;
+  setCreateName: (value: string) => void;
+  submitCreate: () => void;
+  cancelCreate: () => void;
+  openContextMenu: (
+    event: ReactMouseEvent,
+    target: { parentRelative: string | null; fileId?: string | null; fileLabel?: string | null },
+  ) => void;
 }) {
   const isFolder = node.kind === "folder";
   const isCollapsed = isFolder && collapsed.has(node.relativePath);
@@ -143,7 +408,11 @@ function TreeNodeRow({
   if (isFolder) {
     return (
       <li className="project-tree-node" role="treeitem" aria-expanded={!isCollapsed}>
-        <div className="project-tree-row" style={treePadding(depth)}>
+        <div
+          className="project-tree-row"
+          style={treePadding(depth)}
+          onContextMenu={(event) => openContextMenu(event, { parentRelative: node.relativePath })}
+        >
           <button
             type="button"
             className="project-tree-disclosure"
@@ -164,8 +433,18 @@ function TreeNodeRow({
             <span className="project-tree-name">{node.name}</span>
           </button>
         </div>
-        {!isCollapsed && node.children.length > 0 ? (
+        {!isCollapsed ? (
           <ul className="project-tree-children" role="group">
+            {pendingCreate?.parentRelative === node.relativePath ? (
+              <InlineCreateRow
+                depth={depth + 1}
+                pendingCreate={pendingCreate}
+                createName={createName}
+                setCreateName={setCreateName}
+                onSubmit={submitCreate}
+                onCancel={cancelCreate}
+              />
+            ) : null}
             {node.children.map((child) => (
               <TreeNodeRow
                 key={child.relativePath}
@@ -179,7 +458,13 @@ function TreeNodeRow({
                 manuscriptsById={manuscriptsById}
                 onSelectFolder={onSelectFolder}
                 onSelectManuscript={onSelectManuscript}
-                onDelete={onDelete}
+                onRevealManuscript={onRevealManuscript}
+                pendingCreate={pendingCreate}
+                createName={createName}
+                setCreateName={setCreateName}
+                submitCreate={submitCreate}
+                cancelCreate={cancelCreate}
+                openContextMenu={openContextMenu}
               />
             ))}
           </ul>
@@ -197,7 +482,18 @@ function TreeNodeRow({
 
   return (
     <li className="project-tree-node" role="treeitem">
-      <div className="project-tree-row project-tree-row-file" style={treePadding(depth)}>
+      <div
+        className="project-tree-row project-tree-row-file"
+        style={treePadding(depth)}
+        onContextMenu={(event) => {
+          const { directory } = splitRepoPath(node.relativePath);
+          openContextMenu(event, {
+            parentRelative: directory || null,
+            fileId: id,
+            fileLabel: label,
+          });
+        }}
+      >
         <span className="project-tree-disclosure project-tree-disclosure-spacer" aria-hidden />
         <button
           type="button"
@@ -209,18 +505,6 @@ function TreeNodeRow({
           <IconFile />
           <span className="project-tree-name">{label}</span>
           {gitEntry ? <GitFileStatusBadge status={gitEntry.status} /> : null}
-        </button>
-        <button
-          type="button"
-          className="project-tree-action"
-          aria-label={`Delete ${label}`}
-          title="Delete"
-          onClick={(event) => {
-            event.stopPropagation();
-            onDelete(id);
-          }}
-        >
-          <IconTrash />
         </button>
       </div>
     </li>
@@ -286,23 +570,6 @@ function IconFile() {
     >
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
       <path d="M14 2v6h6" />
-    </svg>
-  );
-}
-
-function IconTrash() {
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      aria-hidden
-    >
-      <path d="M3 6h18M8 6V4h8v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-      <path d="M10 11v6M14 11v6" />
     </svg>
   );
 }

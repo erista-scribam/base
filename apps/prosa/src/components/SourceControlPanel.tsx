@@ -301,7 +301,11 @@ export function SourceControlPanel({
               ) : (
                 <p className="sc-changes-hint sc-changes-hint-muted">No uncheckpointed changes.</p>
               )}
-              <ChangedFilesList files={status.changedFiles ?? []} onOpenPath={onOpenChangedPath} />
+              <ChangedFilesList
+                files={status.changedFiles ?? []}
+                refreshKey={refreshKey}
+                onOpenInEditor={onOpenChangedPath}
+              />
               <div className="sc-commit-box">
                 <label className="sc-label" htmlFor="sc-summary">
                   Summary

@@ -34,8 +34,9 @@ use std::process::Command;
 
 #[cfg(feature = "git-vcs")]
 use project_git::{
-    GitGraphCommit, MergeConflictFilePreview, ProjectVersionControl,
-    abort_project_merge as git_abort_merge, checkout_project_branch as git_checkout_branch,
+    ChangedFilePreview, GitGraphCommit, MergeConflictFilePreview, ProjectVersionControl,
+    abort_project_merge as git_abort_merge, changed_file_preview as git_changed_file_preview,
+    checkout_project_branch as git_checkout_branch,
     commit_project_checkpoint as git_commit_checkpoint,
     complete_project_merge as git_complete_merge, create_project_branch as git_create_branch,
     merge_conflict_preview as git_merge_conflict_preview, merge_project_branch as git_merge_branch,
@@ -187,6 +188,15 @@ fn get_merge_conflict_preview(
     relative_path: String,
 ) -> Result<MergeConflictFilePreview, String> {
     git_merge_conflict_preview(&library_root_path(&app)?, &relative_path)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn get_changed_file_preview(
+    app: tauri::AppHandle,
+    relative_path: String,
+) -> Result<ChangedFilePreview, String> {
+    git_changed_file_preview(&library_root_path(&app)?, &relative_path)
 }
 
 #[tauri::command]
@@ -507,7 +517,8 @@ pub fn run() {
             abort_project_merge,
             resolve_project_merge_file,
             complete_project_merge,
-            get_merge_conflict_preview
+            get_merge_conflict_preview,
+            get_changed_file_preview
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

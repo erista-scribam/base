@@ -391,6 +391,115 @@ button.git-branch-chip:hover {
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--scribo-ui-text) 4%, transparent);
 }
 
+.changed-files-list-compact {
+  max-height: 7.5rem;
+}
+
+.changed-files-row[data-selected="true"] {
+  background: var(--scribo-ui-selected);
+}
+
+.changed-files-diff {
+  display: flex;
+  flex-direction: column;
+  gap: var(--scribo-space-2);
+  min-height: 0;
+  margin-top: var(--scribo-space-2);
+}
+
+.changed-files-diff-placeholder {
+  margin: 0;
+  padding: var(--scribo-space-2);
+  font-size: 0.75rem;
+  color: var(--scribo-ui-muted);
+  border: 1px dashed var(--scribo-ui-border-subtle);
+  border-radius: var(--scribo-radius-sm);
+}
+
+.sidebar-file-diff {
+  min-height: 6rem;
+  max-height: 14rem;
+  border: 1px solid color-mix(in srgb, var(--scribo-ui-text) 12%, var(--scribo-ui-border-subtle));
+  border-radius: var(--scribo-radius-sm);
+  overflow: hidden;
+}
+
+.sidebar-file-diff .merge-conflict-pane pre {
+  font-size: 0.6875rem;
+  max-height: 10rem;
+}
+
+.sidebar-file-diff .merge-conflict-pane h3 {
+  font-size: 0.6875rem;
+  padding: 0.375rem 0.5rem;
+}
+
+.changed-files-open-btn {
+  flex-shrink: 0;
+}
+
+.project-tree-shell {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.project-tree-empty {
+  cursor: context-menu;
+}
+
+.project-tree-create-input {
+  flex: 1;
+  min-width: 0;
+  height: 1.25rem;
+  padding: 0 0.25rem;
+  border: 1px solid var(--scribo-ui-accent, #3b82f6);
+  border-radius: 2px;
+  background: var(--scribo-ui-bg);
+  font-family: var(--scribo-font-ui);
+  font-size: 0.8125rem;
+  outline: none;
+}
+
+.explorer-context-menu {
+  position: fixed;
+  z-index: 200;
+  min-width: 10rem;
+  padding: 0.25rem 0;
+  border: 1px solid color-mix(in srgb, var(--scribo-ui-text) 12%, var(--scribo-ui-border-subtle));
+  border-radius: var(--scribo-radius-sm);
+  background: var(--scribo-ui-surface);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--scribo-ui-text) 18%, transparent);
+}
+
+.explorer-context-menu-item {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--scribo-ui-text);
+  font-family: var(--scribo-font-ui);
+  font-size: 0.8125rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.explorer-context-menu-item:hover {
+  background: var(--scribo-ui-hover);
+}
+
+.explorer-context-menu-danger {
+  color: var(--scribo-ui-danger, #c0392b);
+}
+
+.explorer-context-menu-sep {
+  height: 1px;
+  margin: 0.25rem 0;
+  background: var(--scribo-ui-border-subtle);
+}
+
 .changed-files-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);

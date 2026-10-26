@@ -530,6 +530,76 @@ pub fn resolve_project_merge_file(
     finalize_version_control(root, true)
 }
 
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChangedFilePreview {
+    pub relative_path: String,
+    pub left_label: String,
+    pub right_label: String,
+    pub left_text: String,
+    pub right_text: String,
+}
+
+fn read_head_file_text(repo: &Repository, relative_path: &str) -> Option<String> {
+    let head = repo.head().ok()?.peel_to_commit().ok()?;
+    let tree = head.tree().ok()?;
+    let entry = tree.get_path(Path::new(relative_path)).ok()?;
+    let blob = repo.find_blob(entry.id()).ok()?;
+    String::from_utf8(blob.content().to_vec()).ok()
+}
+
+pub fn changed_file_preview(
+    root: &Path,
+    relative_path: &str,
+) -> Result<ChangedFilePreview, String> {
+    if relative_path.contains("..") {
+        return Err("Invalid path".into());
+    }
+    let path = root.join(relative_path);
+    if !path.starts_with(root) {
+        return Err("Invalid path".into());
+    }
+
+    let branch_label = if root.join(".git").exists() {
+        match open_repo(root) {
+            Ok(repo) => repo
+                .head()
+                .ok()
+                .and_then(|head| head.shorthand().map(str::to_string))
+                .unwrap_or_else(|| "HEAD".into()),
+            Err(_) => "HEAD".into(),
+        }
+    } else {
+        "HEAD".into()
+    };
+
+    let left_label = format!("HEAD ({branch_label})");
+    let right_label = "Working tree".to_string();
+
+    let left_text = if root.join(".git").exists() {
+        open_repo(root)
+            .ok()
+            .and_then(|repo| read_head_file_text(&repo, relative_path))
+            .unwrap_or_default()
+    } else {
+        String::new()
+    };
+
+    let right_text = if path.is_file() {
+        fs::read_to_string(&path).unwrap_or_default()
+    } else {
+        String::new()
+    };
+
+    Ok(ChangedFilePreview {
+        relative_path: relative_path.to_string(),
+        left_label,
+        right_label,
+        left_text,
+        right_text,
+    })
+}
+
 pub fn merge_conflict_preview(
     root: &Path,
     relative_path: &str,
