@@ -368,6 +368,158 @@ fn resolve_library_path(root: &Path, path_key: &str) -> Result<PathBuf, String> 
     Ok(candidate)
 }
 
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProjectEntry {
+    pub relative_path: String,
+    pub name: String,
+    /// `folder` or `file`
+    pub kind: String,
+    pub manuscript_id: Option<String>,
+    pub updated_at: Option<String>,
+}
+
+fn should_skip_dir_entry(name: &str) -> bool {
+    name.starts_with('.') || name == "node_modules"
+}
+
+fn resolve_explorer_parent(root: &Path, parent_relative: Option<&str>) -> Result<PathBuf, String> {
+    match parent_relative.filter(|value| !value.is_empty()) {
+        Some(rel) => {
+            let path = resolve_library_path(root, rel)?;
+            if path.is_file() {
+                return path
+                    .parent()
+                    .map(|parent| parent.to_path_buf())
+                    .ok_or_else(|| "Invalid parent folder".to_string());
+            }
+            Ok(path)
+        }
+        None => Ok(root.to_path_buf()),
+    }
+}
+
+fn resolve_manuscript_parent(
+    root: &Path,
+    parent_relative: Option<&str>,
+) -> Result<PathBuf, String> {
+    match parent_relative.filter(|value| !value.is_empty()) {
+        Some(rel) => resolve_explorer_parent(root, Some(rel)),
+        None => Ok(manuscripts_dir(root)),
+    }
+}
+
+fn unique_folder_path(parent: &Path, name: &str) -> PathBuf {
+    let base = sanitize_title_for_filename(name);
+    let mut candidate = parent.join(&base);
+    if !candidate.exists() {
+        return candidate;
+    }
+    let mut counter = 2;
+    while candidate.exists() {
+        candidate = parent.join(format!("{base} {counter}"));
+        counter += 1;
+    }
+    candidate
+}
+
+fn walk_project_entries(
+    root: &Path,
+    dir: &Path,
+    entries: &mut Vec<ProjectEntry>,
+) -> Result<(), String> {
+    for entry in fs::read_dir(dir).map_err(|error| error.to_string())? {
+        let entry = entry.map_err(|error| error.to_string())?;
+        let path = entry.path();
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if should_skip_dir_entry(&name) {
+            continue;
+        }
+        let rel = path
+            .strip_prefix(root)
+            .map_err(|error| error.to_string())?
+            .to_string_lossy()
+            .into_owned();
+        let file_type = entry.file_type().map_err(|error| error.to_string())?;
+        if file_type.is_dir() {
+            entries.push(ProjectEntry {
+                relative_path: rel.clone(),
+                name,
+                kind: "folder".into(),
+                manuscript_id: None,
+                updated_at: None,
+            });
+            walk_project_entries(root, &path, entries)?;
+            continue;
+        }
+        if !is_markdown_file(&path) {
+            continue;
+        }
+        let (_created, modified) = file_created_modified(&path);
+        entries.push(ProjectEntry {
+            relative_path: rel.clone(),
+            name,
+            kind: "file".into(),
+            manuscript_id: Some(manuscript_id_for_path(&rel)),
+            updated_at: Some(modified),
+        });
+    }
+    Ok(())
+}
+
+pub fn list_project_entries(app: &AppHandle) -> Result<Vec<ProjectEntry>, String> {
+    let Some(config) = read_config(app)? else {
+        return Ok(Vec::new());
+    };
+    if !config.root_path.exists() {
+        return Ok(Vec::new());
+    }
+    let mut entries = Vec::new();
+    walk_project_entries(&config.root_path, &config.root_path, &mut entries)?;
+    entries.sort_by(|a, b| match (a.kind.as_str(), b.kind.as_str()) {
+        ("folder", "file") => std::cmp::Ordering::Less,
+        ("file", "folder") => std::cmp::Ordering::Greater,
+        _ => a.relative_path.cmp(&b.relative_path),
+    });
+    Ok(entries)
+}
+
+pub fn create_project_folder(
+    app: &AppHandle,
+    parent_relative: Option<String>,
+    folder_name: String,
+) -> Result<ProjectEntry, String> {
+    let trimmed = folder_name.trim();
+    if trimmed.is_empty() {
+        return Err("Folder name is required".into());
+    }
+    if trimmed.contains('/') || trimmed.contains('\\') {
+        return Err("Folder name cannot contain path separators".into());
+    }
+    let config = read_config(app)?.ok_or("Library is not configured")?;
+    let parent = resolve_explorer_parent(&config.root_path, parent_relative.as_deref())?;
+    fs::create_dir_all(&parent).map_err(|error| error.to_string())?;
+    let folder_path = unique_folder_path(&parent, trimmed);
+    fs::create_dir_all(&folder_path).map_err(|error| error.to_string())?;
+    let rel = folder_path
+        .strip_prefix(&config.root_path)
+        .map_err(|error| error.to_string())?
+        .to_string_lossy()
+        .into_owned();
+    let name = folder_path
+        .file_name()
+        .and_then(|value| value.to_str())
+        .unwrap_or(trimmed)
+        .to_string();
+    Ok(ProjectEntry {
+        relative_path: rel,
+        name,
+        kind: "folder".into(),
+        manuscript_id: None,
+        updated_at: None,
+    })
+}
+
 fn walk_markdown_files(
     root: &Path,
     dir: &Path,
@@ -619,20 +771,22 @@ fn unique_markdown_path(
     Ok((candidate, rel))
 }
 
-pub fn create_library_markdown(
-    app: &AppHandle,
-    title: String,
-) -> Result<(ManuscriptSummary, String), String> {
-    create_library_markdown_with_content(app, title, String::new())
-}
-
 pub fn create_library_markdown_with_content(
     app: &AppHandle,
     title: String,
     markdown: String,
 ) -> Result<(ManuscriptSummary, String), String> {
+    create_library_markdown_in_parent(app, None, title, markdown)
+}
+
+pub fn create_library_markdown_in_parent(
+    app: &AppHandle,
+    parent_relative: Option<String>,
+    title: String,
+    markdown: String,
+) -> Result<(ManuscriptSummary, String), String> {
     let config = read_config(app)?.ok_or("Library is not configured")?;
-    let parent = manuscripts_dir(&config.root_path);
+    let parent = resolve_manuscript_parent(&config.root_path, parent_relative.as_deref())?;
     fs::create_dir_all(&parent).map_err(|error| error.to_string())?;
 
     let (path, rel) = unique_markdown_path(&config.root_path, &parent, &title)?;

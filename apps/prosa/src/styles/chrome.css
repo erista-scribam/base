@@ -291,37 +291,198 @@ button.git-branch-chip:hover {
   color: #e06c75;
 }
 
-.sc-changed-files {
-  margin: 0 0 var(--scribo-space-2);
+.changed-files {
+  margin: 0 0 var(--scribo-space-3);
+}
+
+.changed-files-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.375rem;
+  padding: 0 0.125rem;
+}
+
+.changed-files-title {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--scribo-ui-muted);
+}
+
+.changed-files-count {
+  min-width: 1.125rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--scribo-ui-accent, #3b82f6) 22%, var(--scribo-ui-canvas));
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.125rem;
+  text-align: center;
+  color: var(--scribo-ui-text);
+}
+
+.changed-files-list {
+  margin: 0;
   padding: 0;
-  max-height: 8rem;
-  overflow-y: auto;
   list-style: none;
   border: 1px solid var(--scribo-ui-border-subtle);
   border-radius: var(--scribo-radius-sm);
   background: var(--scribo-ui-canvas);
+  max-height: 10rem;
+  overflow-y: auto;
 }
 
-.sc-changed-file {
-  display: flex;
+.changed-files-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: 0 0.375rem;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.5rem;
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  border: none;
   border-bottom: 1px solid var(--scribo-ui-border-subtle);
-  font-size: 0.6875rem;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
 }
 
-.sc-changed-file:last-child {
+.changed-files-row:last-child {
   border-bottom: none;
 }
 
-.sc-changed-file-path {
-  min-width: 0;
+.changed-files-row:hover {
+  background: var(--scribo-ui-hover);
+}
+
+.changed-files-row .git-file-status {
+  grid-row: 1 / span 2;
+}
+
+.changed-files-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--scribo-ui-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: var(--scribo-font-mono, ui-monospace, monospace);
-  color: var(--scribo-ui-text-secondary);
+}
+
+.changed-files-dir {
+  grid-column: 2;
+  font-size: 0.625rem;
+  color: var(--scribo-ui-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explorer-create-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding: 0 var(--scribo-space-3) var(--scribo-space-2);
+}
+
+.explorer-create-input {
+  flex: 1;
+  min-width: 6rem;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--scribo-ui-border-subtle);
+  border-radius: var(--scribo-radius-sm);
+  background: var(--scribo-ui-bg);
+  font-family: var(--scribo-font-ui);
+  font-size: 0.75rem;
+}
+
+.project-tree {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0 var(--scribo-space-1) var(--scribo-space-3);
+  list-style: none;
+}
+
+.project-tree-children {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-tree-row,
+.project-tree-file-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.project-tree-disclosure {
+  flex-shrink: 0;
+  width: 1rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--scribo-ui-muted);
+  font-size: 0.625rem;
+  cursor: pointer;
+}
+
+.project-tree-folder,
+.project-tree-file {
+  flex: 1;
+  min-width: 0;
+}
+
+.project-tree-folder {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.375rem;
+  border: none;
+  border-radius: var(--scribo-radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.project-tree-folder[data-selected="true"] {
+  background: var(--scribo-ui-selected);
+}
+
+.project-tree-folder:hover {
+  background: var(--scribo-ui-hover);
+}
+
+.project-tree-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-tree-icon {
+  flex-shrink: 0;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 2px;
+  opacity: 0.85;
+}
+
+.project-tree-icon-folder {
+  background: color-mix(in srgb, #f59e0b 55%, var(--scribo-ui-muted));
+}
+
+.project-tree-icon-file {
+  background: color-mix(in srgb, var(--scribo-ui-accent, #3b82f6) 45%, var(--scribo-ui-muted));
+}
+
+.project-tree-file-row .manuscript-item {
+  padding-left: 0.25rem;
 }
 
 .sidebar-sash {

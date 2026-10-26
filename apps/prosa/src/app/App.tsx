@@ -26,6 +26,7 @@ import { useViewportLayout } from "../hooks/useViewportLayout";
 import { ask, open } from "@tauri-apps/plugin-dialog";
 import {
   createManuscript,
+  createProjectFolder,
   deleteManuscript,
   getLibrary,
   importMarkdownFile,
@@ -41,6 +42,7 @@ import {
   revealLibraryFolder,
   revealManuscriptInFileManager,
 } from "../features/persistence/tauri-manuscripts";
+import { manuscriptIdForPath } from "../features/persistence/manuscript-path-id";
 import { openProject } from "../features/projects/project-catalog";
 import { GitBranchChip } from "../components/GitBranchChip";
 import { useLibraryViewMode } from "../hooks/useLibraryViewMode";
@@ -67,6 +69,7 @@ export function App() {
   const [libraryPath, setLibraryPath] = useState<string | null>(null);
   const [projectTitle, setProjectTitle] = useState<string | null>(null);
   const [versionControlRefreshKey, setVersionControlRefreshKey] = useState(0);
+  const [explorerRefreshKey, setExplorerRefreshKey] = useState(0);
   const { theme, toggleTheme } = useTheme();
   const { libraryViewMode, setLibraryViewMode } = useLibraryViewMode();
   const { sidebarProjectView, setSidebarProjectView, showSourceControl } = useSidebarProjectView();
@@ -113,6 +116,7 @@ export function App() {
     }
     const items = await listManuscripts();
     setManuscripts(items);
+    setExplorerRefreshKey((value) => value + 1);
   }, []);
 
   useEffect(() => {
@@ -274,17 +278,66 @@ export function App() {
     [refreshList],
   );
 
+  const handleCreateFile = useCallback(
+    async (parentRelative: string | null, title: string) => {
+      if (!isTauriRuntime()) {
+        return;
+      }
+      setError(null);
+      const created = await createManuscript(title, parentRelative);
+      await refreshList();
+      setActiveId(created.summary.id);
+      setDocument(created.document);
+      setSaveState("idle");
+      setSidebarCollapsed(false);
+      setFocusMode(false);
+      setViewMode("classic");
+      setVersionControlRefreshKey((value) => value + 1);
+    },
+    [refreshList],
+  );
+
+  const handleCreateFolder = useCallback(
+    async (parentRelative: string | null, folderName: string) => {
+      if (!isTauriRuntime()) {
+        return;
+      }
+      setError(null);
+      try {
+        await createProjectFolder(folderName, parentRelative);
+        await refreshList();
+        setVersionControlRefreshKey((value) => value + 1);
+        setNotice(`Created folder “${folderName}”.`);
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : "Could not create folder");
+      }
+    },
+    [refreshList],
+  );
+
   const handleCreate = useCallback(async () => {
-    setError(null);
-    const created = await createManuscript("Untitled");
-    await refreshList();
-    setActiveId(created.summary.id);
-    setDocument(created.document);
-    setSaveState("idle");
-    setSidebarCollapsed(false);
-    setFocusMode(false);
-    setViewMode("classic");
-  }, [refreshList]);
+    await handleCreateFile(null, "Untitled");
+  }, [handleCreateFile]);
+
+  const handleOpenRepoPath = useCallback(
+    (relativePath: string) => {
+      const normalized = relativePath.replace(/\\/g, "/").replace(/^\.\//, "");
+      const match = manuscripts.find((item) => {
+        const filePath = item.filePath?.replace(/\\/g, "/").replace(/^\.\//, "");
+        if (!filePath) {
+          return false;
+        }
+        return filePath === normalized || filePath.endsWith(`/${normalized}`);
+      });
+      const id = match?.id ?? manuscriptIdForPath(normalized);
+      void openManuscript(id, { preferDisk: true }).catch(() => {
+        setNotice(
+          `Could not open ${relativePath}. Refresh the explorer or create the file on disk first.`,
+        );
+      });
+    },
+    [manuscripts, openManuscript],
+  );
 
   const handleSaved = useCallback(
     async (saved: ManuscriptSummary, savedFromManuscriptId: string) => {
@@ -413,27 +466,6 @@ export function App() {
     await applyProjectLibrary(library);
     setNotice(`Created project “${library.project?.title ?? "Untitled"}”.`);
   }, [applyProjectLibrary]);
-
-  const handleOpenConflictFile = useCallback(
-    (relativePath: string) => {
-      const normalized = relativePath.replace(/\\/g, "/").replace(/^\.\//, "");
-      const match = manuscripts.find((item) => {
-        const filePath = item.filePath?.replace(/\\/g, "/").replace(/^\.\//, "");
-        if (!filePath) {
-          return false;
-        }
-        return filePath === normalized || filePath.endsWith(`/${normalized}`);
-      });
-      if (match) {
-        void openManuscript(match.id, { preferDisk: true });
-        return;
-      }
-      setNotice(
-        `Could not open ${relativePath} in the editor. Reload the manuscript list or open the file from the sidebar.`,
-      );
-    },
-    [manuscripts, openManuscript],
-  );
 
   const handleOpenFile = useCallback(async () => {
     if (!isTauriRuntime()) {
@@ -572,7 +604,7 @@ export function App() {
           onBeforeGitOperation={handleBeforeGitOperation}
           onGitOperationComplete={handleGitOperationComplete}
           onError={(message) => setError(message)}
-          onOpenFile={handleOpenConflictFile}
+          onOpenFile={handleOpenRepoPath}
         />
       ) : null}
       {focusMode && gitInitialized && currentBranch ? (
@@ -599,8 +631,11 @@ export function App() {
           changedFiles={changedFiles}
           changeCount={changeCount}
           mergeInProgress={mergeInProgress}
+          explorerRefreshKey={explorerRefreshKey}
           onSelect={(id) => void openManuscript(id)}
-          onCreate={() => void handleCreate()}
+          onCreateFile={(parent, title) => void handleCreateFile(parent, title)}
+          onCreateFolder={(parent, name) => void handleCreateFolder(parent, name)}
+          onOpenRepoPath={handleOpenRepoPath}
           onOpenFile={() => void handleOpenFile()}
           onChooseLibrary={() => void handleChooseLibrary()}
           onCreateProject={() => void handleCreateProject()}

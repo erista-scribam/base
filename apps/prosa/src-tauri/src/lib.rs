@@ -13,11 +13,12 @@ mod recovery;
 use crate::atomic_io::atomic_write;
 use library::{
     LibraryInfo, ProjectSummary, absolute_path_for_entry, clear_library_recovery,
-    create_library_markdown, create_library_markdown_with_content, create_project_root,
-    delete_library_manuscript, ensure_default_library, get_library_info, import_external_markdown,
-    is_library_manuscript_id, library_recovery_path, list_library_manuscripts, list_projects,
-    migrate_legacy_root_markdown, open_project_root, path_key_for_manuscript_id,
-    read_library_markdown, set_library_root, write_library_markdown,
+    create_library_markdown_in_parent, create_library_markdown_with_content, create_project_folder,
+    create_project_root, delete_library_manuscript, ensure_default_library, get_library_info,
+    import_external_markdown, is_library_manuscript_id, library_recovery_path,
+    list_library_manuscripts, list_project_entries, list_projects, migrate_legacy_root_markdown,
+    open_project_root, path_key_for_manuscript_id, read_library_markdown, set_library_root,
+    write_library_markdown,
 };
 use persistence::{
     ManuscriptSummary, clear_recovery_snapshot as clear_internal_recovery_snapshot,
@@ -213,13 +214,30 @@ fn create_project(
 }
 
 #[tauri::command]
+fn list_project_tree(app: tauri::AppHandle) -> Result<Vec<library::ProjectEntry>, String> {
+    list_project_entries(&app)
+}
+
+#[tauri::command]
+fn create_project_folder_entry(
+    app: tauri::AppHandle,
+    parent_relative: Option<String>,
+    folder_name: String,
+) -> Result<library::ProjectEntry, String> {
+    ensure_default_library(&app)?;
+    create_project_folder(&app, parent_relative, folder_name)
+}
+
+#[tauri::command]
 fn create_manuscript(
     app: tauri::AppHandle,
     title: String,
+    parent_relative: Option<String>,
     _document_json: String,
 ) -> Result<LoadedManuscript, String> {
     ensure_default_library(&app)?;
-    let (summary, markdown) = create_library_markdown(&app, title)?;
+    let (summary, markdown) =
+        create_library_markdown_in_parent(&app, parent_relative, title, String::new())?;
     Ok(LoadedManuscript {
         summary,
         document_json: None,
@@ -465,6 +483,8 @@ pub fn run() {
             list_projects_catalog,
             open_project,
             create_project,
+            list_project_tree,
+            create_project_folder_entry,
             create_manuscript,
             migrate_internal_manuscript,
             load_manuscript,

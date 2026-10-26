@@ -119,16 +119,30 @@ export async function migrateAllLegacyManuscriptsToLibrary(): Promise<number> {
   return migrated;
 }
 
-export async function createManuscript(title: string): Promise<LoadedManuscript> {
+export async function createManuscript(
+  title: string,
+  parentRelative?: string | null,
+): Promise<LoadedManuscript> {
   const document = createEmptyProsaDocument(title);
   const payload = await invoke<LoadedManuscriptPayload>("create_manuscript", {
     title,
+    parentRelative: parentRelative ?? null,
     documentJson: serializeProsaDocument(document),
   });
   return {
     summary: payload.summary,
     document: documentFromPayload(payload),
   };
+}
+
+export async function createProjectFolder(
+  folderName: string,
+  parentRelative?: string | null,
+): Promise<void> {
+  await invoke("create_project_folder_entry", {
+    folderName,
+    parentRelative: parentRelative ?? null,
+  });
 }
 
 export async function loadManuscript(id: string): Promise<LoadedManuscript> {

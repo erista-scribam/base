@@ -1,21 +1,15 @@
+import { useMemo, useState } from "react";
 import type { ManuscriptSummary } from "@scribo/core";
 import type { GitChangedFile } from "../features/version-control/project-version-control";
-import { gitStatusForManuscriptPath } from "../features/version-control/git-file-status";
 import type { LibraryViewMode } from "../hooks/useLibraryViewMode";
 import type { SidebarProjectView } from "../hooks/useSidebarProjectView";
 import { useSidebarLayout } from "../hooks/useSidebarLayout";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
-import { GitFileStatusBadge } from "./GitFileStatusBadge";
+import { ProjectFilesExplorer } from "./ProjectFilesExplorer";
 import { ProjectSwitcher } from "./ProjectSwitcher";
 import { SidebarActivityBar } from "./SidebarActivityBar";
 import { SidebarResizeSash } from "./SidebarResizeSash";
 import { SourceControlPanel } from "./SourceControlPanel";
-import {
-  formatCompactMeta,
-  formatManuscriptEdited,
-  formatManuscriptPath,
-  formatManuscriptTimestamp,
-} from "../features/library/manuscript-list-meta";
 
 export interface ManuscriptNavProps {
   manuscripts: ManuscriptSummary[];
@@ -29,8 +23,11 @@ export interface ManuscriptNavProps {
   changedFiles: GitChangedFile[];
   changeCount: number;
   mergeInProgress: boolean;
+  explorerRefreshKey: number;
   onSelect: (id: string) => void;
-  onCreate: () => void;
+  onCreateFile: (parentRelative: string | null, title: string) => void;
+  onCreateFolder: (parentRelative: string | null, folderName: string) => void;
+  onOpenRepoPath: (relativePath: string) => void;
   onOpenFile: () => void;
   onChooseLibrary: () => void;
   onCreateProject: () => void;
@@ -62,8 +59,11 @@ export function ManuscriptNav({
   changedFiles,
   changeCount,
   mergeInProgress,
+  explorerRefreshKey,
   onSelect,
-  onCreate,
+  onCreateFile,
+  onCreateFolder,
+  onOpenRepoPath,
   onOpenFile,
   onChooseLibrary,
   onCreateProject,
@@ -78,6 +78,30 @@ export function ManuscriptNav({
 }: ManuscriptNavProps) {
   const { adjustSidebarWidth } = useSidebarLayout();
   const showActivityBar = isTauriRuntime() && Boolean(libraryPath);
+  const [selectedFolderPath, setSelectedFolderPath] = useState<string | null>(null);
+  const [createKind, setCreateKind] = useState<"file" | "folder" | null>(null);
+  const [createName, setCreateName] = useState("");
+
+  const manuscriptsById = useMemo(
+    () => new Map(manuscripts.map((item) => [item.id, item])),
+    [manuscripts],
+  );
+
+  const createParent = selectedFolderPath;
+
+  const submitCreate = () => {
+    const trimmed = createName.trim();
+    if (!trimmed || !createKind) {
+      return;
+    }
+    if (createKind === "file") {
+      onCreateFile(createParent, trimmed);
+    } else {
+      onCreateFolder(createParent, trimmed);
+    }
+    setCreateKind(null);
+    setCreateName("");
+  };
 
   return (
     <aside className="app-sidebar" aria-label="Navigation">
@@ -122,11 +146,12 @@ export function ManuscriptNav({
                   onGitOperationComplete={async (result) => {
                     await onGitOperationComplete(result.workspaceUpdated === true);
                   }}
+                  onOpenChangedPath={onOpenRepoPath}
                 />
               ) : (
                 <>
                   <div className="app-sidebar-header sidebar-project-header">
-                    <span className="app-sidebar-label">Manuscripts</span>
+                    <span className="app-sidebar-label">Explorer</span>
                     <div className="app-sidebar-actions">
                       <div
                         className="library-view-switch"
@@ -150,91 +175,79 @@ export function ManuscriptNav({
                       <button
                         type="button"
                         className="text-btn"
+                        onClick={() => {
+                          setCreateKind("folder");
+                          setCreateName("");
+                        }}
+                        title="New folder in selected location"
+                      >
+                        Folder
+                      </button>
+                      <button
+                        type="button"
+                        className="text-btn"
+                        onClick={() => {
+                          setCreateKind("file");
+                          setCreateName("Untitled");
+                        }}
+                        title="New markdown file in selected location"
+                      >
+                        File
+                      </button>
+                      <button
+                        type="button"
+                        className="text-btn"
                         onClick={onOpenFile}
-                        title="Open markdown file in this project"
+                        title="Import markdown"
                       >
                         Open
-                      </button>
-                      <button type="button" className="text-btn" onClick={onCreate}>
-                        New
                       </button>
                     </div>
                   </div>
 
-                  <ul className="app-sidebar-list" data-library-view={libraryViewMode}>
-                    {manuscripts.length === 0 ? (
-                      <li className="app-sidebar-empty">
-                        Add `.md` files to your project or create a new manuscript.
-                      </li>
-                    ) : (
-                      manuscripts.map((item) => {
-                        const gitEntry = gitStatusForManuscriptPath(item.filePath, changedFiles);
-                        return (
-                          <li key={item.id} className="manuscript-row">
-                            <button
-                              type="button"
-                              className="manuscript-item"
-                              data-active={activeId === item.id ? "true" : undefined}
-                              onClick={() => onSelect(item.id)}
-                            >
-                              <div className="manuscript-item-title-row">
-                                <span className="manuscript-item-title">
-                                  {item.title || "Untitled"}
-                                </span>
-                                {gitEntry ? <GitFileStatusBadge status={gitEntry.status} /> : null}
-                              </div>
-                              {libraryViewMode === "compact" ? (
-                                <div className="manuscript-item-meta">
-                                  {formatCompactMeta(item)}
-                                </div>
-                              ) : null}
-                              {libraryViewMode === "comfortable" ? (
-                                <div className="manuscript-item-details">
-                                  <div className="manuscript-item-meta-line">
-                                    Edited {formatManuscriptTimestamp(item.updatedAt)}
-                                  </div>
-                                  {item.createdAt ? (
-                                    <div className="manuscript-item-meta-line">
-                                      Created {formatManuscriptTimestamp(item.createdAt)}
-                                    </div>
-                                  ) : null}
-                                  {formatManuscriptPath(item) ? (
-                                    <div className="manuscript-item-meta-line manuscript-item-path">
-                                      {formatManuscriptPath(item)}
-                                    </div>
-                                  ) : null}
-                                </div>
-                              ) : null}
-                              {libraryViewMode === "grid" ? (
-                                <div className="manuscript-item-details">
-                                  <div className="manuscript-item-meta-line">
-                                    Edited {formatManuscriptEdited(item.updatedAt)}
-                                  </div>
-                                  {item.createdAt ? (
-                                    <div className="manuscript-item-meta-line">
-                                      Created {formatManuscriptEdited(item.createdAt)}
-                                    </div>
-                                  ) : null}
-                                </div>
-                              ) : null}
-                            </button>
-                            <button
-                              type="button"
-                              className="icon-btn manuscript-delete"
-                              aria-label={`Delete ${item.title || "Untitled"}`}
-                              title="Delete"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                onDelete(item.id);
-                              }}
-                            >
-                              <IconTrash />
-                            </button>
-                          </li>
-                        );
-                      })
-                    )}
-                  </ul>
+                  {createKind ? (
+                    <form
+                      className="explorer-create-form"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        submitCreate();
+                      }}
+                    >
+                      <input
+                        type="text"
+                        className="explorer-create-input"
+                        value={createName}
+                        placeholder={createKind === "file" ? "File name" : "Folder name"}
+                        autoFocus
+                        onChange={(event) => setCreateName(event.target.value)}
+                      />
+                      <button type="submit" className="sc-btn sc-btn-primary">
+                        Create
+                      </button>
+                      <button
+                        type="button"
+                        className="sc-btn"
+                        onClick={() => {
+                          setCreateKind(null);
+                          setCreateName("");
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </form>
+                  ) : null}
+
+                  <ProjectFilesExplorer
+                    refreshKey={explorerRefreshKey}
+                    activeId={activeId}
+                    libraryViewMode={libraryViewMode}
+                    changedFiles={changedFiles}
+                    selectedFolderPath={selectedFolderPath}
+                    onSelectFolder={setSelectedFolderPath}
+                    onSelectManuscript={onSelect}
+                    onDelete={onDelete}
+                    manuscriptsById={manuscriptsById}
+                  />
 
                   {activeId ? (
                     <div className="app-sidebar-footer">
@@ -257,22 +270,5 @@ export function ManuscriptNav({
         </div>
       )}
     </aside>
-  );
-}
-
-function IconTrash() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      aria-hidden
-    >
-      <path d="M3 6h18M8 6V4h8v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-      <path d="M10 11v6M14 11v6" />
-    </svg>
   );
 }
