@@ -1,20 +1,18 @@
 # Active plans
 
-| Plan                                                                                         | Status                                                                        |
-| -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| **[multi-application-architecture-roadmap.md](./multi-application-architecture-roadmap.md)** | **Primary roadmap** — family architecture R0–R8                               |
-| **[006-scribo-lanista-platform.md](./006-scribo-lanista-platform.md)**                       | Execution track (Lanista, grants, `.mdprosa`; reconcile Git with family spec) |
-| [project-format-and-storage.md](./project-format-and-storage.md)                             | Manifest, layout v2, format validation                                        |
-| [project-git-strategy.md](./project-git-strategy.md)                                         | Unified vs split repos — experiments before ADR                               |
-| [005-project-workspace-and-git.md](./005-project-workspace-and-git.md)                       | **Paused**                                                                    |
-| [project-architecture-roadmap.md](./project-architecture-roadmap.md)                         | 005 phase track (frozen)                                                      |
-| [git-integration-feasibility.md](./git-integration-feasibility.md)                           | Git spike (completed)                                                         |
-| [revision-history-v1.md](./revision-history-v1.md)                                           | Withdrawn                                                                     |
+| Plan                                                                                         | Status                                                                               |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| **[multi-application-architecture-roadmap.md](./multi-application-architecture-roadmap.md)** | **Primary** — R1–R4, R6 shipped; R5 Option A; R7 partial; R8 stub dirs               |
+| [006-scribo-lanista-platform.md](./006-scribo-lanista-platform.md)                           | Lanista MVP shipped; per-ms Git **deferred**                                         |
+| [005-project-workspace-and-git.md](./005-project-workspace-and-git.md)                       | **Closed** — Git + layout shipped; workspace/knowledge deferred to multi-app roadmap |
+| [project-format-and-storage.md](./project-format-and-storage.md)                             | Validation plan (layout v2 wizard still open)                                        |
+| [project-git-strategy.md](./project-git-strategy.md)                                         | **Option A default** (unified project Git)                                           |
+| [project-architecture-roadmap.md](./project-architecture-roadmap.md)                         | 005 phase track (historical)                                                         |
+| [git-integration-feasibility.md](./git-integration-feasibility.md)                           | Completed spike                                                                      |
+| [revision-history-v1.md](./revision-history-v1.md)                                           | Withdrawn                                                                            |
 
 **Master spec:** [specs/multi-application-project-architecture.md](../../specs/multi-application-project-architecture.md)
 
-**Platform stubs:** [specs/lanista-platform-and-storage.md](../../specs/lanista-platform-and-storage.md), [mdprosa-format-v1.md](../../specs/mdprosa-format-v1.md), [app-filesystem-grants.md](../../specs/app-filesystem-grants.md)
+**Apps:** [apps/lanista/README.md](../../../apps/lanista/README.md), `@scribo/prosa`
 
-**Legacy audit:** [specs/project-architecture-and-storage.md](../../specs/project-architecture-and-storage.md)
-
-**Superseded strategy:** [003](../completed/003-prosa-deep-writing-features.md) (philosophy only).
+**Remaining before “release” (no Changeset yet):** layout v2 migration wizard, Lanista-only catalog cutover (R7), formal Git ADR sign-off, Folio/Drama apps.

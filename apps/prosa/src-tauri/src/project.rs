@@ -39,6 +39,26 @@ pub fn manuscripts_dir(root: &Path) -> PathBuf {
     crate::project_layout::resolve_manuscripts_dir(root)
 }
 
+const WORKSPACE_TASKS_FILE: &str = "workspace/tasks.json";
+
+fn ensure_workspace_stub(root: &Path) -> Result<(), String> {
+    let path = root.join(WORKSPACE_TASKS_FILE);
+    if path.exists() {
+        return Ok(());
+    }
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|error| error.to_string())?;
+    }
+    let stub = serde_json::json!({
+        "schemaVersion": 1,
+        "tasks": []
+    });
+    atomic_write(
+        &path,
+        &serde_json::to_string_pretty(&stub).map_err(|e| e.to_string())?,
+    )
+}
+
 fn write_manifest(root: &Path, manifest: &ScriboProjectManifest) -> Result<(), String> {
     let path = root.join(PROJECT_MANIFEST_FILE);
     let raw = serde_json::to_string_pretty(manifest).map_err(|error| error.to_string())?;
@@ -64,6 +84,7 @@ pub fn ensure_project_layout(
 ) -> Result<bool, String> {
     fs::create_dir_all(root.join(".scribo/recovery")).map_err(|error| error.to_string())?;
     crate::project_layout::ensure_v1_manuscripts_dir(root)?;
+    ensure_workspace_stub(root)?;
 
     if manifest.layout_version >= PROJECT_LAYOUT_VERSION {
         return Ok(false);

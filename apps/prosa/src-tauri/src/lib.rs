@@ -96,6 +96,21 @@ fn init_library(app: tauri::AppHandle) -> Result<LibraryInfo, String> {
 }
 
 #[tauri::command]
+fn get_prosa_launch_context() -> ProsaLaunchContext {
+    ProsaLaunchContext {
+        launched_from_lanista: std::env::var("SCRIBO_LAUNCHED_FROM_LANISTA")
+            .ok()
+            .is_some_and(|value| !value.trim().is_empty() && value != "0"),
+    }
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ProsaLaunchContext {
+    launched_from_lanista: bool,
+}
+
+#[tauri::command]
 fn migrate_legacy_root_manuscripts(app: tauri::AppHandle) -> Result<u32, String> {
     ensure_default_library(&app)?;
     migrate_legacy_root_markdown(&app)
@@ -491,6 +506,7 @@ pub fn run() {
             list_legacy_internal_manuscripts,
             get_library,
             init_library,
+            get_prosa_launch_context,
             set_library,
             list_projects_catalog,
             open_project,
