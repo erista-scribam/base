@@ -51,7 +51,7 @@ Touch Rust → `pnpm verify:all`. Docs-only → `pnpm format:check` at minimum.
 
 - Authoritative types live in `@scribo/document-model`.
 - TipTap and CodeMirror are adapters; do not treat editor JSON as canonical.
-- Library manuscripts persist as Markdown on disk; Classic editing uses `ProsaDocument` in memory.
+- Library manuscripts persist as `.mdprosa` (dual-read legacy `.md`); Proper mode uses `ProsaDocument` in memory.
 
 ## Persistence
 

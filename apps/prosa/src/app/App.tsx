@@ -8,11 +8,8 @@ import { EditorTabBar } from "../components/EditorTabBar";
 import { EditorToolbar } from "../components/EditorToolbar";
 import { GitDiffEditorTab } from "../components/GitDiffEditorTab";
 import { EmptyWorkspace } from "../components/EmptyWorkspace";
-import {
-  EditorWorkspace,
-  type EditorViewMode,
-  type EditorWorkspaceHandle,
-} from "../components/EditorWorkspace";
+import { EditorWorkspace, type EditorWorkspaceHandle } from "../components/EditorWorkspace";
+import { MdprosaFormatNotice } from "../components/MdprosaFormatNotice";
 import type { MarkdownFormatAction } from "../features/markdown/markdown-source-format";
 import { useManuscriptPersistence } from "../hooks/useManuscriptPersistence";
 import { useMarkdownPreviewVisible } from "../hooks/useMarkdownPreviewVisible";
@@ -25,6 +22,7 @@ import { useAppShortcuts } from "../hooks/useAppShortcuts";
 import { useEditorZoom } from "../hooks/useEditorZoom";
 import { useTheme } from "../hooks/useTheme";
 import { useViewportLayout } from "../hooks/useViewportLayout";
+import { useEditorViewMode } from "../hooks/useEditorViewMode";
 import { ask, open } from "@tauri-apps/plugin-dialog";
 import {
   createManuscript,
@@ -67,7 +65,7 @@ export function App() {
   const [diskRevisionAtOpen, setDiskRevisionAtOpen] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
-  const [viewMode, setViewMode] = useState<EditorViewMode>("classic");
+  const { viewMode, setViewMode } = useEditorViewMode();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [layoutKey, setLayoutKey] = useState(0);
   const [libraryPath, setLibraryPath] = useState<string | null>(null);
@@ -237,13 +235,13 @@ export function App() {
 
   const toggleViewMode = useCallback(() => {
     setViewMode((mode) => {
-      const next = mode === "classic" ? "split" : "classic";
-      if (next === "split") {
+      const next = mode === "proper" ? "minimalist" : "proper";
+      if (next === "minimalist") {
         setEditor(null);
       }
       return next;
     });
-  }, []);
+  }, [setViewMode]);
 
   useAppShortcuts({
     onToggleSidebar: toggleSidebar,
@@ -314,10 +312,10 @@ export function App() {
       setSaveState("idle");
       setSidebarCollapsed(false);
       setFocusMode(false);
-      setViewMode("classic");
+      setViewMode("proper");
       setVersionControlRefreshKey((value) => value + 1);
     },
-    [refreshList, registerTab],
+    [refreshList, registerTab, setViewMode],
   );
 
   const handleCreateFolder = useCallback(
@@ -346,7 +344,7 @@ export function App() {
     (relativePath: string) => {
       const normalized = relativePath.replace(/\\/g, "/").replace(/^\.\//, "");
       if (!isMarkdownRepoPath(normalized)) {
-        setNotice("Only markdown manuscripts (.md) can be opened in the editor.");
+        setNotice("Only .mdprosa or legacy .md manuscripts can be opened in the editor.");
         return;
       }
       const match = manuscripts.find((item) => {
@@ -564,8 +562,8 @@ export function App() {
     }
     const selected = await open({
       multiple: false,
-      title: "Open markdown file",
-      filters: [{ name: "Markdown", extensions: ["md", "markdown"] }],
+      title: "Import prose file",
+      filters: [{ name: "Scribo prose", extensions: ["mdprosa", "md", "markdown"] }],
     });
     if (typeof selected !== "string") {
       return;
@@ -758,7 +756,7 @@ export function App() {
           onBeforeGitOperation={handleBeforeGitOperation}
           onGitOperationComplete={handleGitOperationComplete}
         />
-        <main className="app-main" data-editor-view={viewMode === "split" ? "markdown" : "classic"}>
+        <main className="app-main" data-editor-view={viewMode}>
           {openTabIds.length > 0 || document || activeDiffPath ? (
             <>
               {openTabIds.length > 0 ? (
@@ -779,6 +777,7 @@ export function App() {
                 />
               ) : document ? (
                 <>
+                  <MdprosaFormatNotice />
                   <EditorToolbar
                     title={document.title}
                     onTitleChange={handleTitleChange}
@@ -800,20 +799,14 @@ export function App() {
                     onZoomIn={zoomIn}
                     onZoomOut={zoomOut}
                     onZoomReset={resetZoom}
-                    onMarkdownFormat={viewMode === "split" ? handleMarkdownFormat : undefined}
+                    onMarkdownFormat={viewMode === "minimalist" ? handleMarkdownFormat : undefined}
                     gitBranch={gitInitialized ? currentBranch : null}
                     gitChangeCount={changeCount}
                     gitMergeInProgress={mergeInProgress}
                     onGitBranchClick={openSourceControlSidebar}
                   />
-                  <div
-                    className="editor-scroll"
-                    data-view={viewMode === "split" ? "markdown" : "classic"}
-                  >
-                    <div
-                      className="editor-scroll-inner"
-                      data-view={viewMode === "split" ? "markdown" : "classic"}
-                    >
+                  <div className="editor-scroll" data-view={viewMode}>
+                    <div className="editor-scroll-inner" data-view={viewMode}>
                       <EditorWorkspace
                         ref={workspaceRef}
                         key={document.id}

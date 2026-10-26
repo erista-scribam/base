@@ -1994,6 +1994,45 @@ button.git-branch-chip:hover {
   background: var(--scribo-ui-canvas);
 }
 
+.mdprosa-format-notice {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  gap: var(--scribo-space-3);
+  padding: var(--scribo-space-2) var(--scribo-space-4);
+  border-bottom: 1px solid var(--scribo-ui-border-subtle);
+  background: color-mix(in srgb, var(--scribo-ui-accent) 8%, var(--scribo-ui-canvas));
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--scribo-ui-text-secondary);
+}
+
+.mdprosa-format-notice-text {
+  flex: 1;
+  margin: 0;
+}
+
+.mdprosa-format-notice-text strong {
+  color: var(--scribo-ui-text);
+  font-weight: 600;
+}
+
+.mdprosa-format-notice-dismiss {
+  flex-shrink: 0;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--scribo-radius-sm);
+  padding: 0.2rem 0.55rem;
+  background: transparent;
+  color: var(--scribo-ui-accent);
+}
+
+.mdprosa-format-notice-dismiss:hover {
+  background: var(--scribo-ui-hover);
+}
+
 .editor-chrome {
   flex-shrink: 0;
   border-bottom: 1px solid var(--scribo-ui-border-subtle);
@@ -2004,12 +2043,12 @@ button.git-branch-chip:hover {
     border-color var(--scribo-transition-fast);
 }
 
-.editor-chrome[data-mode="markdown"] {
+.editor-chrome[data-mode="minimalist"] {
   border-bottom: 2px solid color-mix(in srgb, var(--scribo-ui-accent) 55%, var(--scribo-ui-border));
   background: color-mix(in srgb, var(--scribo-md-source-bg) 35%, var(--scribo-ui-bg));
 }
 
-.editor-chrome[data-mode="markdown"] .editor-title {
+.editor-chrome[data-mode="minimalist"] .editor-title {
   font-family: var(--scribo-font-mono);
   font-size: 0.875rem;
   font-weight: 500;
@@ -2044,7 +2083,7 @@ button.git-branch-chip:hover {
   box-shadow: 0 1px 2px color-mix(in srgb, var(--scribo-ui-text) 8%, transparent);
 }
 
-.editor-chrome[data-mode="markdown"] .editor-mode-switch-btn[data-active="true"] {
+.editor-chrome[data-mode="minimalist"] .editor-mode-switch-btn[data-active="true"] {
   background: var(--scribo-md-source-bg);
   color: var(--scribo-ui-accent);
 }
@@ -2096,11 +2135,11 @@ button.git-branch-chip:hover {
   border-radius: calc(var(--scribo-radius-sm) - 2px);
 }
 
-.app-main[data-editor-view="markdown"] .editor-scroll {
+.app-main[data-editor-view="minimalist"] .editor-scroll {
   background: var(--scribo-md-source-bg);
 }
 
-.app-main[data-editor-view="classic"] .editor-scroll {
+.app-main[data-editor-view="proper"] .editor-scroll {
   background: var(--scribo-ui-canvas);
 }
 
@@ -2174,7 +2213,7 @@ button.git-branch-chip:hover {
   gap: var(--scribo-space-2);
 }
 
-.editor-chrome[data-mode="markdown"] .format-bar-reference {
+.editor-chrome[data-mode="minimalist"] .format-bar-reference {
   background: color-mix(in srgb, var(--scribo-md-source-bg) 65%, var(--scribo-ui-bg));
   border-top-color: color-mix(in srgb, var(--scribo-ui-accent) 25%, var(--scribo-ui-border));
 }
@@ -2306,7 +2345,7 @@ button.git-branch-chip:hover {
   overflow-y: auto;
 }
 
-.editor-scroll[data-view="markdown"] {
+.editor-scroll[data-view="minimalist"] {
   overflow: hidden;
 }
 
@@ -2373,7 +2412,7 @@ button.git-branch-chip:hover {
   flex-direction: column;
 }
 
-.editor-scroll-inner[data-view="markdown"] {
+.editor-scroll-inner[data-view="minimalist"] {
   min-height: 0;
   height: 100%;
 }

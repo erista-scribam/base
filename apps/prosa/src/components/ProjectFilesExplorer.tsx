@@ -271,7 +271,7 @@ export function ProjectFilesExplorer({
                   onImportMarkdown();
                 }}
               >
-                Import Markdown…
+                Import prose…
               </button>
             </>
           ) : null}

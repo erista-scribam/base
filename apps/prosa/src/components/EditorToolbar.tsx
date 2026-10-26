@@ -134,7 +134,7 @@ export function EditorToolbar({
   gitMergeInProgress = false,
   onGitBranchClick,
 }: EditorToolbarProps) {
-  const isMarkdown = viewMode === "split";
+  const isMinimalist = viewMode === "minimalist";
   const statusLabel =
     saveState === "saving"
       ? "Saving…"
@@ -147,7 +147,7 @@ export function EditorToolbar({
             : "";
 
   return (
-    <div className="editor-chrome" data-mode={isMarkdown ? "markdown" : "classic"}>
+    <div className="editor-chrome" data-mode={isMinimalist ? "minimalist" : "proper"}>
       <header className="editor-header">
         <IconButton
           label={sidebarCollapsed || focusMode ? "Show sidebar" : "Hide sidebar"}
@@ -183,21 +183,23 @@ export function EditorToolbar({
           <button
             type="button"
             className="editor-mode-switch-btn"
-            data-active={!isMarkdown ? "true" : undefined}
-            onClick={() => isMarkdown && onToggleViewMode()}
+            data-active={!isMinimalist ? "true" : undefined}
+            title="Proper — structured layout and inline formatting"
+            onClick={() => isMinimalist && onToggleViewMode()}
           >
-            Classic
+            Proper
           </button>
           <button
             type="button"
             className="editor-mode-switch-btn"
-            data-active={isMarkdown ? "true" : undefined}
-            onClick={() => !isMarkdown && onToggleViewMode()}
+            data-active={isMinimalist ? "true" : undefined}
+            title="Minimalist — plain-text .mdprosa source with optional preview"
+            onClick={() => !isMinimalist && onToggleViewMode()}
           >
-            Markdown
+            Minimalist
           </button>
         </div>
-        {isMarkdown ? (
+        {isMinimalist ? (
           <IconButton
             label={markdownPreviewVisible ? "Hide side panel" : "Show side panel"}
             active={markdownPreviewVisible}
@@ -248,7 +250,7 @@ export function EditorToolbar({
           <IconFocus />
         </IconButton>
       </header>
-      {viewMode === "classic" ? (
+      {viewMode === "proper" ? (
         <FormatToolbar editor={editor} />
       ) : onMarkdownFormat ? (
         <MarkdownFormatToolbar onFormat={onMarkdownFormat} />
