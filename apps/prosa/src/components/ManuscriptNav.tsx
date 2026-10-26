@@ -1,6 +1,9 @@
 import type { ManuscriptSummary } from "@scribo/core";
 import type { LibraryViewMode } from "../hooks/useLibraryViewMode";
+import { useSidebarLayout } from "../hooks/useSidebarLayout";
+import { isTauriRuntime } from "../features/persistence/is-tauri";
 import { ProjectSwitcher } from "./ProjectSwitcher";
+import { SidebarResizeSash } from "./SidebarResizeSash";
 import { SourceControlPanel } from "./SourceControlPanel";
 import {
   formatCompactMeta,
@@ -58,8 +61,18 @@ export function ManuscriptNav({
   onBeforeGitOperation,
   onGitOperationComplete,
 }: ManuscriptNavProps) {
+  const { adjustSidebarWidth, adjustSourceControlHeight, sourceControlHeightPx } =
+    useSidebarLayout();
+  const showSourceControlPane = isTauriRuntime() && Boolean(libraryPath);
+
   return (
     <aside className="app-sidebar" aria-label="Navigation">
+      <SidebarResizeSash
+        orientation="vertical"
+        className="sidebar-width-sash"
+        ariaLabel="Resize sidebar"
+        onDelta={adjustSidebarWidth}
+      />
       <section className="sidebar-workspace" aria-label="Workspace">
         <div className="sidebar-zone-header">
           <span className="sidebar-zone-label">Workspace</span>
@@ -77,119 +90,137 @@ export function ManuscriptNav({
 
       {libraryPath ? (
         <section className="sidebar-project" aria-label="Project">
-          <div className="app-sidebar-header sidebar-project-header">
-            <span className="app-sidebar-label">Manuscripts</span>
-            <div className="app-sidebar-actions">
-              <div className="library-view-switch" role="group" aria-label="Manuscript layout">
-                {(["compact", "comfortable", "grid"] as const).map((mode) => (
+          <div className="sidebar-project-stack">
+            <div className="sidebar-pane sidebar-pane-manuscripts">
+              <div className="app-sidebar-header sidebar-project-header">
+                <span className="app-sidebar-label">Manuscripts</span>
+                <div className="app-sidebar-actions">
+                  <div className="library-view-switch" role="group" aria-label="Manuscript layout">
+                    {(["compact", "comfortable", "grid"] as const).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        className="library-view-btn"
+                        data-active={libraryViewMode === mode ? "true" : undefined}
+                        aria-pressed={libraryViewMode === mode}
+                        title={`${VIEW_LABELS[mode]} view`}
+                        onClick={() => onLibraryViewModeChange(mode)}
+                      >
+                        {VIEW_LABELS[mode]}
+                      </button>
+                    ))}
+                  </div>
                   <button
-                    key={mode}
                     type="button"
-                    className="library-view-btn"
-                    data-active={libraryViewMode === mode ? "true" : undefined}
-                    aria-pressed={libraryViewMode === mode}
-                    title={`${VIEW_LABELS[mode]} view`}
-                    onClick={() => onLibraryViewModeChange(mode)}
+                    className="text-btn"
+                    onClick={onOpenFile}
+                    title="Open markdown file in this project"
                   >
-                    {VIEW_LABELS[mode]}
+                    Open
                   </button>
-                ))}
+                  <button type="button" className="text-btn" onClick={onCreate}>
+                    New
+                  </button>
+                </div>
               </div>
-              <button
-                type="button"
-                className="text-btn"
-                onClick={onOpenFile}
-                title="Open markdown file in this project"
-              >
-                Open
-              </button>
-              <button type="button" className="text-btn" onClick={onCreate}>
-                New
-              </button>
-            </div>
-          </div>
 
-          <SourceControlPanel
-            refreshKey={versionControlRefreshKey}
-            onError={onVersionControlError}
-            onBeforeGitOperation={onBeforeGitOperation}
-            onGitOperationComplete={async (result) => {
-              await onGitOperationComplete(result.workspaceUpdated === true);
-            }}
-          />
+              <ul className="app-sidebar-list" data-library-view={libraryViewMode}>
+                {manuscripts.length === 0 ? (
+                  <li className="app-sidebar-empty">
+                    Add `.md` files to your library folder or create a new manuscript.
+                  </li>
+                ) : (
+                  manuscripts.map((item) => (
+                    <li key={item.id} className="manuscript-row">
+                      <button
+                        type="button"
+                        className="manuscript-item"
+                        data-active={activeId === item.id ? "true" : undefined}
+                        onClick={() => onSelect(item.id)}
+                      >
+                        <div className="manuscript-item-title">{item.title || "Untitled"}</div>
+                        {libraryViewMode === "compact" ? (
+                          <div className="manuscript-item-meta">{formatCompactMeta(item)}</div>
+                        ) : null}
+                        {libraryViewMode === "comfortable" ? (
+                          <div className="manuscript-item-details">
+                            <div className="manuscript-item-meta-line">
+                              Edited {formatManuscriptTimestamp(item.updatedAt)}
+                            </div>
+                            {item.createdAt ? (
+                              <div className="manuscript-item-meta-line">
+                                Created {formatManuscriptTimestamp(item.createdAt)}
+                              </div>
+                            ) : null}
+                            {formatManuscriptPath(item) ? (
+                              <div className="manuscript-item-meta-line manuscript-item-path">
+                                {formatManuscriptPath(item)}
+                              </div>
+                            ) : null}
+                          </div>
+                        ) : null}
+                        {libraryViewMode === "grid" ? (
+                          <div className="manuscript-item-details">
+                            <div className="manuscript-item-meta-line">
+                              Edited {formatManuscriptEdited(item.updatedAt)}
+                            </div>
+                            {item.createdAt ? (
+                              <div className="manuscript-item-meta-line">
+                                Created {formatManuscriptEdited(item.createdAt)}
+                              </div>
+                            ) : null}
+                          </div>
+                        ) : null}
+                      </button>
+                      <button
+                        type="button"
+                        className="icon-btn manuscript-delete"
+                        aria-label={`Delete ${item.title || "Untitled"}`}
+                        title="Delete"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onDelete(item.id);
+                        }}
+                      >
+                        <IconTrash />
+                      </button>
+                    </li>
+                  ))
+                )}
+              </ul>
 
-          <ul className="app-sidebar-list" data-library-view={libraryViewMode}>
-            {manuscripts.length === 0 ? (
-              <li className="app-sidebar-empty">
-                Add `.md` files to your library folder or create a new manuscript.
-              </li>
-            ) : (
-              manuscripts.map((item) => (
-                <li key={item.id} className="manuscript-row">
-                  <button
-                    type="button"
-                    className="manuscript-item"
-                    data-active={activeId === item.id ? "true" : undefined}
-                    onClick={() => onSelect(item.id)}
-                  >
-                    <div className="manuscript-item-title">{item.title || "Untitled"}</div>
-                    {libraryViewMode === "compact" ? (
-                      <div className="manuscript-item-meta">{formatCompactMeta(item)}</div>
-                    ) : null}
-                    {libraryViewMode === "comfortable" ? (
-                      <div className="manuscript-item-details">
-                        <div className="manuscript-item-meta-line">
-                          Edited {formatManuscriptTimestamp(item.updatedAt)}
-                        </div>
-                        {item.createdAt ? (
-                          <div className="manuscript-item-meta-line">
-                            Created {formatManuscriptTimestamp(item.createdAt)}
-                          </div>
-                        ) : null}
-                        {formatManuscriptPath(item) ? (
-                          <div className="manuscript-item-meta-line manuscript-item-path">
-                            {formatManuscriptPath(item)}
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
-                    {libraryViewMode === "grid" ? (
-                      <div className="manuscript-item-details">
-                        <div className="manuscript-item-meta-line">
-                          Edited {formatManuscriptEdited(item.updatedAt)}
-                        </div>
-                        {item.createdAt ? (
-                          <div className="manuscript-item-meta-line">
-                            Created {formatManuscriptEdited(item.createdAt)}
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
+              {activeId ? (
+                <div className="app-sidebar-footer">
+                  <button type="button" className="sidebar-footer-btn" onClick={onRevealActive}>
+                    Reveal in Finder
                   </button>
-                  <button
-                    type="button"
-                    className="icon-btn manuscript-delete"
-                    aria-label={`Delete ${item.title || "Untitled"}`}
-                    title="Delete"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onDelete(item.id);
+                </div>
+              ) : null}
+            </div>
+
+            {showSourceControlPane ? (
+              <>
+                <SidebarResizeSash
+                  orientation="horizontal"
+                  ariaLabel="Resize source control panel"
+                  onDelta={adjustSourceControlHeight}
+                />
+                <div
+                  className="sidebar-pane sidebar-pane-source-control"
+                  style={{ height: sourceControlHeightPx }}
+                >
+                  <SourceControlPanel
+                    refreshKey={versionControlRefreshKey}
+                    onError={onVersionControlError}
+                    onBeforeGitOperation={onBeforeGitOperation}
+                    onGitOperationComplete={async (result) => {
+                      await onGitOperationComplete(result.workspaceUpdated === true);
                     }}
-                  >
-                    <IconTrash />
-                  </button>
-                </li>
-              ))
-            )}
-          </ul>
-
-          {activeId ? (
-            <div className="app-sidebar-footer">
-              <button type="button" className="sidebar-footer-btn" onClick={onRevealActive}>
-                Reveal in Finder
-              </button>
-            </div>
-          ) : null}
+                  />
+                </div>
+              </>
+            ) : null}
+          </div>
         </section>
       ) : (
         <div className="sidebar-project-placeholder">
