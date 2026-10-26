@@ -191,19 +191,19 @@ fn rewrite_config_paths_away_from_legacy(
         }
     }
 
-    if let Some(new_root) = remapped_path_under_scribam(&config.root_path, canonical_home) {
-        if !paths_equal(&config.root_path, &new_root) {
-            config.root_path = new_root;
-            changed = true;
-        }
+    if let Some(new_root) = remapped_path_under_scribam(&config.root_path, canonical_home)
+        && !paths_equal(&config.root_path, &new_root)
+    {
+        config.root_path = new_root;
+        changed = true;
     }
 
     for entry in &mut config.recent_projects {
-        if let Some(new_path) = remapped_path_under_scribam(&entry.root_path, canonical_home) {
-            if !paths_equal(&entry.root_path, &new_path) {
-                entry.root_path = new_path;
-                changed = true;
-            }
+        if let Some(new_path) = remapped_path_under_scribam(&entry.root_path, canonical_home)
+            && !paths_equal(&entry.root_path, &new_path)
+        {
+            entry.root_path = new_path;
+            changed = true;
         }
     }
 
@@ -246,7 +246,8 @@ fn try_adopt_legacy_app_library_config(app: &AppHandle) -> Result<(), String> {
             continue;
         }
         let raw = fs::read_to_string(&legacy_file).map_err(|error| error.to_string())?;
-        let config: LibraryConfig = serde_json::from_str(&raw).map_err(|error| error.to_string())?;
+        let config: LibraryConfig =
+            serde_json::from_str(&raw).map_err(|error| error.to_string())?;
         write_config(app, &config)?;
         return Ok(());
     }
@@ -1277,8 +1278,7 @@ mod tests {
 
     #[test]
     fn canonical_library_home_is_always_scribam() {
-        let docs =
-            std::env::temp_dir().join(format!("scribam-lib-home-{}", uuid::Uuid::new_v4()));
+        let docs = std::env::temp_dir().join(format!("scribam-lib-home-{}", uuid::Uuid::new_v4()));
         fs::create_dir_all(&docs).unwrap();
         assert_eq!(canonical_library_home(&docs), docs.join("Scribam"));
 
@@ -1291,9 +1291,15 @@ mod tests {
 
     #[test]
     fn is_legacy_home_path_detects_old_folder_names() {
-        assert!(is_legacy_home_path(Path::new("/Users/x/Documents/Scribam Prosa")));
-        assert!(is_legacy_home_path(Path::new("/Users/x/Documents/Scribo Prosa")));
-        assert!(!is_legacy_home_path(Path::new("/Users/x/Documents/Scribam")));
+        assert!(is_legacy_home_path(Path::new(
+            "/Users/x/Documents/Scribam Prosa"
+        )));
+        assert!(is_legacy_home_path(Path::new(
+            "/Users/x/Documents/Scribo Prosa"
+        )));
+        assert!(!is_legacy_home_path(Path::new(
+            "/Users/x/Documents/Scribam"
+        )));
     }
 
     #[test]

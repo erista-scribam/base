@@ -32,12 +32,12 @@ Horizontal word + tagline lockups live on the brand sheet only until a designer 
 
 ## Typography
 
-| Role                      | Typeface              |
-| ------------------------- | --------------------- |
-| Brand / UI                | **Plus Jakarta Sans** |
-| Brand serif / prose default | **Source Serif 4**  |
-| Markdown / code           | **JetBrains Mono**    |
-| Screenplay (future Drama) | **Courier Prime**     |
+| Role                        | Typeface              |
+| --------------------------- | --------------------- |
+| Brand / UI                  | **Plus Jakarta Sans** |
+| Brand serif / prose default | **Source Serif 4**    |
+| Markdown / code             | **JetBrains Mono**    |
+| Screenplay (future Drama)   | **Courier Prime**     |
 
 The **Prosa app** keeps its own reading typography (Literata for manuscripts, system UI sans, system monospace)—see `apps/prosa/src/styles/tokens.css`.
 
