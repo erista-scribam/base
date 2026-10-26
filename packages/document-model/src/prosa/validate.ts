@@ -1,4 +1,4 @@
-import { ValidationError } from "@scribo/core";
+import { ValidationError } from "@scribam/core";
 import type { ProsaDocument } from "./types";
 import { prosaDocumentSchema } from "./schema";
 import { repairProsaDocumentInput } from "./repair";

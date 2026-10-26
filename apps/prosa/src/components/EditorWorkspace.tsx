@@ -8,19 +8,19 @@ import {
   forwardRef,
 } from "react";
 import type { Editor } from "@tiptap/core";
-import { serializeProsaDocument, type ProsaDocument } from "@scribo/document-model";
+import { serializeProsaDocument, type ProsaDocument } from "@scribam/document-model";
 import { ProsaEditor } from "../editor/ProsaEditor";
 import { ManuscriptPreview } from "./ManuscriptPreview";
 import { MarkdownSectionOutline } from "./MarkdownSectionOutline";
 import { MarkdownSourceEditor, type MarkdownSourceEditorHandle } from "./MarkdownSourceEditor";
 import {
   markdownToProsaDocument,
-  prosaDocumentToMarkdown,
+  prosaDocumentToAuthorMarkdown,
 } from "../features/markdown/prosa-markdown";
 import { useMarkdownRuler } from "../hooks/useMarkdownRuler";
 import type { MarkdownFormatAction } from "../features/markdown/markdown-source-format";
 
-export type EditorViewMode = "classic" | "split";
+export type EditorViewMode = "proper" | "minimalist";
 export type MarkdownSideTab = "preview" | "sections";
 
 export interface EditorWorkspaceProps {
@@ -50,7 +50,7 @@ export const EditorWorkspace = forwardRef<EditorWorkspaceHandle, EditorWorkspace
     },
     ref,
   ) {
-    const [markdown, setMarkdown] = useState(() => prosaDocumentToMarkdown(document));
+    const [markdown, setMarkdown] = useState(() => prosaDocumentToAuthorMarkdown(document));
     const [sideTab, setSideTab] = useState<MarkdownSideTab>("sections");
     const [cursorLine, setCursorLine] = useState<number | null>(null);
     const markdownEditorRef = useRef<MarkdownSourceEditorHandle>(null);
@@ -83,11 +83,11 @@ export const EditorWorkspace = forwardRef<EditorWorkspaceHandle, EditorWorkspace
     }, [markdown]);
 
     useEffect(() => {
-      if (viewMode !== "split") {
+      if (viewMode !== "minimalist") {
         return;
       }
       // Source of truth when opening markdown: serialize the structured doc once per manuscript/mode.
-      setMarkdown(prosaDocumentToMarkdown(documentRef.current));
+      setMarkdown(prosaDocumentToAuthorMarkdown(documentRef.current));
     }, [document.id, viewMode]);
 
     useEffect(
@@ -100,7 +100,7 @@ export const EditorWorkspace = forwardRef<EditorWorkspaceHandle, EditorWorkspace
     );
 
     useEffect(() => {
-      if (viewMode !== "classic") {
+      if (viewMode !== "proper") {
         return;
       }
       const parsed = markdownToProsaDocument(documentRef.current, markdownRef.current);
@@ -115,7 +115,7 @@ export const EditorWorkspace = forwardRef<EditorWorkspaceHandle, EditorWorkspace
       if (parsedJson !== currentJson) {
         onDocumentChange(parsed);
       }
-      // Apply markdown → model when entering classic so TipTap receives full content.
+      // Apply source → model when entering proper mode so TipTap receives full content.
       // eslint-disable-next-line react-hooks/exhaustive-deps -- only when view mode flips
     }, [viewMode]);
 
@@ -136,7 +136,7 @@ export const EditorWorkspace = forwardRef<EditorWorkspaceHandle, EditorWorkspace
       markdownEditorRef.current?.goToLine(line);
     }, []);
 
-    if (viewMode === "classic") {
+    if (viewMode === "proper") {
       return (
         <div className="editor-canvas-wrap editor-canvas-classic">
           <ProsaEditor
@@ -155,7 +155,7 @@ export const EditorWorkspace = forwardRef<EditorWorkspaceHandle, EditorWorkspace
       >
         <div className="editor-split-pane editor-split-source">
           <div className="editor-split-label editor-split-label-row">
-            <span className="editor-split-label-title">Markdown source</span>
+            <span className="editor-split-label-title">Source</span>
             <span className="editor-split-label-hint">
               ⌘↑/↓ section · Ctrl+↑/↓ paragraph · headings &amp; scene breaks define sections
             </span>
@@ -169,7 +169,7 @@ export const EditorWorkspace = forwardRef<EditorWorkspaceHandle, EditorWorkspace
             onRulerSelectFullWidth={setRulerFullWidth}
             editorZoom={editorZoom}
             onCursorLineChange={setCursorLine}
-            aria-label="Markdown source"
+            aria-label="Manuscript source"
           />
         </div>
         {markdownPreviewVisible ? (

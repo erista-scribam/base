@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Scribam Folia">
+  <rect width="256" height="256" rx="52" fill="#2563EB" />
+  <path d="M68 46H176Q192 46 192 62V184H162V78H68Z" fill="#BFDBFE" />
+  <path d="M48 74H156Q172 74 172 90V212H66Q50 212 50 196Z" fill="#F8FAFC" />
+  <path
+    d="M78 110H144M78 138H144M78 166H126"
+    stroke="#2563EB"
+    stroke-width="9"
+    stroke-linecap="round"
+  />
+</svg>

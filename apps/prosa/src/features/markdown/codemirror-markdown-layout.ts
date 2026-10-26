@@ -102,17 +102,17 @@ const markdownSourceLayoutPlugin = ViewPlugin.fromClass(
 );
 
 const prosaMarkdownHighlight = HighlightStyle.define([
-  { tag: t.heading, color: "var(--scribo-ui-text)", fontWeight: "600" },
-  { tag: t.strong, fontWeight: "600", color: "var(--scribo-ui-text)" },
-  { tag: t.emphasis, fontStyle: "italic", color: "var(--scribo-ui-text)" },
-  { tag: t.link, color: "var(--scribo-md-marker)" },
-  { tag: t.url, color: "var(--scribo-md-marker)" },
-  { tag: t.quote, color: "var(--scribo-md-marker)" },
-  { tag: t.monospace, color: "var(--scribo-md-marker)" },
-  { tag: t.meta, color: "var(--scribo-md-marker)" },
-  { tag: t.contentSeparator, color: "var(--scribo-md-marker)" },
-  { tag: t.processingInstruction, color: "var(--scribo-md-marker)" },
-  { tag: t.comment, color: "var(--scribo-md-marker)" },
+  { tag: t.heading, color: "var(--scribam-ui-text)", fontWeight: "600" },
+  { tag: t.strong, fontWeight: "600", color: "var(--scribam-ui-text)" },
+  { tag: t.emphasis, fontStyle: "italic", color: "var(--scribam-ui-text)" },
+  { tag: t.link, color: "var(--scribam-md-marker)" },
+  { tag: t.url, color: "var(--scribam-md-marker)" },
+  { tag: t.quote, color: "var(--scribam-md-marker)" },
+  { tag: t.monospace, color: "var(--scribam-md-marker)" },
+  { tag: t.meta, color: "var(--scribam-md-marker)" },
+  { tag: t.contentSeparator, color: "var(--scribam-md-marker)" },
+  { tag: t.processingInstruction, color: "var(--scribam-md-marker)" },
+  { tag: t.comment, color: "var(--scribam-md-marker)" },
 ]);
 
 const markdownSourceEditorTheme = EditorView.theme({
@@ -130,16 +130,16 @@ const markdownSourceEditorTheme = EditorView.theme({
     flex: "1 1 0",
     minHeight: "0",
     overflowY: "auto",
-    fontFamily: "var(--scribo-font-mono)",
-    fontSize: "var(--scribo-md-editor-font-size)",
-    lineHeight: "var(--scribo-ms-line-height)",
-    color: "var(--scribo-ui-text)",
+    fontFamily: "var(--scribam-font-mono)",
+    fontSize: "var(--scribam-md-editor-font-size)",
+    lineHeight: "var(--scribam-ms-line-height)",
+    color: "var(--scribam-ui-text)",
     overflowX: "hidden",
   },
   ".cm-content": {
-    caretColor: "var(--scribo-ui-caret)",
-    padding: "var(--scribo-ms-pad-y) var(--scribo-ms-pad-x) 0",
-    maxWidth: "var(--md-content-max-width, min(100%, var(--scribo-ms-max-width)))",
+    caretColor: "var(--scribam-ui-caret)",
+    padding: "var(--scribam-ms-pad-y) var(--scribam-ms-pad-x) 0",
+    maxWidth: "var(--md-content-max-width, min(100%, var(--scribam-ms-max-width)))",
     width: "100%",
     margin: "0 auto",
     boxSizing: "border-box",
@@ -155,17 +155,17 @@ const markdownSourceEditorTheme = EditorView.theme({
     backgroundColor: "transparent",
   },
   ".cm-selectionBackground": {
-    backgroundColor: "var(--scribo-ui-selection-bg) !important",
+    backgroundColor: "var(--scribam-ui-selection-bg) !important",
   },
   ".cm-cursor": {
-    borderLeftColor: "var(--scribo-ui-caret)",
+    borderLeftColor: "var(--scribam-ui-caret)",
   },
   ".cm-md-active-sentence": {
-    backgroundColor: "color-mix(in srgb, var(--scribo-ui-accent) 14%, transparent)",
+    backgroundColor: "color-mix(in srgb, var(--scribam-ui-accent) 14%, transparent)",
     borderRadius: "2px",
   },
   ".cm-md-dialog": {
-    color: "var(--scribo-md-dialog-fg)",
+    color: "var(--scribam-md-dialog-fg)",
   },
   ".cm-md-line": {
     paddingLeft: "var(--md-marker-width, calc(6 * 0.6em))",
@@ -180,7 +180,7 @@ const markdownSourceEditorTheme = EditorView.theme({
   ".cm-md-line.cm-md-break": {
     paddingLeft: "0",
     textAlign: "center",
-    color: "var(--scribo-scene-break-fg)",
+    color: "var(--scribam-scene-break-fg)",
   },
 });
 

@@ -17,7 +17,13 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
+[features]
+default = ["git-vcs"]
+git-vcs = ["dep:git2"]
+git-spike = ["git-vcs"]
+
 [dependencies]
+git2 = { version = "0.20", optional = true }
 tauri = { version = "2", features = [] }
 tauri-plugin-dialog = "2"
 tauri-plugin-opener = "2"
@@ -26,4 +32,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+tempfile = "3"
 

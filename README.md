@@ -1,16 +1,19 @@
-# Scribo
+# Scribam
 
-Opinionated, structured writing software. **Scribo Prosa** is the first product: a local-first desktop app for prose manuscripts (novels, essays, memoir, and similar forms).
+Opinionated, structured writing software. **Scribam Prosa** is the first product: a local-first desktop app for prose manuscripts (novels, essays, memoir, and similar forms).
 
-Scribo owns the **structure** of the writing; the application owns **presentation**.
+Scribam owns the **structure** of the writing; the application owns **presentation**. Product law: [docs/product/philosophy.md](docs/product/philosophy.md). Brand assets: [docs/brands/scribam-brand-kit/](docs/brands/scribam-brand-kit/).
+
+**License:** [AGPL-3.0-or-later](LICENSE) ([open core & premium](docs/product/licensing.md)) · **Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · **Security:** [SECURITY.md](SECURITY.md)
 
 ## Repository layout
 
 - `apps/prosa` — Tauri 2 desktop app (React + TypeScript + Vite)
 - `packages/core` — Domain IDs, metadata contracts, errors
 - `packages/document-model` — Canonical Prosa document schema and validation
-- `docs/` — Architecture and decision log
-- `MASTERPLAN.md` — Full product and engineering specification
+- `docs/` — [Documentation index](docs/README.md): product, engineering, architecture, [issues](docs/issues/README.md), specs, plans
+- `AGENTS.md` — Instructions for AI coding agents
+- `MASTERPLAN.md` — Stack, monorepo, and Prosa schema foundation
 
 ## Prerequisites
 
@@ -62,14 +65,16 @@ pnpm tauri:build
 
 ## Version control & releases
 
-- **Changesets:** `pnpm changeset` on feature PRs; releases are automated from `main` (see `docs/RELEASE.md`)
-- Branching and hooks: `docs/VERSION_CONTROL.md`
+- **Changesets:** `pnpm changeset` on feature PRs; releases are automated from `main` (see [docs/engineering/release-process.md](docs/engineering/release-process.md))
+- Branching and hooks: [docs/engineering/version-control.md](docs/engineering/version-control.md)
 - Changelog: `CHANGELOG.md`
 
 ## Milestone status
 
 This repository implements the **initial architectural milestone** from `MASTERPLAN.md`: monorepo, canonical Prosa schema with tests, minimal shell (navigation + editor), TipTap-based structured editing, global manuscript typography, and local JSON persistence via Tauri.
 
-Not included yet: DOCX/PDF, cloud sync, full export pipeline, and additional Scribo product lines (Drama, Versus, Academia).
+Not included yet: DOCX/PDF, cloud sync, full export pipeline, and additional Scribam product lines (Drama, Versus, Academia).
 
-See `docs/ARCHITECTURE.md` and `docs/DECISIONS.md` for diagrams, dependency rules, and known limits.
+**Governance:** [philosophy](docs/product/philosophy.md) · [roadmap](docs/product/roadmap.md) · [invariants](docs/product/invariants.md) · [operating model](docs/engineering/operating-model.md)
+
+Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)

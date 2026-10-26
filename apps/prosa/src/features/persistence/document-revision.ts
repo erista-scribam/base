@@ -1,4 +1,4 @@
-import { serializeProsaDocument, type ProsaDocument } from "@scribo/document-model";
+import { serializeProsaDocument, type ProsaDocument } from "@scribam/document-model";
 import { prosaDocumentToMarkdown } from "../markdown/prosa-markdown";
 
 /** Stable fingerprint for comparing document revisions in memory. */

@@ -1,0 +1,71 @@
+# Scribam documentation
+
+Start here for product and engineering knowledge. **One topic, one canonical file**—link instead of copying.
+
+## New contributors
+
+1. [README.md](../README.md) — setup and scripts
+2. [CONTRIBUTING.md](../CONTRIBUTING.md) — workflow
+3. [AGENTS.md](../AGENTS.md) — AI agents and conventions
+
+## Product
+
+| Document                                                                     | Purpose                                     |
+| ---------------------------------------------------------------------------- | ------------------------------------------- |
+| [product/philosophy.md](./product/philosophy.md)                             | Constitution / writer-first principles      |
+| [product/prosa-shell-and-projects.md](./product/prosa-shell-and-projects.md) | IDE-like shell, Prosa home, project folders |
+| [product/invariants.md](./product/invariants.md)                             | Integrity and portability rules             |
+| [product/roadmap.md](./product/roadmap.md)                                   | Phased delivery                             |
+| [product/known-limitations.md](./product/known-limitations.md)               | Current gaps                                |
+| [product/licensing.md](./product/licensing.md)                               | Open core (AGPL) vs premium services        |
+| [brands/scribam-brand-kit/](./brands/scribam-brand-kit/)                     | Logos, palette, app icons (marketing)       |
+| [../MASTERPLAN.md](../MASTERPLAN.md) §3                                      | Brand plan summary (reuse across apps)      |
+
+## Engineering
+
+| Document                                                             | Purpose                      |
+| -------------------------------------------------------------------- | ---------------------------- |
+| [engineering/operating-model.md](./engineering/operating-model.md)   | Repository-first workflow    |
+| [engineering/project-baseline.md](./engineering/project-baseline.md) | Opening balance (2026-10-26) |
+| [engineering/testing-strategy.md](./engineering/testing-strategy.md) | Test priorities              |
+| [engineering/release-process.md](./engineering/release-process.md)   | Changesets and releases      |
+| [engineering/version-control.md](./engineering/version-control.md)   | Branching and hooks          |
+| [engineering/compatibility.md](./engineering/compatibility.md)       | Version domains              |
+
+## Architecture
+
+| Document                                                                       | Purpose                    |
+| ------------------------------------------------------------------------------ | -------------------------- |
+| [architecture/system-overview.md](./architecture/system-overview.md)           | Monorepo and layers        |
+| [architecture/data-model.md](./architecture/data-model.md)                     | Canonical manuscript model |
+| [architecture/implementation-audit.md](./architecture/implementation-audit.md) | Code vs target subsystems  |
+| [architecture/decisions/](./architecture/decisions/)                           | ADRs                       |
+
+## Issues
+
+| Path                                   | Purpose                                     |
+| -------------------------------------- | ------------------------------------------- |
+| [issues/README.md](./issues/README.md) | Written bypass vs GitHub Issues             |
+| [issues/written/](./issues/written/)   | Maintainer batch lists                      |
+| [issues/github.md](./issues/github.md) | GitHub Issues policy (not mirrored in docs) |
+
+## Specs and plans
+
+| Path                                                                                                               | Purpose                                                             |
+| ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| [specs/](./specs/)                                                                                                 | Feature contracts                                                   |
+| [specs/multi-application-project-architecture.md](./specs/multi-application-project-architecture.md)               | **Family architecture** — Lanista, Prosa, Folia, Drama, grants, Git |
+| [plans/active/multi-application-architecture-roadmap.md](./plans/active/multi-application-architecture-roadmap.md) | R0–R8 adoption roadmap                                              |
+| [plans/active/project-format-and-storage.md](./plans/active/project-format-and-storage.md)                         | Manifest + layout v2 validation plan                                |
+| [plans/active/project-git-strategy.md](./plans/active/project-git-strategy.md)                                     | Unified vs split Git — decision experiments                         |
+| [product/lanista-future.md](./product/lanista-future.md)                                                           | Future paid Lanista hub (concept only)                              |
+| [plans/active/006-scribam-lanista-platform.md](./plans/active/006-scribam-lanista-platform.md)                     | **Withdrawn** historical Lanista MVP track                          |
+| [specs/lanista-platform-and-storage.md](./specs/lanista-platform-and-storage.md)                                   | Lanista detail stub (deferred)                                      |
+| [specs/project-architecture-and-storage.md](./specs/project-architecture-and-storage.md)                           | 005 audit baseline (project-root Git — paused)                      |
+| [plans/active/](./plans/active/)                                                                                   | In-flight implementation plans                                      |
+| [plans/completed/](./plans/completed/)                                                                             | Historical / finished plans                                         |
+| [research/WRITING_FRICTION_LOG.md](./research/WRITING_FRICTION_LOG.md)                                             | Real-use evidence                                                   |
+
+## Legacy paths
+
+Older links may redirect from `docs/PRODUCT_*.md`, `docs/ARCHITECTURE.md`, etc.

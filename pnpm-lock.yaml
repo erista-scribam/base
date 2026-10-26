@@ -50,12 +50,15 @@ importers:
       '@codemirror/view':
         specifier: ^6.43.15
         version: 6.43.15
-      '@scribo/core':
+      '@scribam/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@scribo/document-model':
+      '@scribam/document-model':
         specifier: workspace:*
         version: link:../../packages/document-model
+      '@scribam/mdprosa':
+        specifier: workspace:*
+        version: link:../../packages/mdprosa
       '@tauri-apps/api':
         specifier: ^2
         version: 2.12.4
@@ -174,12 +177,34 @@ importers:
 
   packages/document-model:
     dependencies:
-      '@scribo/core':
+      '@scribam/core':
         specifier: workspace:*
         version: link:../core
       zod:
         specifier: ^3.25.76
         version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ~6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.0.8
+        version: 4.1.12(vite@8.3.5(jiti@2.7.0))
+
+  packages/mdprosa:
+    devDependencies:
+      typescript:
+        specifier: ~6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.0.8
+        version: 4.1.12(vite@8.3.5(jiti@2.7.0))
+
+  packages/project-model:
+    dependencies:
+      '@scribam/core':
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
       typescript:
         specifier: ~6.0.3

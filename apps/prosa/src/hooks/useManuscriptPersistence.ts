@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
-import type { ManuscriptSummary } from "@scribo/core";
-import type { ProsaDocument } from "@scribo/document-model";
+import type { ManuscriptSummary } from "@scribam/core";
+import type { ProsaDocument } from "@scribam/document-model";
 import { ManuscriptPersistence } from "../features/persistence/manuscript-persistence";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
 

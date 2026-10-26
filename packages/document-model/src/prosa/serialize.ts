@@ -1,4 +1,4 @@
-import { ScriboError } from "@scribo/core";
+import { ScribamError } from "@scribam/core";
 import type { ProsaDocument } from "./types";
 import { parseProsaDocument } from "./validate";
 import { validateProsaDocument } from "./validate";
@@ -8,7 +8,7 @@ export function serializeProsaDocument(document: ProsaDocument): string {
   try {
     return JSON.stringify(validated, null, 2);
   } catch (cause) {
-    throw new ScriboError("serialization_failed", "Failed to serialize Prosa document", {
+    throw new ScribamError("serialization_failed", "Failed to serialize Prosa document", {
       cause,
     });
   }

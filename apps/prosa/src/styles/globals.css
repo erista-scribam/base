@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./tokens.css";
+@import "./brand.css";
 @import "./chrome.css";
 @import "./manuscript.css";
 
@@ -16,11 +17,11 @@ html {
 
 body {
   margin: 0;
-  height: var(--scribo-app-height, 100%);
+  height: var(--scribam-app-height, 100%);
   min-height: 0;
   overflow: hidden;
-  background: var(--scribo-ui-bg);
-  color: var(--scribo-ui-text);
+  background: var(--scribam-ui-bg);
+  color: var(--scribam-ui-text);
 }
 
 #root {
@@ -30,6 +31,6 @@ body {
 }
 
 ::selection {
-  background: var(--scribo-ui-selection-bg);
-  color: var(--scribo-ui-selection-fg);
+  background: var(--scribam-ui-selection-bg);
+  color: var(--scribam-ui-selection-fg);
 }

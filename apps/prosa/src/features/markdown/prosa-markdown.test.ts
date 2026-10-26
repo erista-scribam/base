@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createEmptyProsaDocument } from "@scribo/document-model";
-import { markdownToProsaDocument, prosaDocumentToMarkdown } from "./prosa-markdown";
+import { createEmptyProsaDocument } from "@scribam/document-model";
+import {
+  markdownToProsaDocument,
+  prosaDocumentToAuthorMarkdown,
+  prosaDocumentToMarkdown,
+} from "./prosa-markdown";
 
 describe("prosa-markdown", () => {
   it("round-trips headings, paragraphs, and ordered lists", () => {
@@ -56,13 +60,43 @@ Meh`;
     const base = createEmptyProsaDocument("Test");
     const md = "Intro line\n1. one\n2. two\nAfter the list\nStill here";
     const doc = markdownToProsaDocument(base, md);
-    expect(prosaDocumentToMarkdown(doc)).toBe(md);
-    expect(doc.blocks.map((block) => block.type)).toEqual([
+    const exported = prosaDocumentToMarkdown(doc);
+    const roundTrip = markdownToProsaDocument(base, exported);
+    expect(roundTrip.blocks.map((block) => block.type)).toEqual([
       "paragraph",
       "list",
       "paragraph",
       "paragraph",
     ]);
+    expect(roundTrip.blocks.map((block) => block.id)).toEqual(doc.blocks.map((block) => block.id));
+  });
+
+  it("hides block id comments in author markdown but keeps them on disk export", () => {
+    const base = createEmptyProsaDocument("Test");
+    const md = `<!-- scribam:block=blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee -->
+# Title
+
+Body line`;
+    const doc = markdownToProsaDocument(base, md);
+    const author = prosaDocumentToAuthorMarkdown(doc);
+    expect(author).not.toContain("scribam:block");
+    expect(author).toContain("# Title");
+    expect(prosaDocumentToMarkdown(doc)).toContain("blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+    const roundTrip = markdownToProsaDocument(doc, author);
+    expect(roundTrip.blocks.map((block) => block.id)).toEqual(doc.blocks.map((block) => block.id));
+  });
+
+  it("preserves block ids from scribam markdown comments", () => {
+    const base = createEmptyProsaDocument("Test");
+    const md = `<!-- scribam:block=blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee -->
+# Title
+
+<!-- scribam:block=blk_bbbbbbbb-bbbb-cccc-dddd-eeeeeeeeeeee -->
+Body`;
+    const doc = markdownToProsaDocument(base, md);
+    expect(doc.blocks[0]?.id).toBe("blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+    expect(doc.blocks[1]?.id).toBe("blk_bbbbbbbb-bbbb-cccc-dddd-eeeeeeeeeeee");
+    expect(prosaDocumentToMarkdown(doc)).toContain("blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
   });
 
   it("does not treat scene breaks as bullet lists", () => {

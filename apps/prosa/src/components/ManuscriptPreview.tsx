@@ -1,5 +1,5 @@
 import type { JSX, ReactNode } from "react";
-import type { ProsaBlock, ProsaDocument, ProsaInlineNode } from "@scribo/document-model";
+import type { ProsaBlock, ProsaDocument, ProsaInlineNode } from "@scribam/document-model";
 
 function renderInline(nodes: ProsaInlineNode[]) {
   return nodes.map((node) => {

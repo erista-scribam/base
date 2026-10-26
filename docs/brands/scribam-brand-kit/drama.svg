@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Scribam Drama">
+  <rect width="256" height="256" rx="52" fill="#D97706" />
+  <path d="M44 56H212V104H44Z" fill="#F8FAFC" />
+  <path
+    d="M58 56 82 82M108 56 132 82M158 56 182 82M196 56 212 78"
+    stroke="#D97706"
+    stroke-width="10"
+    stroke-linecap="round"
+  />
+  <path d="M52 116H204V200H52Z" fill="#F8FAFC" />
+  <path
+    d="M74 146H182M74 172H148"
+    stroke="#D97706"
+    stroke-width="9"
+    stroke-linecap="round"
+  />
+</svg>

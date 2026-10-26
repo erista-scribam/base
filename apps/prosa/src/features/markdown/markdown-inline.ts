@@ -1,4 +1,4 @@
-import type { ProsaInlineMark, ProsaInlineNode } from "@scribo/document-model";
+import type { ProsaInlineMark, ProsaInlineNode } from "@scribam/document-model";
 
 function inlineId(): string {
   return `inl_${crypto.randomUUID()}`;

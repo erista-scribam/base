@@ -1,4 +1,4 @@
-# @scribo/prosa
+# @scribam/prosa
 
 ## 0.4.0
 
@@ -13,7 +13,7 @@
 
   ### Reading & navigation aids
   - Active sentence highlight at the caret.
-  - Dialog in straight or curly double quotes uses a subtle accent text color (`--scribo-md-dialog-fg`).
+  - Dialog in straight or curly double quotes uses a subtle accent text color (`--scribam-md-dialog-fg`).
   - Find panel (⌘F): Find and Replace rows with next/previous, match case, Replace, and Replace all.
 
   ### Layout & persistence
@@ -22,22 +22,22 @@
 
 ### Patch Changes
 
-- @scribo/core@0.4.0
-- @scribo/document-model@0.4.0
+- @scribam/core@0.4.0
+- @scribam/document-model@0.4.0
 
 ## 0.3.1
 
 ### Patch Changes
 
 - 6dc65ef: Fix library manuscript title saves so renaming the title in the editor renames the `.md` file on disk and keeps the active manuscript in sync.
-  - @scribo/core@0.3.1
-  - @scribo/document-model@0.3.1
+  - @scribam/core@0.3.1
+  - @scribam/document-model@0.3.1
 
 ## 0.3.0
 
 ### Minor Changes
 
-- bf156fd: Markdown writing and library release (fixed bump with `@scribo/core` and `@scribo/document-model`):
+- bf156fd: Markdown writing and library release (fixed bump with `@scribam/core` and `@scribam/document-model`):
 
   **Markdown mode** — Split source editor (CodeMirror) with Preview / Sections side panel; Classic ↔ Markdown sync; one source line = one paragraph; Shift+Enter hard break; line length 64 / 72 / 80 / full width; editor zoom 85–135% (toolbar and ⌘+ / ⌘− / ⌘0).
 
@@ -45,33 +45,33 @@
 
   **Sections panel** — Outline of headings, scene breaks, and passages; caret sync and click-to-jump in source; same section rules as ⌘↑/↓.
 
-  **Library & persistence** — Save manuscripts as `.md` under Documents/Scribo Prosa; Finder reveal; legacy storage migration; autosave, recovery, and clearer on-disk change handling.
+  **Library & persistence** — Save manuscripts as `.md` under Documents/Scribam Prosa; Finder reveal; legacy storage migration; autosave, recovery, and clearer on-disk change handling.
 
   **Polish** — UI overhaul (library, focus mode, themes); centered scene breaks and dark-mode break styling; scroll padding at end of document; markdown preview from live source; document repair/coercion for import; list, code, and Classic/Markdown sync fixes.
 
 ### Patch Changes
 
-- @scribo/core@0.3.0
-- @scribo/document-model@0.3.0
+- @scribam/core@0.3.0
+- @scribam/document-model@0.3.0
 
 ## 0.2.0
 
 ### Minor Changes
 
-- Markdown writing mode: split source editor with CodeMirror, live preview toggle, column ruler, and Classic ↔ Markdown sync. Library manuscripts save as `.md` under Documents/Scribo Prosa with Finder reveal, legacy app-data migration, debounced autosave, recovery snapshots, and fewer false “changed on disk” / recovery prompts. Editor zoom (85–135%, toolbar and ⌘+/⌘−/⌘0) for Classic and Markdown, persisted locally.
+- Markdown writing mode: split source editor with CodeMirror, live preview toggle, column ruler, and Classic ↔ Markdown sync. Library manuscripts save as `.md` under Documents/Scribam Prosa with Finder reveal, legacy app-data migration, debounced autosave, recovery snapshots, and fewer false “changed on disk” / recovery prompts. Editor zoom (85–135%, toolbar and ⌘+/⌘−/⌘0) for Classic and Markdown, persisted locally.
 
 ### Patch Changes
 
-- @scribo/core@0.2.0
-- @scribo/document-model@0.2.0
+- @scribam/core@0.2.0
+- @scribam/document-model@0.2.0
 
 ## 0.1.0
 
 ### Minor Changes
 
-- a9e3250: Initial Scribo Prosa release: pnpm monorepo, canonical Prosa document model, Tauri desktop shell, structured editor, global manuscript typography, local persistence, CI, and Changesets release automation.
+- a9e3250: Initial Scribam Prosa release: pnpm monorepo, canonical Prosa document model, Tauri desktop shell, structured editor, global manuscript typography, local persistence, CI, and Changesets release automation.
 
 ### Patch Changes
 
-- @scribo/core@0.1.0
-- @scribo/document-model@0.1.0
+- @scribam/core@0.1.0
+- @scribam/document-model@0.1.0

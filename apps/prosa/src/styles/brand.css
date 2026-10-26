@@ -1,0 +1,57 @@
+@import "../../../../docs/brands/scribam-brand-kit/brand-tokens.css";
+
+:root,
+[data-theme="light"] {
+  --scribam-ui-accent: var(--scribam-prosa);
+  --scribam-ui-accent-hover: #047857;
+  --scribam-ui-on-accent: var(--scribam-paper);
+  --scribam-ui-selected: color-mix(in srgb, var(--scribam-prosa) 14%, transparent);
+  --scribam-ui-selection-bg: color-mix(in srgb, var(--scribam-prosa) 22%, transparent);
+  --scribam-md-dialog-fg: color-mix(in srgb, var(--scribam-prosa) 55%, var(--scribam-ink));
+}
+
+[data-theme="dark"] {
+  --scribam-ui-accent: #34d399;
+  --scribam-ui-accent-hover: #6ee7b7;
+  --scribam-ui-on-accent: var(--scribam-ink);
+  --scribam-ui-selected: color-mix(in srgb, var(--scribam-prosa) 22%, transparent);
+  --scribam-ui-selection-bg: color-mix(in srgb, var(--scribam-prosa) 28%, transparent);
+}
+
+.prosa-brand-bar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--scribam-space-2);
+  padding: var(--scribam-space-3) var(--scribam-space-3) var(--scribam-space-2);
+  border-bottom: 1px solid var(--scribam-ui-border-subtle);
+  background: color-mix(in srgb, var(--scribam-ui-canvas) 70%, var(--scribam-ui-surface));
+}
+
+.prosa-brand-bar img {
+  display: block;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.prosa-brand-bar-text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.05rem;
+  line-height: 1.2;
+}
+
+.prosa-brand-bar-kicker {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--scribam-ui-muted);
+}
+
+.prosa-brand-bar-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--scribam-ui-text);
+}

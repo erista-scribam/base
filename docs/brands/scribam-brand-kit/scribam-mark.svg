@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Scribam">
+  <rect width="256" height="256" rx="52" fill="#0F172A" />
+  <g transform="translate(68 48) scale(1.05)" fill="#F8FAFC">
+    <path
+      d="M88 6 52 30 72 42 38 58 62 72 32 90 56 104 42 118 48 126 44 134 50 138 56 132 60 122 52 112 68 98 36 80 58 66 30 50 50 36 24 22 46 10 76 4 88 6Z"
+    />
+    <path d="M44 134 40 144 48 144 44 134Z" />
+  </g>
+  <path
+    stroke="#6366F1"
+    stroke-width="4"
+    stroke-linecap="round"
+    d="M78 208h100"
+  />
+</svg>

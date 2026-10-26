@@ -1,15 +1,27 @@
+mod app_paths;
 mod atomic_io;
+#[cfg(feature = "git-spike")]
+mod git_spike;
+mod grants;
 mod library;
+#[cfg(feature = "git-vcs")]
+mod merge_conflicts;
 mod persistence;
+mod project;
+#[cfg(feature = "git-vcs")]
+mod project_git;
+mod project_layout;
 mod recovery;
 
 use crate::atomic_io::atomic_write;
 use library::{
-    LibraryInfo, absolute_path_for_entry, clear_library_recovery, create_library_markdown,
-    create_library_markdown_with_content, ensure_default_library, get_library_info,
-    import_external_markdown, is_library_manuscript_id, library_recovery_path,
-    list_library_manuscripts, path_key_for_manuscript_id, read_library_markdown, set_library_root,
-    write_library_markdown,
+    LibraryInfo, ProjectSummary, absolute_path_for_entry, clear_library_recovery,
+    create_library_markdown_in_parent, create_library_markdown_with_content, create_project_folder,
+    create_project_root, delete_library_manuscript, ensure_default_library, get_library_info,
+    import_external_markdown, init_library as init_library_impl, is_library_manuscript_id,
+    library_recovery_path, list_library_manuscripts, list_project_entries, list_projects,
+    migrate_legacy_root_markdown, open_project_root, path_key_for_manuscript_id,
+    read_library_markdown, set_library_root, write_library_markdown,
 };
 use persistence::{
     ManuscriptSummary, clear_recovery_snapshot as clear_internal_recovery_snapshot,
@@ -20,7 +32,20 @@ use persistence::{
 };
 use recovery::{parse_recovery, wrap_recovery};
 use serde::Serialize;
+use std::path::{Path, PathBuf};
 use std::process::Command;
+
+#[cfg(feature = "git-vcs")]
+use project_git::{
+    ChangedFilePreview, GitGraphCommit, MergeConflictFilePreview, ProjectVersionControl,
+    abort_project_merge as git_abort_merge, changed_file_preview as git_changed_file_preview,
+    checkout_project_branch as git_checkout_branch,
+    commit_project_checkpoint as git_commit_checkpoint,
+    complete_project_merge as git_complete_merge, create_project_branch as git_create_branch,
+    merge_conflict_preview as git_merge_conflict_preview, merge_project_branch as git_merge_branch,
+    project_git_graph as git_project_graph, project_version_control as git_project_status,
+    resolve_project_merge_file as git_resolve_merge_file,
+};
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -68,7 +93,113 @@ fn get_library(app: tauri::AppHandle) -> Result<LibraryInfo, String> {
 
 #[tauri::command]
 fn init_library(app: tauri::AppHandle) -> Result<LibraryInfo, String> {
-    ensure_default_library(&app)
+    init_library_impl(&app)
+}
+
+#[tauri::command]
+fn migrate_legacy_root_manuscripts(app: tauri::AppHandle) -> Result<u32, String> {
+    ensure_default_library(&app)?;
+    migrate_legacy_root_markdown(&app)
+}
+
+fn library_root_path(app: &tauri::AppHandle) -> Result<std::path::PathBuf, String> {
+    let info = ensure_default_library(app)?;
+    Ok(Path::new(&info.root_path).to_path_buf())
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn get_project_version_control(app: tauri::AppHandle) -> Result<ProjectVersionControl, String> {
+    git_project_status(&library_root_path(&app)?)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn commit_project_checkpoint(
+    app: tauri::AppHandle,
+    message: String,
+) -> Result<ProjectVersionControl, String> {
+    git_commit_checkpoint(&library_root_path(&app)?, &message)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn create_project_branch(
+    app: tauri::AppHandle,
+    name: String,
+) -> Result<ProjectVersionControl, String> {
+    git_create_branch(&library_root_path(&app)?, &name)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn checkout_project_branch(
+    app: tauri::AppHandle,
+    name: String,
+) -> Result<ProjectVersionControl, String> {
+    git_checkout_branch(&library_root_path(&app)?, &name)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn get_project_git_graph(
+    app: tauri::AppHandle,
+    limit: Option<u32>,
+) -> Result<Vec<GitGraphCommit>, String> {
+    let limit = limit.unwrap_or(40) as usize;
+    git_project_graph(&library_root_path(&app)?, limit)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn merge_project_branch(
+    app: tauri::AppHandle,
+    source_branch: String,
+) -> Result<ProjectVersionControl, String> {
+    git_merge_branch(&library_root_path(&app)?, &source_branch)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn abort_project_merge(app: tauri::AppHandle) -> Result<ProjectVersionControl, String> {
+    git_abort_merge(&library_root_path(&app)?)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn resolve_project_merge_file(
+    app: tauri::AppHandle,
+    relative_path: String,
+    resolution: String,
+) -> Result<ProjectVersionControl, String> {
+    git_resolve_merge_file(&library_root_path(&app)?, &relative_path, &resolution)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn complete_project_merge(
+    app: tauri::AppHandle,
+    message: Option<String>,
+) -> Result<ProjectVersionControl, String> {
+    git_complete_merge(&library_root_path(&app)?, message.as_deref())
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn get_merge_conflict_preview(
+    app: tauri::AppHandle,
+    relative_path: String,
+) -> Result<MergeConflictFilePreview, String> {
+    git_merge_conflict_preview(&library_root_path(&app)?, &relative_path)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn get_changed_file_preview(
+    app: tauri::AppHandle,
+    relative_path: String,
+) -> Result<ChangedFilePreview, String> {
+    git_changed_file_preview(&library_root_path(&app)?, &relative_path)
 }
 
 #[tauri::command]
@@ -77,13 +208,49 @@ fn set_library(app: tauri::AppHandle, root_path: String) -> Result<LibraryInfo, 
 }
 
 #[tauri::command]
+fn list_projects_catalog(app: tauri::AppHandle) -> Result<Vec<ProjectSummary>, String> {
+    list_projects(&app)
+}
+
+#[tauri::command]
+fn open_project(app: tauri::AppHandle, root_path: String) -> Result<LibraryInfo, String> {
+    open_project_root(&app, PathBuf::from(root_path))
+}
+
+#[tauri::command]
+fn create_project(
+    app: tauri::AppHandle,
+    parent_path: String,
+    name: String,
+) -> Result<LibraryInfo, String> {
+    create_project_root(&app, parent_path, name)
+}
+
+#[tauri::command]
+fn list_project_tree(app: tauri::AppHandle) -> Result<Vec<library::ProjectEntry>, String> {
+    list_project_entries(&app)
+}
+
+#[tauri::command]
+fn create_project_folder_entry(
+    app: tauri::AppHandle,
+    parent_relative: Option<String>,
+    folder_name: String,
+) -> Result<library::ProjectEntry, String> {
+    ensure_default_library(&app)?;
+    create_project_folder(&app, parent_relative, folder_name)
+}
+
+#[tauri::command]
 fn create_manuscript(
     app: tauri::AppHandle,
     title: String,
+    parent_relative: Option<String>,
     _document_json: String,
 ) -> Result<LoadedManuscript, String> {
     ensure_default_library(&app)?;
-    let (summary, markdown) = create_library_markdown(&app, title)?;
+    let (summary, markdown) =
+        create_library_markdown_in_parent(&app, parent_relative, title, String::new())?;
     Ok(LoadedManuscript {
         summary,
         document_json: None,
@@ -122,6 +289,7 @@ fn load_manuscript(app: tauri::AppHandle, id: String) -> Result<LoadedManuscript
             });
         }
         let path = absolute_path_for_entry(&app, &path_key)?;
+        let (created, modified) = library::file_created_modified(&path);
         let summary = ManuscriptSummary {
             id: id.clone(),
             title: path
@@ -129,7 +297,8 @@ fn load_manuscript(app: tauri::AppHandle, id: String) -> Result<LoadedManuscript
                 .and_then(|stem| stem.to_str())
                 .unwrap_or("Untitled")
                 .to_string(),
-            updated_at: chrono::Utc::now().to_rfc3339(),
+            updated_at: modified,
+            created_at: Some(created),
             file_path: Some(path_key),
             source: Some("library".into()),
         };
@@ -285,6 +454,16 @@ fn clear_recovery_snapshot(app: tauri::AppHandle, id: String) -> Result<(), Stri
 }
 
 #[tauri::command]
+fn delete_manuscript(app: tauri::AppHandle, id: String) -> Result<(), String> {
+    if is_library_manuscript_id(&id) {
+        delete_library_manuscript(&app, &id)
+    } else {
+        clear_internal_recovery_snapshot(&app, &id)?;
+        delete_internal_manuscript(&app, &id)
+    }
+}
+
+#[tauri::command]
 fn get_manuscript_disk_revision(app: tauri::AppHandle, id: String) -> Result<DiskRevision, String> {
     let modified_at = if is_library_manuscript_id(&id) {
         let path_key = path_key_for_manuscript_id(&id).ok_or("Invalid library manuscript id")?;
@@ -314,6 +493,11 @@ pub fn run() {
             get_library,
             init_library,
             set_library,
+            list_projects_catalog,
+            open_project,
+            create_project,
+            list_project_tree,
+            create_project_folder_entry,
             create_manuscript,
             migrate_internal_manuscript,
             load_manuscript,
@@ -324,7 +508,20 @@ pub fn run() {
             save_recovery_snapshot,
             load_recovery_snapshot,
             clear_recovery_snapshot,
-            get_manuscript_disk_revision
+            delete_manuscript,
+            get_manuscript_disk_revision,
+            migrate_legacy_root_manuscripts,
+            get_project_version_control,
+            commit_project_checkpoint,
+            create_project_branch,
+            checkout_project_branch,
+            get_project_git_graph,
+            merge_project_branch,
+            abort_project_merge,
+            resolve_project_merge_file,
+            complete_project_merge,
+            get_merge_conflict_preview,
+            get_changed_file_preview
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

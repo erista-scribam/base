@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createEmptyProsaDocument } from "@scribo/document-model";
+import { createEmptyProsaDocument } from "@scribam/document-model";
 import { ManuscriptPersistence } from "./manuscript-persistence";
 
 vi.mock("./tauri-manuscripts", () => ({

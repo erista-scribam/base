@@ -1,4 +1,4 @@
-import type { DocumentId } from "@scribo/core";
+import type { DocumentId } from "@scribam/core";
 import type { ProsaSchemaVersion } from "./version";
 
 export type ProsaInlineMark = "bold" | "italic" | "underline" | "link" | "code" | "strike";

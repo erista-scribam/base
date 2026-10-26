@@ -10,8 +10,14 @@
 ## Test plan
 
 - [ ] `pnpm verify` passes locally
+- [ ] `pnpm verify:all` if Rust or Tauri changed
 - [ ] Desktop smoke test (`pnpm tauri:dev`) if UI or native code changed
+
+## Docs and contracts
+
+- [ ] No change to behavioral contracts
+- [ ] Updated canonical docs (`docs/product/`, `docs/specs/`, ADRs) because contracts or decisions changed
 
 ## Notes
 
-<!-- Schema migrations, breaking changes, follow-ups. -->
+<!-- Schema migrations, breaking changes, follow-ups. See docs/engineering/operating-model.md. -->

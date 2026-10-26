@@ -1,138 +1,162 @@
-import type { ManuscriptSummary } from "@scribo/core";
+import { useMemo, useState } from "react";
+import type { ManuscriptSummary } from "@scribam/core";
+import type { GitChangedFile } from "../features/version-control/project-version-control";
+import type { SidebarProjectView } from "../hooks/useSidebarProjectView";
+import { useSidebarLayout } from "../hooks/useSidebarLayout";
+import { isTauriRuntime } from "../features/persistence/is-tauri";
+import { ProjectFilesExplorer } from "./ProjectFilesExplorer";
+import { ProjectSwitcher } from "./ProjectSwitcher";
+import { SidebarActivityBar } from "./SidebarActivityBar";
+import { SidebarResizeSash } from "./SidebarResizeSash";
+import { SourceControlPanel } from "./SourceControlPanel";
+import { ProsaBrandBar } from "./ProsaBrandBar";
 
 export interface ManuscriptNavProps {
   manuscripts: ManuscriptSummary[];
   activeId: string | null;
+  activeDiffPath: string | null;
+  onOpenDiffTab: (relativePath: string) => void;
   libraryPath: string | null;
+  projectTitle: string | null;
+  sidebarProjectView: SidebarProjectView;
+  onSidebarProjectViewChange: (view: SidebarProjectView) => void;
+  changedFiles: GitChangedFile[];
+  changeCount: number;
+  mergeInProgress: boolean;
+  explorerRefreshKey: number;
   onSelect: (id: string) => void;
-  onCreate: () => void;
-  onOpenFile: () => void;
+  onCreateFile: (parentRelative: string | null, title: string) => void;
+  onCreateFolder: (parentRelative: string | null, folderName: string) => void;
+  onOpenRepoPath: (relativePath: string) => void;
   onChooseLibrary: () => void;
+  onCreateProject: () => void;
+  onSwitchProject: (rootPath: string) => void;
   onRevealLibrary: () => void;
-  onRevealActive: () => void;
-}
-
-function formatLibraryLabel(path: string): string {
-  const parts = path.split(/[/\\]/).filter(Boolean);
-  if (parts.length <= 2) {
-    return path.replace(/^\/Users\/[^/]+/, "~");
-  }
-  return `~/${parts.slice(-2).join("/")}`;
-}
-
-function formatFileMeta(item: ManuscriptSummary): string {
-  const date = new Date(item.updatedAt).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
-  if (!item.filePath || item.source === "internal") {
-    return `App storage · ${date}`;
-  }
-  const segments = item.filePath.split(/[/\\]/);
-  if (segments.length <= 1) {
-    return date;
-  }
-  const folder = segments.slice(0, -1).join("/");
-  return `${folder} · ${date}`;
+  onRevealManuscript: (id: string) => void;
+  onImportMarkdown: () => void;
+  onDelete: (id: string) => void;
+  versionControlRefreshKey: number;
+  onVersionControlError: (message: string) => void;
+  onBeforeGitOperation: () => void | Promise<void>;
+  onGitOperationComplete: (workspaceUpdated: boolean) => void | Promise<void>;
 }
 
 export function ManuscriptNav({
   manuscripts,
   activeId,
+  activeDiffPath,
+  onOpenDiffTab,
   libraryPath,
+  projectTitle,
+  sidebarProjectView,
+  onSidebarProjectViewChange,
+  changedFiles,
+  changeCount,
+  mergeInProgress,
+  explorerRefreshKey,
   onSelect,
-  onCreate,
-  onOpenFile,
+  onCreateFile,
+  onCreateFolder,
+  onOpenRepoPath,
   onChooseLibrary,
+  onCreateProject,
+  onSwitchProject,
   onRevealLibrary,
-  onRevealActive,
+  onRevealManuscript,
+  onImportMarkdown,
+  onDelete,
+  versionControlRefreshKey,
+  onVersionControlError,
+  onBeforeGitOperation,
+  onGitOperationComplete,
 }: ManuscriptNavProps) {
+  const { adjustSidebarWidth, commitSidebarWidth } = useSidebarLayout();
+  const showActivityBar = isTauriRuntime() && Boolean(libraryPath);
+  const [selectedFolderPath, setSelectedFolderPath] = useState<string | null>(null);
+
+  const manuscriptsById = useMemo(
+    () => new Map(manuscripts.map((item) => [item.id, item])),
+    [manuscripts],
+  );
+
   return (
-    <aside className="app-sidebar" aria-label="Library">
-      <div className="app-sidebar-header">
-        <span className="app-sidebar-label">Library</span>
-        <div className="app-sidebar-actions">
-          <button
-            type="button"
-            className="text-btn"
-            onClick={onOpenFile}
-            title="Open markdown file"
-          >
-            Open
-          </button>
-          <button type="button" className="text-btn" onClick={onCreate}>
-            New
-          </button>
+    <aside className="app-sidebar" aria-label="Navigation">
+      <ProsaBrandBar />
+      <SidebarResizeSash
+        orientation="vertical"
+        className="sidebar-width-sash"
+        ariaLabel="Resize sidebar"
+        onDelta={adjustSidebarWidth}
+        onCommit={commitSidebarWidth}
+      />
+      <section className="sidebar-workspace" aria-label="Workspace">
+        <div className="sidebar-zone-header">
+          <span className="sidebar-zone-label">Workspace</span>
+          <span className="sidebar-zone-hint">Choose a project folder</span>
         </div>
-      </div>
+        <ProjectSwitcher
+          currentRootPath={libraryPath}
+          projectTitle={projectTitle}
+          onOpenProject={onChooseLibrary}
+          onCreateProject={onCreateProject}
+          onSwitchProject={onSwitchProject}
+          onRevealProject={onRevealLibrary}
+        />
+      </section>
 
       {libraryPath ? (
-        <div className="library-folder">
-          <button
-            type="button"
-            className="library-folder-path"
-            onClick={onChooseLibrary}
-            title={libraryPath}
-          >
-            {formatLibraryLabel(libraryPath)}
-          </button>
-          <button
-            type="button"
-            className="icon-btn library-folder-reveal"
-            aria-label="Show library in Finder"
-            title="Show in Finder"
-            onClick={onRevealLibrary}
-          >
-            <IconReveal />
+        <section className="sidebar-project" aria-label="Project">
+          {showActivityBar ? (
+            <SidebarActivityBar
+              activeView={sidebarProjectView}
+              changeCount={changeCount}
+              mergeInProgress={mergeInProgress}
+              onSelectView={onSidebarProjectViewChange}
+            />
+          ) : null}
+          <div className="sidebar-project-body">
+            <div className="sidebar-view-panel" data-sidebar-view={sidebarProjectView}>
+              {sidebarProjectView === "sourceControl" && showActivityBar ? (
+                <SourceControlPanel
+                  refreshKey={versionControlRefreshKey}
+                  onError={onVersionControlError}
+                  onBeforeGitOperation={onBeforeGitOperation}
+                  onGitOperationComplete={async (result) => {
+                    await onGitOperationComplete(result.workspaceUpdated === true);
+                  }}
+                  onOpenChangedPath={onOpenRepoPath}
+                  activeDiffPath={activeDiffPath}
+                  onOpenDiffTab={onOpenDiffTab}
+                />
+              ) : (
+                <div className="sidebar-panel-scroll sidebar-explorer-body">
+                  <ProjectFilesExplorer
+                    refreshKey={explorerRefreshKey}
+                    activeId={activeId}
+                    changedFiles={changedFiles}
+                    selectedFolderPath={selectedFolderPath}
+                    onSelectFolder={setSelectedFolderPath}
+                    onSelectManuscript={onSelect}
+                    onCreateFile={onCreateFile}
+                    onCreateFolder={onCreateFolder}
+                    onRevealManuscript={onRevealManuscript}
+                    onImportMarkdown={onImportMarkdown}
+                    onDelete={onDelete}
+                    manuscriptsById={manuscriptsById}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      ) : (
+        <div className="sidebar-project-placeholder">
+          <p>Open or create a project to browse manuscripts and source control.</p>
+          <button type="button" className="sc-btn sc-btn-primary" onClick={onChooseLibrary}>
+            Open project…
           </button>
         </div>
-      ) : null}
-
-      <ul className="app-sidebar-list">
-        {manuscripts.length === 0 ? (
-          <li className="app-sidebar-empty">
-            Add `.md` files to your library folder or create a new manuscript.
-          </li>
-        ) : (
-          manuscripts.map((item) => (
-            <li key={item.id}>
-              <button
-                type="button"
-                className="manuscript-item"
-                data-active={activeId === item.id ? "true" : undefined}
-                onClick={() => onSelect(item.id)}
-              >
-                <div className="manuscript-item-title">{item.title || "Untitled"}</div>
-                <div className="manuscript-item-meta">{formatFileMeta(item)}</div>
-              </button>
-            </li>
-          ))
-        )}
-      </ul>
-
-      {activeId ? (
-        <div className="app-sidebar-footer">
-          <button type="button" className="sidebar-footer-btn" onClick={onRevealActive}>
-            Reveal in Finder
-          </button>
-        </div>
-      ) : null}
+      )}
     </aside>
-  );
-}
-
-function IconReveal() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      aria-hidden
-    >
-      <path d="M14 3h7v7M10 14L21 3M5 12v7h7" />
-    </svg>
   );
 }

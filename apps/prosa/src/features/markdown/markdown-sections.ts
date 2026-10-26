@@ -1,4 +1,5 @@
 import type { Text } from "@codemirror/state";
+import { isBlockIdCommentLine } from "./markdown-block-ids";
 import { isSceneBreakLineRaw } from "./markdown-source-layout";
 
 export function parseMarkdownHeadingLine(
@@ -18,6 +19,9 @@ export type LineBoundary =
   { kind: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; title: string } | { kind: "scene" };
 
 export function lineBoundaryForText(text: string): LineBoundary | null {
+  if (isBlockIdCommentLine(text)) {
+    return null;
+  }
   if (isSceneBreakLineRaw(text)) {
     return { kind: "scene" };
   }
@@ -148,6 +152,10 @@ export function buildMarkdownOutline(source: string): MarkdownOutlineEntry[] {
   let line = 1;
   while (line <= lines.length) {
     const text = lines[line - 1] ?? "";
+    if (isBlockIdCommentLine(text)) {
+      line += 1;
+      continue;
+    }
     const boundary = lineBoundaryForText(text);
     if (boundary?.kind === "heading") {
       const endLine = sectionEndLine(lines, line);

@@ -14,6 +14,8 @@ export interface ManuscriptSummary {
   id: ManuscriptId;
   title: string;
   updatedAt: string;
+  /** File birth time when available; internal manuscripts use meta createdAt. */
+  createdAt?: string;
   /** Relative path under library root, or absolute path for external files. */
   filePath?: string;
   source?: ManuscriptSource;

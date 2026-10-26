@@ -1,12 +1,12 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { ManuscriptSummary } from "@scribo/core";
-import type { ProsaDocument } from "@scribo/document-model";
+import type { ManuscriptSummary, ScribamProjectManifest } from "@scribam/core";
+import type { ProsaDocument } from "@scribam/document-model";
 import {
   createEmptyProsaDocument,
   deserializeProsaDocument,
   serializeProsaDocument,
   tryValidateProsaDocument,
-} from "@scribo/document-model";
+} from "@scribam/document-model";
 import { markdownToProsaDocument, prosaDocumentToMarkdown } from "../markdown/prosa-markdown";
 import { normalizeMarkdownSource } from "../markdown/markdown-normalize";
 import type { RecoveryCandidate } from "./recovery-policy";
@@ -19,7 +19,9 @@ export interface LoadedManuscript {
 
 export interface LibraryInfo {
   rootPath: string;
+  homePath: string;
   exists: boolean;
+  project?: ScribamProjectManifest;
 }
 
 interface LoadedManuscriptPayload {
@@ -101,6 +103,10 @@ export async function migrateLegacyManuscriptToLibrary(id: string): Promise<Load
   };
 }
 
+export async function migrateLegacyRootManuscriptsToContent(): Promise<number> {
+  return invoke<number>("migrate_legacy_root_manuscripts");
+}
+
 export async function migrateAllLegacyManuscriptsToLibrary(): Promise<number> {
   const legacy = await listLegacyInternalManuscripts();
   let migrated = 0;
@@ -114,16 +120,30 @@ export async function migrateAllLegacyManuscriptsToLibrary(): Promise<number> {
   return migrated;
 }
 
-export async function createManuscript(title: string): Promise<LoadedManuscript> {
+export async function createManuscript(
+  title: string,
+  parentRelative?: string | null,
+): Promise<LoadedManuscript> {
   const document = createEmptyProsaDocument(title);
   const payload = await invoke<LoadedManuscriptPayload>("create_manuscript", {
     title,
+    parentRelative: parentRelative ?? null,
     documentJson: serializeProsaDocument(document),
   });
   return {
     summary: payload.summary,
     document: documentFromPayload(payload),
   };
+}
+
+export async function createProjectFolder(
+  folderName: string,
+  parentRelative?: string | null,
+): Promise<void> {
+  await invoke("create_project_folder_entry", {
+    folderName,
+    parentRelative: parentRelative ?? null,
+  });
 }
 
 export async function loadManuscript(id: string): Promise<LoadedManuscript> {
@@ -188,4 +208,8 @@ export async function saveRecoverySnapshot(id: string, document: ProsaDocument):
 
 export async function clearRecoverySnapshot(id: string): Promise<void> {
   await invoke("clear_recovery_snapshot", { id });
+}
+
+export async function deleteManuscript(id: string): Promise<void> {
+  await invoke("delete_manuscript", { id });
 }

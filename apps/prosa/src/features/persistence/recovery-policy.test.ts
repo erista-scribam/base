@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createEmptyProsaDocument } from "@scribo/document-model";
+import { createEmptyProsaDocument } from "@scribam/document-model";
 import { resolveRecoveryOnOpen } from "./recovery-policy";
 
 describe("resolveRecoveryOnOpen", () => {

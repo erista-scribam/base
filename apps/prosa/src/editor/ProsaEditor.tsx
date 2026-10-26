@@ -9,11 +9,12 @@ import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import Placeholder from "@tiptap/extension-placeholder";
 import type { Editor } from "@tiptap/core";
-import { serializeProsaDocument, type ProsaDocument } from "@scribo/document-model";
+import { serializeProsaDocument, type ProsaDocument } from "@scribam/document-model";
 import { useEffect, useRef } from "react";
 import { ProsaCodeBlock } from "./prosa-code-block";
 import { ProsaEditingRules } from "./prosa-editing-rules";
 import { SceneBreak } from "./scene-break";
+import { ScribamBlockId } from "./scribam-block-id";
 import { prosaDocumentFromTiptapJson, tiptapJsonFromProsaDocument } from "./prosa-convert";
 
 export interface ProsaEditorProps {
@@ -52,6 +53,7 @@ export function ProsaEditor({ document, onDocumentChange, onEditorReady }: Prosa
       }),
       ProsaCodeBlock,
       ProsaEditingRules,
+      ScribamBlockId,
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
       TaskList,

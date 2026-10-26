@@ -1,10 +1,10 @@
-# Scribo Prosa — Reliability Notes
+# Scribam Prosa — Reliability Notes
 
 ## Canonical model
 
-The Prosa document model (`@scribo/document-model`) is the source of truth in memory.
+The Prosa document model (`@scribam/document-model`) is the source of truth in memory.
 
-**Library folder** (default `Documents/Scribo Prosa`): each manuscript is a `.md` file you can open in Finder. **App config** (e.g. `com.scribo.prosa`) holds library settings and recovery snapshots under `.scribo/recovery/` inside the library — not your manuscript text.
+**Library folder** (default `Documents/Scribam Prosa`): each manuscript is a `.md` file you can open in Finder. **App config** (e.g. `com.scribam.prosa`) holds library settings and recovery snapshots under `.scribam/recovery/` inside the library — not your manuscript text.
 
 Legacy manuscripts that were created in app storage are **migrated automatically** to the library as `.md` on launch.
 

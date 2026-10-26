@@ -1,8 +1,8 @@
-# Scribo Prosa — Visual Design Refinement
+# Scribam Prosa — Visual Design Refinement
 
 ## Objective
 
-Refine the existing Scribo Prosa desktop application into an exceptionally polished, professional writing environment.
+Refine the existing Scribam Prosa desktop application into an exceptionally polished, professional writing environment.
 
 The design direction is inspired by the restraint of Apple software, the typographic sophistication of iA Writer, and the precision of excellent native macOS applications.
 
@@ -10,7 +10,7 @@ The objective is not to imitate any single product. It is to achieve the same le
 
 **The application should feel like a carefully designed instrument for serious writers, not a generic SaaS dashboard, a web application inside a desktop window, or a developer prototype.**
 
-The product's defining principle remains unchanged: Scribo controls presentation so that writers can concentrate on content.
+The product's defining principle remains unchanged: Scribam controls presentation so that writers can concentrate on content.
 
 ## 1. Inspect Before Modifying
 
@@ -276,9 +276,9 @@ Respect reduced-motion preferences where applicable.
 
 Do not animate ordinary typing, scrolling, or document layout unnecessarily.
 
-## 6. Preserve Scribo's Product Philosophy
+## 6. Preserve Scribam's Product Philosophy
 
-Scribo is a structured writing environment, not a general-purpose word processor.
+Scribam is a structured writing environment, not a general-purpose word processor.
 
 The redesign must preserve these constraints:
 
@@ -416,7 +416,7 @@ Use professional design judgment to make reasonable decisions without asking for
 
 ## Definition of Done
 
-The redesign is complete when Scribo Prosa feels visually coherent, typographically sophisticated, restrained, and purpose-built for serious writing.
+The redesign is complete when Scribam Prosa feels visually coherent, typographically sophisticated, restrained, and purpose-built for serious writing.
 
 Every component should appear intentional. The interface should remain quiet while the manuscript remains prominent. Light and dark appearances should both feel fully designed. Interactions should be predictable, and the existing product functionality should continue working.
 

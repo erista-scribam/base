@@ -1,6 +1,6 @@
-# Scribo Prosa
+# Scribam Prosa
 
-Desktop prose editor (Tauri 2 + React). Library manuscripts live as Markdown in `Documents/Scribo Prosa` by default.
+Desktop prose editor (Tauri 2 + React). Library manuscripts live as Markdown in `Documents/Scribam Prosa` by default.
 
 Persistence, recovery, and save guarantees are documented in [RELIABILITY.md](./RELIABILITY.md).
 

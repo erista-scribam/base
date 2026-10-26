@@ -1,6 +1,6 @@
 import type { JSONContent } from "@tiptap/core";
-import type { ProsaBlock, ProsaDocument, ProsaInlineNode } from "@scribo/document-model";
-import { validateProsaDocument } from "@scribo/document-model";
+import type { ProsaBlock, ProsaDocument, ProsaInlineNode } from "@scribam/document-model";
+import { validateProsaDocument } from "@scribam/document-model";
 
 function inlineId(): string {
   return `inl_${crypto.randomUUID()}`;
@@ -8,6 +8,18 @@ function inlineId(): string {
 
 function blockId(): string {
   return `blk_${crypto.randomUUID()}`;
+}
+
+function blockIdFromNode(node: JSONContent): string {
+  const attr = node.attrs?.scribamBlockId ?? node.attrs?.scriboBlockId;
+  if (typeof attr === "string" && attr.startsWith("blk_")) {
+    return attr;
+  }
+  return blockId();
+}
+
+function blockAttrs(block: ProsaBlock): Record<string, unknown> {
+  return { scribamBlockId: block.id };
 }
 
 function listItemId(): string {
@@ -78,7 +90,7 @@ function blockFromTiptap(node: JSONContent): ProsaBlock | null {
       }
       return {
         type: "heading",
-        id: blockId(),
+        id: blockIdFromNode(node),
         level,
         content: inlineFromBlockContent(node.content),
       };
@@ -86,7 +98,7 @@ function blockFromTiptap(node: JSONContent): ProsaBlock | null {
     case "paragraph":
       return {
         type: "paragraph",
-        id: blockId(),
+        id: blockIdFromNode(node),
         content: inlineFromBlockContent(node.content),
       };
     case "blockquote": {
@@ -98,7 +110,7 @@ function blockFromTiptap(node: JSONContent): ProsaBlock | null {
       }
       return {
         type: "blockquote",
-        id: blockId(),
+        id: blockIdFromNode(node),
         content: merged.length ? merged : [{ type: "text", id: inlineId(), text: "" }],
       };
     }
@@ -112,13 +124,13 @@ function blockFromTiptap(node: JSONContent): ProsaBlock | null {
           : undefined;
       return {
         type: "code_block",
-        id: blockId(),
+        id: blockIdFromNode(node),
         text,
         ...(language ? { language } : {}),
       };
     }
     case "sceneBreak":
-      return { type: "scene_break", id: blockId() };
+      return { type: "scene_break", id: blockIdFromNode(node) };
     case "taskList": {
       const taskItems: Array<{
         id: string;
@@ -144,7 +156,13 @@ function blockFromTiptap(node: JSONContent): ProsaBlock | null {
       if (!taskItems.length) {
         return null;
       }
-      return { type: "list", id: blockId(), ordered: false, task: true, items: taskItems };
+      return {
+        type: "list",
+        id: blockIdFromNode(node),
+        ordered: false,
+        task: true,
+        items: taskItems,
+      };
     }
     case "bulletList":
     case "orderedList": {
@@ -168,7 +186,7 @@ function blockFromTiptap(node: JSONContent): ProsaBlock | null {
       if (!items.length) {
         return null;
       }
-      return { type: "list", id: blockId(), ordered, items };
+      return { type: "list", id: blockIdFromNode(node), ordered, items };
     }
     default:
       return null;
@@ -228,28 +246,34 @@ function blockToTiptap(block: ProsaBlock): JSONContent {
     case "heading":
       return {
         type: "heading",
-        attrs: { level: block.level },
+        attrs: { level: block.level, ...blockAttrs(block) },
         content: inlineToTiptap(block.content),
       };
     case "paragraph":
-      return { type: "paragraph", content: inlineToTiptap(block.content) };
+      return {
+        type: "paragraph",
+        attrs: blockAttrs(block),
+        content: inlineToTiptap(block.content),
+      };
     case "blockquote":
       return {
         type: "blockquote",
+        attrs: blockAttrs(block),
         content: [{ type: "paragraph", content: inlineToTiptap(block.content) }],
       };
     case "code_block":
       return {
         type: "codeBlock",
-        attrs: block.language ? { language: block.language } : {},
+        attrs: { ...blockAttrs(block), ...(block.language ? { language: block.language } : {}) },
         content: block.text ? [{ type: "text", text: block.text }] : [],
       };
     case "scene_break":
-      return { type: "sceneBreak" };
+      return { type: "sceneBreak", attrs: blockAttrs(block) };
     case "list":
       if (block.task) {
         return {
           type: "taskList",
+          attrs: blockAttrs(block),
           content: block.items.map((item) => ({
             type: "taskItem",
             attrs: { checked: item.checked ?? false },
@@ -259,6 +283,7 @@ function blockToTiptap(block: ProsaBlock): JSONContent {
       }
       return {
         type: block.ordered ? "orderedList" : "bulletList",
+        attrs: blockAttrs(block),
         content: block.items.map((item) => ({
           type: "listItem",
           content: [{ type: "paragraph", content: inlineToTiptap(item.content) }],

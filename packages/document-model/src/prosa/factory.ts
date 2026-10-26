@@ -1,4 +1,4 @@
-import { createDocumentId } from "@scribo/core";
+import { createDocumentId } from "@scribam/core";
 import type { ProsaDocument } from "./types";
 import { PROSA_SCHEMA_VERSION } from "./version";
 

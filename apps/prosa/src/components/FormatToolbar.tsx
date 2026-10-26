@@ -155,7 +155,7 @@ export function MarkdownFormatToolbar({ onFormat }: MarkdownFormatToolbarProps) 
   };
 
   return (
-    <div className="format-bar" role="toolbar" aria-label="Markdown formatting">
+    <div className="format-bar" role="toolbar" aria-label="Formatting">
       <div className="format-bar-group" aria-label="Character style">
         <IconButton label="Bold" onClick={() => run("bold")}>
           <IconBold />

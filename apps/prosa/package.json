@@ -1,6 +1,7 @@
 {
-  "name": "@scribo/prosa",
+  "name": "@scribam/prosa",
   "private": true,
+  "license": "AGPL-3.0-or-later",
   "version": "0.4.0",
   "type": "module",
   "scripts": {
@@ -13,11 +14,12 @@
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.5.2",
-    "@codemirror/search": "^6.7.2",
     "@codemirror/language": "^6.13.1",
+    "@codemirror/search": "^6.7.2",
     "@codemirror/view": "^6.43.15",
-    "@scribo/core": "workspace:*",
-    "@scribo/document-model": "workspace:*",
+    "@scribam/core": "workspace:*",
+    "@scribam/document-model": "workspace:*",
+    "@scribam/mdprosa": "workspace:*",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-dialog": "^2",
     "@tauri-apps/plugin-opener": "^2",

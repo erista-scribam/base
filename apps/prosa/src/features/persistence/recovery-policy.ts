@@ -1,4 +1,4 @@
-import { tryValidateProsaDocument, type ProsaDocument } from "@scribo/document-model";
+import { tryValidateProsaDocument, type ProsaDocument } from "@scribam/document-model";
 import { manuscriptContentEqual } from "./document-revision";
 
 export interface RecoveryCandidate {

@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react";
+import { syncNativeWindowTheme } from "../features/shell/sync-native-window-theme";
 
 export type ThemeMode = "light" | "dark";
 
-const STORAGE_KEY = "scribo-prosa-theme";
+const STORAGE_KEY = "scribam-prosa-theme";
 
 function readStoredTheme(): ThemeMode {
   const stored = localStorage.getItem(STORAGE_KEY);
@@ -16,6 +17,7 @@ function readStoredTheme(): ThemeMode {
 export function applyTheme(mode: ThemeMode) {
   document.documentElement.dataset.theme = mode;
   document.documentElement.style.colorScheme = mode;
+  void syncNativeWindowTheme(mode);
 }
 
 export function initThemeFromStorage() {
