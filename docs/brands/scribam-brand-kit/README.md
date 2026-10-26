@@ -11,7 +11,7 @@ Vector assets and tokens aligned with the [brand sheet](./brand-sheet-v1.jpg). *
 | `scribam-glyph.svg`   | Standalone export — synced copy of `scribam-s-glyph.svg`        |
 | `scribam-mark.svg`    | Parent app icon (Ink field, Paper mark)                         |
 | `lanista.svg`         | Future hub — slate + four-point star                            |
-| `prosa.svg`           | Prose — green + quill                                           |
+| `prosa.svg`           | Prose — green + quill (UI / favicon)                            |
 | `drama.svg`           | Screenplay — orange + clapper                                   |
 | `folia.svg`           | Presentations — blue + stacked slides                           |
 | `brand-tokens.css`    | Palette + brand type stacks                                     |

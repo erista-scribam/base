@@ -67,7 +67,7 @@ Core tokens in [brand-tokens.css](docs/brands/scribam-brand-kit/brand-tokens.css
 
 ### Legacy name Scribo
 
-Users may still have **Scribo Prosa**, `scribo.project.json`, and `.scribo/`. New defaults use **Scribam Prosa**, `scribam.project.json`, and `.scribam/`. The Prosa backend **dual-reads** legacy paths ([app_paths.rs](apps/prosa/src-tauri/src/app_paths.rs), [library.rs](apps/prosa/src-tauri/src/library.rs)). Do not remove legacy support without a spec and migration.
+Users may still have **Scribo Prosa** or **Scribam Prosa** library folders, `scribo.project.json`, and `.scribo/`. New defaults use **`Documents/Scribam`**, `scribam.project.json`, and `.scribam/`. The Prosa backend **dual-reads** legacy paths ([app_paths.rs](apps/prosa/src-tauri/src/app_paths.rs), [library.rs](apps/prosa/src-tauri/src/library.rs)). Do not remove legacy support without a spec and migration.
 
 ### Checklist: new Scribam app or refresh
 

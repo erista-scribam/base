@@ -38,7 +38,7 @@ User-facing mental model (target): **open Lanista → pick or create a project �
 
 ### Current implementation (transitional)
 
-Today `library.json` may point **directly** at a single project root (the home folder and the active project can be the same path). Catalog and “Open project” already support **multiple** project directories via `scribam.project.json` discovery and recents. **Convergence work:** treat `Documents/Scribam Prosa/` as the default **home**, create new projects as **child folders**, and migrate legacy layouts where manuscripts lived at the home root into `content/manuscripts/` inside a named project folder.
+Today `library.json` may point **directly** at a single project root (the home folder and the active project can be the same path). Catalog and “Open project” already support **multiple** project directories via `scribam.project.json` discovery and recents. **Convergence work:** treat `Documents/Scribam/` as the default **home** (legacy folder names still open if present), create new projects as **child folders**, and migrate legacy layouts where manuscripts lived at the home root into `content/manuscripts/` inside a named project folder.
 
 ---
 

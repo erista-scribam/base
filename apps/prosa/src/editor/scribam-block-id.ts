@@ -24,6 +24,7 @@ export const ScribamBlockId = Extension.create({
             default: null,
             parseHTML: (element) =>
               element.getAttribute("data-scribam-block-id") ??
+              // Legacy TipTap HTML from Scribo builds
               element.getAttribute("data-scribo-block-id"),
             renderHTML: (attributes) => {
               if (!attributes.scribamBlockId) {

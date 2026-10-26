@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "icons": "node ../../scripts/build-prosa-app-icon.mjs"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.5.2",

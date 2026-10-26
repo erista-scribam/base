@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Scribam Prosa">
+  <g transform="translate(512 512) scale(3.21875) translate(-128 -128)">
+<rect width="256" height="256" rx="52" fill="#059669" />
+  <path
+    d="M58 196C72 118 118 64 198 48 188 118 148 178 58 196Z"
+    fill="#F8FAFC"
+  />
+  <path
+    d="M72 186 158 82"
+    fill="none"
+    stroke="#059669"
+    stroke-width="9"
+    stroke-linecap="round"
+  />
+  <path
+    d="M48 214H208"
+    fill="none"
+    stroke="#F8FAFC"
+    stroke-width="11"
+    stroke-linecap="round"
+  />
+  </g>
+</svg>
