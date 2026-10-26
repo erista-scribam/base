@@ -312,7 +312,7 @@ export function App() {
       setSaveState("idle");
       setSidebarCollapsed(false);
       setFocusMode(false);
-      setViewMode("proper");
+      setViewMode("minimalist");
       setVersionControlRefreshKey((value) => value + 1);
     },
     [refreshList, registerTab, setViewMode],

@@ -18,9 +18,9 @@ function normalizeStored(raw: string | null): EditorViewMode | null {
 
 function readStored(): EditorViewMode {
   try {
-    return normalizeStored(window.localStorage.getItem(STORAGE_KEY)) ?? "proper";
+    return normalizeStored(window.localStorage.getItem(STORAGE_KEY)) ?? "minimalist";
   } catch {
-    return "proper";
+    return "minimalist";
   }
 }
 
