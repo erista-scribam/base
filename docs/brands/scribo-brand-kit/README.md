@@ -4,7 +4,7 @@ Editable, scalable SVG starter assets for the Scribo identity.
 
 ## Files
 
-- `scribo-mark.svg` — square parent-brand mark / app icon
+- `scribo-mark.svg` — square parent-brand mark / app icon (filled letterform **S**)
 - `scribo-wordmark.svg` — light-background wordmark with tagline
 - `scribo-wordmark-dark.svg` — dark-background wordmark with tagline
 - `lanista.svg` — future hub product icon (not shipped as an app)
