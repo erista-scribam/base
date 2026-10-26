@@ -1,8 +1,76 @@
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ConflictRegion {
+    pub ours: String,
+    pub theirs: String,
+}
+
+use serde::Serialize;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConflictResolution {
     Ours,
     Theirs,
     Both,
+}
+
+/// Lists conflict hunks in a file (empty if none).
+pub fn list_conflict_regions(content: &str) -> Result<Vec<ConflictRegion>, String> {
+    let mut regions = Vec::new();
+    let mut lines = content.lines();
+    let mut in_conflict = false;
+    let mut section: u8 = 0;
+    let mut ours = String::new();
+    let mut theirs = String::new();
+
+    for line in lines.by_ref() {
+        if line.starts_with("<<<<<<<") {
+            if in_conflict {
+                return Err("Nested conflict markers are not supported".into());
+            }
+            in_conflict = true;
+            section = 1;
+            ours.clear();
+            theirs.clear();
+            continue;
+        }
+        if in_conflict && line.starts_with("=======") {
+            section = 2;
+            continue;
+        }
+        if in_conflict && line.starts_with(">>>>>>>") {
+            regions.push(ConflictRegion {
+                ours: ours.trim_end().to_string(),
+                theirs: theirs.trim_end().to_string(),
+            });
+            in_conflict = false;
+            section = 0;
+            continue;
+        }
+        if in_conflict {
+            match section {
+                1 => {
+                    if !ours.is_empty() {
+                        ours.push('\n');
+                    }
+                    ours.push_str(line);
+                }
+                2 => {
+                    if !theirs.is_empty() {
+                        theirs.push('\n');
+                    }
+                    theirs.push_str(line);
+                }
+                _ => {}
+            }
+        }
+    }
+
+    if in_conflict {
+        return Err("Unclosed conflict marker block".into());
+    }
+
+    Ok(regions)
 }
 
 /// Apply a resolution to all conflict regions in a UTF-8 file body.

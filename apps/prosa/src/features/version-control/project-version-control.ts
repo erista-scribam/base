@@ -79,3 +79,20 @@ export async function resolveProjectMergeFile(
 export async function completeProjectMerge(message?: string): Promise<ProjectVersionControl> {
   return invoke<ProjectVersionControl>("complete_project_merge", { message: message ?? null });
 }
+
+export interface ConflictRegion {
+  ours: string;
+  theirs: string;
+}
+
+export interface MergeConflictFilePreview {
+  relativePath: string;
+  regions: ConflictRegion[];
+  hasMarkers: boolean;
+}
+
+export async function getMergeConflictPreview(
+  relativePath: string,
+): Promise<MergeConflictFilePreview> {
+  return invoke<MergeConflictFilePreview>("get_merge_conflict_preview", { relativePath });
+}

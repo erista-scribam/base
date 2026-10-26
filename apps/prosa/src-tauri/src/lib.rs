@@ -12,10 +12,11 @@ mod recovery;
 
 use crate::atomic_io::atomic_write;
 use library::{
-    LibraryInfo, absolute_path_for_entry, clear_library_recovery, create_library_markdown,
-    create_library_markdown_with_content, delete_library_manuscript, ensure_default_library,
-    get_library_info, import_external_markdown, is_library_manuscript_id, library_recovery_path,
-    list_library_manuscripts, migrate_legacy_root_markdown, path_key_for_manuscript_id,
+    LibraryInfo, ProjectSummary, absolute_path_for_entry, clear_library_recovery,
+    create_library_markdown, create_library_markdown_with_content, create_project_root,
+    delete_library_manuscript, ensure_default_library, get_library_info, import_external_markdown,
+    is_library_manuscript_id, library_recovery_path, list_library_manuscripts, list_projects,
+    migrate_legacy_root_markdown, open_project_root, path_key_for_manuscript_id,
     read_library_markdown, set_library_root, write_library_markdown,
 };
 use persistence::{
@@ -27,17 +28,17 @@ use persistence::{
 };
 use recovery::{parse_recovery, wrap_recovery};
 use serde::Serialize;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 #[cfg(feature = "git-vcs")]
 use project_git::{
-    GitGraphCommit, ProjectVersionControl, abort_project_merge as git_abort_merge,
-    checkout_project_branch as git_checkout_branch,
+    GitGraphCommit, MergeConflictFilePreview, ProjectVersionControl,
+    abort_project_merge as git_abort_merge, checkout_project_branch as git_checkout_branch,
     commit_project_checkpoint as git_commit_checkpoint,
     complete_project_merge as git_complete_merge, create_project_branch as git_create_branch,
-    merge_project_branch as git_merge_branch, project_git_graph as git_project_graph,
-    project_version_control as git_project_status,
+    merge_conflict_preview as git_merge_conflict_preview, merge_project_branch as git_merge_branch,
+    project_git_graph as git_project_graph, project_version_control as git_project_status,
     resolve_project_merge_file as git_resolve_merge_file,
 };
 
@@ -178,9 +179,37 @@ fn complete_project_merge(
     git_complete_merge(&library_root_path(&app)?, message.as_deref())
 }
 
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn get_merge_conflict_preview(
+    app: tauri::AppHandle,
+    relative_path: String,
+) -> Result<MergeConflictFilePreview, String> {
+    git_merge_conflict_preview(&library_root_path(&app)?, &relative_path)
+}
+
 #[tauri::command]
 fn set_library(app: tauri::AppHandle, root_path: String) -> Result<LibraryInfo, String> {
     set_library_root(&app, root_path)
+}
+
+#[tauri::command]
+fn list_projects_catalog(app: tauri::AppHandle) -> Result<Vec<ProjectSummary>, String> {
+    list_projects(&app)
+}
+
+#[tauri::command]
+fn open_project(app: tauri::AppHandle, root_path: String) -> Result<LibraryInfo, String> {
+    open_project_root(&app, PathBuf::from(root_path))
+}
+
+#[tauri::command]
+fn create_project(
+    app: tauri::AppHandle,
+    parent_path: String,
+    name: String,
+) -> Result<LibraryInfo, String> {
+    create_project_root(&app, parent_path, name)
 }
 
 #[tauri::command]
@@ -433,6 +462,9 @@ pub fn run() {
             get_library,
             init_library,
             set_library,
+            list_projects_catalog,
+            open_project,
+            create_project,
             create_manuscript,
             migrate_internal_manuscript,
             load_manuscript,
@@ -454,7 +486,8 @@ pub fn run() {
             merge_project_branch,
             abort_project_merge,
             resolve_project_merge_file,
-            complete_project_merge
+            complete_project_merge,
+            get_merge_conflict_preview
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

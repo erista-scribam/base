@@ -20,6 +20,15 @@ export function isProjectId(value: string): value is ProjectId {
   return value.startsWith(PROJECT_ID_PREFIX) && value.length > PROJECT_ID_PREFIX.length;
 }
 
+/** Writer-facing project entry (folder + manifest), distinct from a single manuscript. */
+export interface ProjectSummary {
+  rootPath: string;
+  title: string;
+  id: string | null;
+  lastOpenedAt: string;
+  isCurrent: boolean;
+}
+
 /** On-disk `scribo.project.json` (plan 005). */
 export interface ScriboProjectManifest {
   projectSchemaVersion: ProjectSchemaVersion;

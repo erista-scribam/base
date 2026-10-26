@@ -3,6 +3,7 @@ import type { Editor } from "@tiptap/core";
 import type { ManuscriptSummary } from "@scribo/core";
 import type { ProsaDocument } from "@scribo/document-model";
 import { ManuscriptNav } from "../components/ManuscriptNav";
+import { MergeConflictOverlay } from "../components/MergeConflictOverlay";
 import { EditorToolbar } from "../components/EditorToolbar";
 import { EmptyWorkspace } from "../components/EmptyWorkspace";
 import {
@@ -39,8 +40,8 @@ import {
   loadRecoveryCandidate,
   revealLibraryFolder,
   revealManuscriptInFileManager,
-  setLibraryRoot,
 } from "../features/persistence/tauri-manuscripts";
+import { openProject } from "../features/projects/project-catalog";
 import { useLibraryViewMode } from "../hooks/useLibraryViewMode";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
 
@@ -336,6 +337,20 @@ export function App() {
     workspaceRef.current?.applyMarkdownFormat(action);
   }, []);
 
+  const applyProjectLibrary = useCallback(
+    async (library: { rootPath: string; project?: { title: string } | null }) => {
+      await flushNow();
+      setLibraryPath(library.rootPath);
+      setProjectTitle(library.project?.title ?? null);
+      setActiveId(null);
+      setDocument(null);
+      setSaveState("idle");
+      setVersionControlRefreshKey((value) => value + 1);
+      await refreshList();
+    },
+    [flushNow, refreshList],
+  );
+
   const handleChooseLibrary = useCallback(async () => {
     if (!isTauriRuntime()) {
       return;
@@ -343,16 +358,59 @@ export function App() {
     const selected = await open({
       directory: true,
       multiple: false,
-      title: "Choose project folder",
+      title: "Open project folder",
     });
     if (typeof selected !== "string") {
       return;
     }
-    const library = await setLibraryRoot(selected);
-    setLibraryPath(library.rootPath);
-    setProjectTitle(library.project?.title ?? null);
-    await refreshList();
-  }, [refreshList]);
+    const library = await openProject(selected);
+    await applyProjectLibrary(library);
+  }, [applyProjectLibrary]);
+
+  const handleSwitchProject = useCallback(
+    async (rootPath: string) => {
+      if (!isTauriRuntime()) {
+        return;
+      }
+      const library = await openProject(rootPath);
+      await applyProjectLibrary(library);
+      setNotice("Project switched.");
+    },
+    [applyProjectLibrary],
+  );
+
+  const handleCreateProject = useCallback(async () => {
+    if (!isTauriRuntime()) {
+      return;
+    }
+    const root = await open({
+      directory: true,
+      multiple: false,
+      title: "Choose or create project folder",
+      canCreateDirectories: true,
+    });
+    if (typeof root !== "string") {
+      return;
+    }
+    const library = await openProject(root);
+    await applyProjectLibrary(library);
+    setNotice(`Created project “${library.project?.title ?? "Untitled"}”.`);
+  }, [applyProjectLibrary]);
+
+  const handleOpenConflictFile = useCallback(
+    (relativePath: string) => {
+      const normalized = relativePath.replace(/\\/g, "/");
+      const match = manuscripts.find((item) => item.filePath?.replace(/\\/g, "/") === normalized);
+      if (match) {
+        void openManuscript(match.id, { preferDisk: true });
+        return;
+      }
+      setNotice(
+        `Open ${relativePath} from the project folder in Finder if it is not in the list yet.`,
+      );
+    },
+    [manuscripts, openManuscript],
+  );
 
   const handleOpenFile = useCallback(async () => {
     if (!isTauriRuntime()) {
@@ -485,6 +543,15 @@ export function App() {
           </button>
         </div>
       ) : null}
+      {isTauriRuntime() ? (
+        <MergeConflictOverlay
+          refreshKey={versionControlRefreshKey}
+          onBeforeGitOperation={handleBeforeGitOperation}
+          onGitOperationComplete={handleGitOperationComplete}
+          onError={(message) => setError(message)}
+          onOpenFile={handleOpenConflictFile}
+        />
+      ) : null}
       <div className="app-body" key={layoutKey}>
         <ManuscriptNav
           manuscripts={manuscripts}
@@ -497,6 +564,8 @@ export function App() {
           onCreate={() => void handleCreate()}
           onOpenFile={() => void handleOpenFile()}
           onChooseLibrary={() => void handleChooseLibrary()}
+          onCreateProject={() => void handleCreateProject()}
+          onSwitchProject={(path) => void handleSwitchProject(path)}
           onRevealLibrary={handleRevealLibrary}
           onRevealActive={handleRevealActive}
           onDelete={handleDeleteManuscript}

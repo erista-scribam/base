@@ -17,10 +17,31 @@ use crate::project::{
 const LIBRARY_DIR_NAME: &str = "Scribo Prosa";
 const PATH_ID_PREFIX: &str = "ms_path_";
 
+const MAX_RECENT_PROJECTS: usize = 12;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct RecentProjectEntry {
+    root_path: PathBuf,
+    last_opened_at: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct LibraryConfig {
     root_path: PathBuf,
+    #[serde(default)]
+    recent_projects: Vec<RecentProjectEntry>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProjectSummary {
+    pub root_path: String,
+    pub title: String,
+    pub id: Option<String>,
+    pub last_opened_at: String,
+    pub is_current: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -65,6 +86,34 @@ pub fn default_library_root(app: &AppHandle) -> Result<PathBuf, String> {
     Ok(docs.join(LIBRARY_DIR_NAME))
 }
 
+fn touch_recent_project(config: &mut LibraryConfig, root: &Path) {
+    let now = Utc::now().to_rfc3339();
+    config
+        .recent_projects
+        .retain(|entry| entry.root_path != root);
+    config.recent_projects.insert(
+        0,
+        RecentProjectEntry {
+            root_path: root.to_path_buf(),
+            last_opened_at: now,
+        },
+    );
+    config.recent_projects.truncate(MAX_RECENT_PROJECTS);
+}
+
+fn project_title_for_root(root: &Path) -> String {
+    read_project_manifest(root)
+        .ok()
+        .flatten()
+        .map(|manifest| manifest.title)
+        .unwrap_or_else(|| {
+            root.file_name()
+                .and_then(|name| name.to_str())
+                .unwrap_or("Untitled project")
+                .to_string()
+        })
+}
+
 fn library_info_for_root(root: PathBuf, existed_before: bool) -> Result<LibraryInfo, String> {
     fs::create_dir_all(&root).map_err(|error| error.to_string())?;
     let project = Some(ensure_project_manifest(&root)?);
@@ -90,6 +139,7 @@ pub fn ensure_default_library(app: &AppHandle) -> Result<LibraryInfo, String> {
         app,
         &LibraryConfig {
             root_path: root.clone(),
+            recent_projects: Vec::new(),
         },
     )?;
     library_info_for_root(root, true)
@@ -174,14 +224,95 @@ pub fn migrate_legacy_root_markdown(app: &AppHandle) -> Result<u32, String> {
 }
 
 pub fn set_library_root(app: &AppHandle, root_path: String) -> Result<LibraryInfo, String> {
-    let path = PathBuf::from(&root_path);
-    write_config(
-        app,
-        &LibraryConfig {
-            root_path: path.clone(),
-        },
-    )?;
+    open_project_root(app, PathBuf::from(root_path))
+}
+
+pub fn open_project_root(app: &AppHandle, path: PathBuf) -> Result<LibraryInfo, String> {
+    let mut config = read_config(app)?.unwrap_or(LibraryConfig {
+        root_path: path.clone(),
+        recent_projects: Vec::new(),
+    });
+    config.root_path = path.clone();
+    touch_recent_project(&mut config, &path);
+    write_config(app, &config)?;
     library_info_for_root(path, true)
+}
+
+pub fn create_project_root(
+    app: &AppHandle,
+    parent_path: String,
+    name: String,
+) -> Result<LibraryInfo, String> {
+    let trimmed = name.trim();
+    if trimmed.is_empty() {
+        return Err("Project name is required".into());
+    }
+    if trimmed.contains('/') || trimmed.contains('\\') {
+        return Err("Project name cannot contain path separators".into());
+    }
+    let root = PathBuf::from(parent_path).join(trimmed);
+    if root.exists() {
+        return Err("A folder with that name already exists".into());
+    }
+    fs::create_dir_all(&root).map_err(|error| error.to_string())?;
+    open_project_root(app, root)
+}
+
+pub fn list_projects(app: &AppHandle) -> Result<Vec<ProjectSummary>, String> {
+    let config = read_config(app)?;
+    let current_root = config.as_ref().map(|value| value.root_path.clone());
+    let mut entries: Vec<ProjectSummary> = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+
+    if let Some(config) = config {
+        for recent in config.recent_projects {
+            let root = recent.root_path;
+            if !seen.insert(root.clone()) {
+                continue;
+            }
+            let title = if root.exists() {
+                project_title_for_root(&root)
+            } else {
+                root.file_name()
+                    .and_then(|value| value.to_str())
+                    .unwrap_or("Missing project")
+                    .to_string()
+            };
+            let id = read_project_manifest(&root)
+                .ok()
+                .flatten()
+                .map(|manifest| manifest.id);
+            entries.push(ProjectSummary {
+                root_path: root.to_string_lossy().into_owned(),
+                title,
+                id,
+                last_opened_at: recent.last_opened_at,
+                is_current: current_root.as_deref() == Some(root.as_path()),
+            });
+        }
+    }
+
+    if let Some(current) = current_root.as_deref()
+        && seen.insert(current.to_path_buf())
+    {
+        let title = project_title_for_root(current);
+        let id = read_project_manifest(current)
+            .ok()
+            .flatten()
+            .map(|manifest| manifest.id);
+        entries.insert(
+            0,
+            ProjectSummary {
+                root_path: current.to_string_lossy().into_owned(),
+                title,
+                id,
+                last_opened_at: Utc::now().to_rfc3339(),
+                is_current: true,
+            },
+        );
+    }
+
+    Ok(entries)
 }
 
 pub fn manuscript_id_for_path(path_key: &str) -> String {

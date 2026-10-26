@@ -9,7 +9,17 @@ use git2::{
 use serde::Serialize;
 
 use crate::library::clear_all_library_recovery_at_root;
-use crate::merge_conflicts::{ConflictResolution, resolve_conflict_markers};
+use crate::merge_conflicts::{
+    ConflictRegion, ConflictResolution, list_conflict_regions, resolve_conflict_markers,
+};
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MergeConflictFilePreview {
+    pub relative_path: String,
+    pub regions: Vec<ConflictRegion>,
+    pub has_markers: bool,
+}
 
 const DEFAULT_GITIGNORE: &str = ".scribo/\n";
 
@@ -460,6 +470,31 @@ pub fn resolve_project_merge_file(
     index.write().map_err(|error| error.to_string())?;
 
     finalize_version_control(root, true)
+}
+
+pub fn merge_conflict_preview(
+    root: &Path,
+    relative_path: &str,
+) -> Result<MergeConflictFilePreview, String> {
+    if relative_path.contains("..") {
+        return Err("Invalid path".into());
+    }
+    let path = root.join(relative_path);
+    if !path.starts_with(root) {
+        return Err("Invalid path".into());
+    }
+    let content = fs::read_to_string(&path).map_err(|error| error.to_string())?;
+    let has_markers = content.contains("<<<<<<<");
+    let regions = if has_markers {
+        list_conflict_regions(&content)?
+    } else {
+        Vec::new()
+    };
+    Ok(MergeConflictFilePreview {
+        relative_path: relative_path.to_string(),
+        regions,
+        has_markers,
+    })
 }
 
 pub fn complete_project_merge(

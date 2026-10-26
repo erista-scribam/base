@@ -1,5 +1,6 @@
 import type { ManuscriptSummary } from "@scribo/core";
 import type { LibraryViewMode } from "../hooks/useLibraryViewMode";
+import { ProjectSwitcher } from "./ProjectSwitcher";
 import { SourceControlPanel } from "./SourceControlPanel";
 import {
   formatCompactMeta,
@@ -19,6 +20,8 @@ export interface ManuscriptNavProps {
   onCreate: () => void;
   onOpenFile: () => void;
   onChooseLibrary: () => void;
+  onCreateProject: () => void;
+  onSwitchProject: (rootPath: string) => void;
   onRevealLibrary: () => void;
   onRevealActive: () => void;
   onDelete: (id: string) => void;
@@ -34,14 +37,6 @@ const VIEW_LABELS: Record<LibraryViewMode, string> = {
   grid: "Grid",
 };
 
-function formatLibraryLabel(path: string): string {
-  const parts = path.split(/[/\\]/).filter(Boolean);
-  if (parts.length <= 2) {
-    return path.replace(/^\/Users\/[^/]+/, "~");
-  }
-  return `~/${parts.slice(-2).join("/")}`;
-}
-
 export function ManuscriptNav({
   manuscripts,
   activeId,
@@ -53,6 +48,8 @@ export function ManuscriptNav({
   onCreate,
   onOpenFile,
   onChooseLibrary,
+  onCreateProject,
+  onSwitchProject,
   onRevealLibrary,
   onRevealActive,
   onDelete,
@@ -64,7 +61,7 @@ export function ManuscriptNav({
   return (
     <aside className="app-sidebar" aria-label="Library">
       <div className="app-sidebar-header">
-        <span className="app-sidebar-label">Library</span>
+        <span className="app-sidebar-label">Manuscripts</span>
         <div className="app-sidebar-actions">
           <div className="library-view-switch" role="group" aria-label="Library layout">
             {(["compact", "comfortable", "grid"] as const).map((mode) => (
@@ -95,32 +92,14 @@ export function ManuscriptNav({
         </div>
       </div>
 
-      {libraryPath ? (
-        <div className="library-folder">
-          {projectTitle ? (
-            <span className="library-project-title" title={projectTitle}>
-              {projectTitle}
-            </span>
-          ) : null}
-          <button
-            type="button"
-            className="library-folder-path"
-            onClick={onChooseLibrary}
-            title={libraryPath}
-          >
-            {formatLibraryLabel(libraryPath)}
-          </button>
-          <button
-            type="button"
-            className="icon-btn library-folder-reveal"
-            aria-label="Show library in Finder"
-            title="Show in Finder"
-            onClick={onRevealLibrary}
-          >
-            <IconReveal />
-          </button>
-        </div>
-      ) : null}
+      <ProjectSwitcher
+        currentRootPath={libraryPath}
+        projectTitle={projectTitle}
+        onOpenProject={onChooseLibrary}
+        onCreateProject={onCreateProject}
+        onSwitchProject={onSwitchProject}
+        onRevealProject={onRevealLibrary}
+      />
 
       <SourceControlPanel
         refreshKey={versionControlRefreshKey}
@@ -204,22 +183,6 @@ export function ManuscriptNav({
         </div>
       ) : null}
     </aside>
-  );
-}
-
-function IconReveal() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      aria-hidden
-    >
-      <path d="M14 3h7v7M10 14L21 3M5 12v7h7" />
-    </svg>
   );
 }
 
