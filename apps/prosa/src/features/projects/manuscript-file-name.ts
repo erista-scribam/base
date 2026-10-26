@@ -1,8 +1,12 @@
-/** Strip `.md` / `.markdown` for UI labels (project manuscripts are always markdown). */
+import {
+  displayProsaManuscriptFileName,
+  isProsaManuscriptFileName,
+  normalizeNewManuscriptTitleInput,
+} from "@scribo/mdprosa";
+
+/** Strip manuscript extension for UI labels. */
 export function displayMarkdownFileName(fileNameOrPath: string): string {
-  const normalized = fileNameOrPath.replace(/\\/g, "/");
-  const base = normalized.split("/").pop() ?? normalized;
-  return base.replace(/\.(md|markdown)$/i, "");
+  return displayProsaManuscriptFileName(fileNameOrPath);
 }
 
 export function displayMarkdownRepoPath(relativePath: string): string {
@@ -16,15 +20,11 @@ export function displayMarkdownRepoPath(relativePath: string): string {
   return `${directory}/${fileName}`;
 }
 
-/** Normalize user input to a title stem (`.md` is added on disk). */
 export function normalizeNewManuscriptTitle(input: string): string {
-  const trimmed = input.trim();
-  if (!trimmed) {
-    return "";
-  }
-  return trimmed.replace(/\.(md|markdown)$/i, "").trim();
+  return normalizeNewManuscriptTitleInput(input);
 }
 
 export function isMarkdownRepoPath(relativePath: string): boolean {
-  return /\.(md|markdown)$/i.test(relativePath.replace(/\\/g, "/"));
+  const base = relativePath.replace(/\\/g, "/").split("/").pop() ?? relativePath;
+  return isProsaManuscriptFileName(base);
 }

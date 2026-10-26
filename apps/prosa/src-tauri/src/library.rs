@@ -9,11 +9,13 @@ use tauri::AppHandle;
 use tauri::Manager;
 
 use crate::atomic_io::atomic_write;
+use crate::grants::assert_prosa_manuscript_absolute;
 use crate::persistence::ManuscriptSummary;
 use crate::project::{
     PROJECT_MANIFEST_FILE, ScriboProjectManifest, ensure_project_manifest, manuscripts_dir,
     read_project_manifest,
 };
+use crate::project_layout::{MANUSCRIPT_PROSE_EXTENSION, is_manuscript_prose_file};
 
 const LIBRARY_DIR_NAME: &str = "Scribo Prosa";
 const PATH_ID_PREFIX: &str = "ms_path_";
@@ -171,7 +173,7 @@ fn migrate_embedded_project_from_home(home: &Path) -> Result<PathBuf, String> {
     for entry in fs::read_dir(home).map_err(|error| error.to_string())? {
         let entry = entry.map_err(|error| error.to_string())?;
         let path = entry.path();
-        if path.is_file() && is_markdown_file(&path) {
+        if path.is_file() && is_manuscript_prose_file(&path) {
             fs::rename(&path, dest.join(entry.file_name())).map_err(|error| error.to_string())?;
         }
     }
@@ -321,7 +323,7 @@ pub fn migrate_legacy_root_markdown(app: &AppHandle) -> Result<u32, String> {
     let mut moved = 0u32;
     for path in paths {
         let title = title_from_path(&path);
-        let (target, new_rel) = unique_markdown_path(&root, &parent, &title)?;
+        let (target, new_rel) = unique_manuscript_path(&root, &parent, &title)?;
         if path == target {
             continue;
         }
@@ -466,9 +468,7 @@ pub fn is_library_manuscript_id(id: &str) -> bool {
 }
 
 fn is_markdown_file(path: &Path) -> bool {
-    path.extension()
-        .and_then(|ext| ext.to_str())
-        .is_some_and(|ext| ext.eq_ignore_ascii_case("md") || ext.eq_ignore_ascii_case("markdown"))
+    is_manuscript_prose_file(path)
 }
 
 fn title_from_path(path: &Path) -> String {
@@ -528,7 +528,7 @@ fn resolve_explorer_parent(root: &Path, parent_relative: Option<&str>) -> Result
             }
             Ok(path)
         }
-        None => Ok(root.to_path_buf()),
+        None => Ok(manuscripts_dir(root)),
     }
 }
 
@@ -607,8 +607,12 @@ pub fn list_project_entries(app: &AppHandle) -> Result<Vec<ProjectEntry>, String
     if !config.root_path.exists() {
         return Ok(Vec::new());
     }
+    let ms_root = manuscripts_dir(&config.root_path);
+    if !ms_root.exists() {
+        return Ok(Vec::new());
+    }
     let mut entries = Vec::new();
-    walk_project_entries(&config.root_path, &config.root_path, &mut entries)?;
+    walk_project_entries(&config.root_path, &ms_root, &mut entries)?;
     entries.sort_by(|a, b| match (a.kind.as_str(), b.kind.as_str()) {
         ("folder", "file") => std::cmp::Ordering::Less,
         ("file", "folder") => std::cmp::Ordering::Greater,
@@ -717,8 +721,12 @@ pub fn list_library_manuscripts(app: &AppHandle) -> Result<Vec<ManuscriptSummary
         return Ok(Vec::new());
     }
 
+    let ms_root = manuscripts_dir(&config.root_path);
+    if !ms_root.exists() {
+        return Ok(Vec::new());
+    }
     let mut files = Vec::new();
-    walk_markdown_files(&config.root_path, &config.root_path, &mut files)?;
+    walk_markdown_files(&config.root_path, &ms_root, &mut files)?;
 
     let mut summaries = files
         .into_iter()
@@ -742,6 +750,7 @@ pub fn list_library_manuscripts(app: &AppHandle) -> Result<Vec<ManuscriptSummary
 pub fn read_library_markdown(app: &AppHandle, path_key: String) -> Result<String, String> {
     let config = read_config(app)?.ok_or("Library is not configured")?;
     let path = resolve_library_path(&config.root_path, &path_key)?;
+    assert_prosa_manuscript_absolute(&config.root_path, &path)?;
     if !path.exists() {
         return Err("File not found".into());
     }
@@ -759,6 +768,9 @@ fn strip_markdown_extension(title: &str) -> String {
     }
     if trimmed.len() >= 3 && trimmed.to_ascii_lowercase().ends_with(".md") {
         return trimmed[..trimmed.len() - 3].trim_end().to_string();
+    }
+    if trimmed.len() >= 8 && trimmed.to_ascii_lowercase().ends_with(".mdprosa") {
+        return trimmed[..trimmed.len() - 8].trim_end().to_string();
     }
     trimmed.to_string()
 }
@@ -786,16 +798,17 @@ fn sanitize_title_for_filename(title: &str) -> String {
     }
 }
 
-/// Pick `{sanitized title}.md` in `parent`, avoiding collisions except `current`.
+/// Pick `{sanitized title}.mdprosa` in `parent` (migrates off `.md` on rename/save).
 fn sibling_markdown_path(parent: &Path, title: &str, current: &Path) -> PathBuf {
     let base_name = sanitize_title_for_filename(title);
-    let mut candidate = parent.join(format!("{base_name}.md"));
+    let ext = MANUSCRIPT_PROSE_EXTENSION;
+    let mut candidate = parent.join(format!("{base_name}.{ext}"));
     if candidate == current {
         return candidate;
     }
     let mut counter = 2;
     while candidate.exists() && candidate != current {
-        candidate = parent.join(format!("{base_name} {counter}.md"));
+        candidate = parent.join(format!("{base_name} {counter}.{ext}"));
         counter += 1;
     }
     candidate
@@ -809,6 +822,7 @@ pub fn write_library_markdown(
 ) -> Result<ManuscriptSummary, String> {
     let config = read_config(app)?.ok_or("Library is not configured")?;
     let current_path = resolve_library_path(&config.root_path, &path_key)?;
+    assert_prosa_manuscript_absolute(&config.root_path, &current_path)?;
     let parent = current_path
         .parent()
         .ok_or("Invalid manuscript path")?
@@ -856,6 +870,8 @@ pub fn delete_library_manuscript(app: &AppHandle, id: &str) -> Result<(), String
     let path_key = path_key_for_manuscript_id(id).ok_or("Invalid library manuscript id")?;
     clear_library_recovery(app, &path_key)?;
     let path = absolute_path_for_entry(app, &path_key)?;
+    let config = read_config(app)?.ok_or("Library is not configured")?;
+    assert_prosa_manuscript_absolute(&config.root_path, &path)?;
     if path.exists() {
         fs::remove_file(&path).map_err(|error| error.to_string())?;
     }
@@ -894,17 +910,18 @@ pub fn clear_all_library_recovery_at_root(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
-fn unique_markdown_path(
+fn unique_manuscript_path(
     library_root: &Path,
     parent: &Path,
     title: &str,
 ) -> Result<(PathBuf, String), String> {
     let base_name = sanitize_title_for_filename(title);
 
-    let mut candidate = parent.join(format!("{base_name}.md"));
+    let ext = MANUSCRIPT_PROSE_EXTENSION;
+    let mut candidate = parent.join(format!("{base_name}.{ext}"));
     let mut counter = 2;
     while candidate.exists() {
-        candidate = parent.join(format!("{base_name} {counter}.md"));
+        candidate = parent.join(format!("{base_name} {counter}.{ext}"));
         counter += 1;
     }
 
@@ -934,7 +951,8 @@ pub fn create_library_markdown_in_parent(
     let parent = resolve_manuscript_parent(&config.root_path, parent_relative.as_deref())?;
     fs::create_dir_all(&parent).map_err(|error| error.to_string())?;
 
-    let (path, rel) = unique_markdown_path(&config.root_path, &parent, &title)?;
+    let (path, rel) = unique_manuscript_path(&config.root_path, &parent, &title)?;
+    assert_prosa_manuscript_absolute(&config.root_path, &path)?;
     atomic_write(&path, &markdown)?;
     let (created, modified) = file_created_modified(&path);
     Ok((
@@ -1039,7 +1057,7 @@ mod tests {
         fs::write(&current, "# old").unwrap();
 
         let next = sibling_markdown_path(&dir, "New Name", &current);
-        assert_eq!(next, dir.join("New Name.md"));
+        assert_eq!(next, dir.join("New Name.mdprosa"));
 
         fs::remove_dir_all(&dir).ok();
     }

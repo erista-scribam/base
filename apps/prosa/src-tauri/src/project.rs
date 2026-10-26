@@ -7,8 +7,6 @@ use serde::{Deserialize, Serialize};
 use crate::atomic_io::atomic_write;
 
 pub const PROJECT_MANIFEST_FILE: &str = "scribo.project.json";
-pub const CONTENT_MANUSCRIPTS_DIR: &str = "content/manuscripts";
-
 const PROJECT_SCHEMA_VERSION: u32 = 1;
 pub const PROJECT_LAYOUT_VERSION: u32 = 1;
 const PROJECT_ID_PREFIX: &str = "proj_";
@@ -38,7 +36,7 @@ fn default_title_from_root(root: &Path) -> String {
 }
 
 pub fn manuscripts_dir(root: &Path) -> PathBuf {
-    root.join(CONTENT_MANUSCRIPTS_DIR)
+    crate::project_layout::resolve_manuscripts_dir(root)
 }
 
 fn write_manifest(root: &Path, manifest: &ScriboProjectManifest) -> Result<(), String> {
@@ -65,7 +63,7 @@ pub fn ensure_project_layout(
     manifest: &mut ScriboProjectManifest,
 ) -> Result<bool, String> {
     fs::create_dir_all(root.join(".scribo/recovery")).map_err(|error| error.to_string())?;
-    fs::create_dir_all(manuscripts_dir(root)).map_err(|error| error.to_string())?;
+    crate::project_layout::ensure_v1_manuscripts_dir(root)?;
 
     if manifest.layout_version >= PROJECT_LAYOUT_VERSION {
         return Ok(false);

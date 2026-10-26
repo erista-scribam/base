@@ -30,7 +30,9 @@ flowchart LR
 
 ---
 
-## Phase R0 — Specs and review (current)
+## Phase R0 — Specs and review
+
+**Status:** Complete (2026-10-26) — implementation started same day per maintainer direction.
 
 | Item                | Deliverable                                                                                        | Acceptance       |
 | ------------------- | -------------------------------------------------------------------------------------------------- | ---------------- |
@@ -45,6 +47,8 @@ flowchart LR
 
 ## Phase R1 — Shared project types (minimal code)
 
+**Status:** **Shipped** — `@scribo/project-model` (layout, capabilities, manifest extensions).
+
 | Scope | `@scribo/project-model` or extend `@scribo/core` with manifest v2 types only |
 | Retain | Existing `ScriboProjectManifest` v1 types |
 | Non-goals | FS writes, Git |
@@ -54,6 +58,8 @@ flowchart LR
 ---
 
 ## Phase R2 — Layout adapters (Prosa)
+
+**Status:** **Shipped (Rust + TS)** — `project_layout.rs` resolves v1/v2 manuscripts dir; explorer scoped to manuscripts tree.
 
 | Scope | Resolve paths: v1 `content/manuscripts` **or** v2 `contents/canon/manuscripts` |
 | Migration | Spec-only until wizard exists |
@@ -65,6 +71,8 @@ flowchart LR
 
 ## Phase R3 — `@scribo/mdprosa`
 
+**Status:** **Shipped (foundation)** — format helpers + block IDs; new saves use `.mdprosa`; dual-read `.md`.
+
 | Scope | Parse/serialize v1 markdown + block comments → `.mdprosa` contract |
 | Retain | Dual-read `.md` one release |
 
@@ -73,6 +81,8 @@ flowchart LR
 ---
 
 ## Phase R4 — Capability grants (Rust)
+
+**Status:** **Shipped (Prosa)** — `grants.rs` enforces manuscript-tree writes; `ERR_SCRIBO_PATH_FORBIDDEN`.
 
 | Scope | Shared crate; Prosa Tauri commands check grants |
 | Interim | Grant = full project root until Lanista spawns |

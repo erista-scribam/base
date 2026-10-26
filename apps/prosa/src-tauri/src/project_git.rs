@@ -185,7 +185,11 @@ fn is_markdown_relative_path(relative_path: &str) -> bool {
     Path::new(relative_path)
         .extension()
         .and_then(|ext| ext.to_str())
-        .is_some_and(|ext| ext.eq_ignore_ascii_case("md") || ext.eq_ignore_ascii_case("markdown"))
+        .is_some_and(|ext| {
+            ext.eq_ignore_ascii_case("md")
+                || ext.eq_ignore_ascii_case("markdown")
+                || ext.eq_ignore_ascii_case("mdprosa")
+        })
 }
 
 pub fn list_changed_files(root: &Path) -> Result<Vec<GitChangedFile>, String> {

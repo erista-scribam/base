@@ -1,6 +1,7 @@
 mod atomic_io;
 #[cfg(feature = "git-spike")]
 mod git_spike;
+mod grants;
 mod library;
 #[cfg(feature = "git-vcs")]
 mod merge_conflicts;
@@ -8,6 +9,7 @@ mod persistence;
 mod project;
 #[cfg(feature = "git-vcs")]
 mod project_git;
+mod project_layout;
 mod recovery;
 
 use crate::atomic_io::atomic_write;

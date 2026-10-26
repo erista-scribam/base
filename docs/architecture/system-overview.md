@@ -1,6 +1,6 @@
 # Scribo architecture (initial milestone)
 
-Scribo is a pnpm monorepo: desktop apps under `apps/`, shared TypeScript under `packages/`, and Rust native code colocated with each Tauri app (`apps/prosa/src-tauri`). A root `Cargo.toml` workspace includes the Prosa Tauri crate.
+Scribo is a pnpm monorepo: desktop apps under `apps/`, shared TypeScript under `packages/` (including `@scribo/project-model` and `@scribo/mdprosa`), and Rust native code colocated with each Tauri app (`apps/prosa/src-tauri`). A root `Cargo.toml` workspace includes the Prosa Tauri crate. Multi-app direction: [multi-application-project-architecture.md](../specs/multi-application-project-architecture.md).
 
 ## Dependency direction
 
@@ -12,13 +12,19 @@ flowchart TB
   subgraph packages
     DM["@scribo/document-model"]
     Core["@scribo/core"]
+    PM["@scribo/project-model"]
+    MP["@scribo/mdprosa"]
   end
   subgraph native
     Tauri["prosa (Rust / Tauri 2)"]
   end
   Prosa --> DM
   Prosa --> Core
+  Prosa --> PM
+  Prosa --> MP
   DM --> Core
+  PM --> Core
+  MP --> Core
   Prosa --> Tauri
 ```
 
