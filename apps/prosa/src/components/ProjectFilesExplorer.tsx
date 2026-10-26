@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import type { ManuscriptSummary } from "@scribo/core";
 import type { GitChangedFile } from "../features/version-control/project-version-control";
 import { gitStatusForManuscriptPath } from "../features/version-control/git-file-status";
@@ -7,19 +7,15 @@ import {
   listProjectTree,
   type ProjectTreeNode,
 } from "../features/projects/project-tree";
-import type { LibraryViewMode } from "../hooks/useLibraryViewMode";
-import {
-  formatCompactMeta,
-  formatManuscriptEdited,
-  formatManuscriptPath,
-  formatManuscriptTimestamp,
-} from "../features/library/manuscript-list-meta";
 import { GitFileStatusBadge } from "./GitFileStatusBadge";
+
+/** Horizontal inset per tree level (px), matched in CSS via the same calc. */
+const TREE_INDENT_PX = 12;
+const TREE_BASE_PADDING_PX = 6;
 
 export interface ProjectFilesExplorerProps {
   refreshKey: number;
   activeId: string | null;
-  libraryViewMode: LibraryViewMode;
   changedFiles: GitChangedFile[];
   selectedFolderPath: string | null;
   onSelectFolder: (relativePath: string | null) => void;
@@ -31,7 +27,6 @@ export interface ProjectFilesExplorerProps {
 export function ProjectFilesExplorer({
   refreshKey,
   activeId,
-  libraryViewMode,
   changedFiles,
   selectedFolderPath,
   onSelectFolder,
@@ -90,7 +85,7 @@ export function ProjectFilesExplorer({
   }
 
   return (
-    <ul className="project-tree" data-library-view={libraryViewMode}>
+    <ul className="project-tree" role="tree">
       {tree.map((node) => (
         <TreeNodeRow
           key={node.relativePath}
@@ -100,7 +95,6 @@ export function ProjectFilesExplorer({
           onToggleCollapsed={toggleCollapsed}
           activeId={activeId}
           selectedFolderPath={selectedFolderPath}
-          libraryViewMode={libraryViewMode}
           changedFiles={changedFiles}
           manuscriptsById={manuscriptsById}
           onSelectFolder={onSelectFolder}
@@ -112,6 +106,10 @@ export function ProjectFilesExplorer({
   );
 }
 
+function treePadding(depth: number): CSSProperties {
+  return { paddingLeft: `${TREE_BASE_PADDING_PX + depth * TREE_INDENT_PX}px` };
+}
+
 function TreeNodeRow({
   node,
   depth,
@@ -119,7 +117,6 @@ function TreeNodeRow({
   onToggleCollapsed,
   activeId,
   selectedFolderPath,
-  libraryViewMode,
   changedFiles,
   manuscriptsById,
   onSelectFolder,
@@ -132,7 +129,6 @@ function TreeNodeRow({
   onToggleCollapsed: (path: string) => void;
   activeId: string | null;
   selectedFolderPath: string | null;
-  libraryViewMode: LibraryViewMode;
   changedFiles: GitChangedFile[];
   manuscriptsById: Map<string, ManuscriptSummary>;
   onSelectFolder: (relativePath: string | null) => void;
@@ -146,28 +142,30 @@ function TreeNodeRow({
 
   if (isFolder) {
     return (
-      <li className="project-tree-node">
-        <div className="project-tree-row" style={{ paddingLeft: `${depth * 0.75 + 0.5}rem` }}>
+      <li className="project-tree-node" role="treeitem" aria-expanded={!isCollapsed}>
+        <div className="project-tree-row" style={treePadding(depth)}>
           <button
             type="button"
             className="project-tree-disclosure"
+            aria-label={isCollapsed ? `Expand ${node.name}` : `Collapse ${node.name}`}
             aria-expanded={!isCollapsed}
             onClick={() => onToggleCollapsed(node.relativePath)}
           >
-            {isCollapsed ? "▸" : "▾"}
+            {isCollapsed ? <IconChevronRight /> : <IconChevronDown />}
           </button>
           <button
             type="button"
-            className="project-tree-folder"
+            className="project-tree-entry"
+            data-kind="folder"
             data-selected={selectedFolderPath === node.relativePath ? "true" : undefined}
             onClick={() => onSelectFolder(node.relativePath)}
           >
-            <span className="project-tree-icon project-tree-icon-folder" aria-hidden />
-            <span className="project-tree-label">{node.name}</span>
+            <IconFolder />
+            <span className="project-tree-name">{node.name}</span>
           </button>
         </div>
         {!isCollapsed && node.children.length > 0 ? (
-          <ul className="project-tree-children">
+          <ul className="project-tree-children" role="group">
             {node.children.map((child) => (
               <TreeNodeRow
                 key={child.relativePath}
@@ -177,7 +175,6 @@ function TreeNodeRow({
                 onToggleCollapsed={onToggleCollapsed}
                 activeId={activeId}
                 selectedFolderPath={selectedFolderPath}
-                libraryViewMode={libraryViewMode}
                 changedFiles={changedFiles}
                 manuscriptsById={manuscriptsById}
                 onSelectFolder={onSelectFolder}
@@ -196,50 +193,27 @@ function TreeNodeRow({
     return null;
   }
 
+  const label = node.name;
+
   return (
-    <li className="project-tree-node">
-      <div
-        className="manuscript-row project-tree-file-row"
-        style={{ paddingLeft: `${depth * 0.75 + 0.5}rem` }}
-      >
+    <li className="project-tree-node" role="treeitem">
+      <div className="project-tree-row project-tree-row-file" style={treePadding(depth)}>
+        <span className="project-tree-disclosure project-tree-disclosure-spacer" aria-hidden />
         <button
           type="button"
-          className="manuscript-item project-tree-file"
+          className="project-tree-entry"
+          data-kind="file"
           data-active={activeId === id ? "true" : undefined}
           onClick={() => onSelectManuscript(id)}
         >
-          <div className="manuscript-item-title-row">
-            <span className="project-tree-icon project-tree-icon-file" aria-hidden />
-            <span className="manuscript-item-title">{manuscript?.title ?? node.name}</span>
-            {gitEntry ? <GitFileStatusBadge status={gitEntry.status} /> : null}
-          </div>
-          {libraryViewMode === "compact" && manuscript ? (
-            <div className="manuscript-item-meta">{formatCompactMeta(manuscript)}</div>
-          ) : null}
-          {libraryViewMode === "comfortable" && manuscript ? (
-            <div className="manuscript-item-details">
-              <div className="manuscript-item-meta-line">
-                Edited {formatManuscriptTimestamp(manuscript.updatedAt)}
-              </div>
-              {formatManuscriptPath(manuscript) ? (
-                <div className="manuscript-item-meta-line manuscript-item-path">
-                  {formatManuscriptPath(manuscript)}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-          {libraryViewMode === "grid" && manuscript ? (
-            <div className="manuscript-item-details">
-              <div className="manuscript-item-meta-line">
-                Edited {formatManuscriptEdited(manuscript.updatedAt)}
-              </div>
-            </div>
-          ) : null}
+          <IconFile />
+          <span className="project-tree-name">{label}</span>
+          {gitEntry ? <GitFileStatusBadge status={gitEntry.status} /> : null}
         </button>
         <button
           type="button"
-          className="icon-btn manuscript-delete"
-          aria-label={`Delete ${manuscript?.title ?? node.name}`}
+          className="project-tree-action"
+          aria-label={`Delete ${label}`}
           title="Delete"
           onClick={(event) => {
             event.stopPropagation();
@@ -253,11 +227,74 @@ function TreeNodeRow({
   );
 }
 
-function IconTrash() {
+function IconChevronRight() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path
+        d="M6 4l4 4-4 4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconChevronDown() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path
+        d="M4 6l4 4 4-4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconFolder() {
   return (
     <svg
       width="14"
       height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      className="project-tree-svg-icon"
+      aria-hidden
+    >
+      <path d="M3 7v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z" />
+    </svg>
+  );
+}
+
+function IconFile() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      className="project-tree-svg-icon project-tree-svg-icon-muted"
+      aria-hidden
+    >
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+    </svg>
+  );
+}
+
+function IconTrash() {
+  return (
+    <svg
+      width="12"
+      height="12"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

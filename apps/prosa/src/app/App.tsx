@@ -45,7 +45,6 @@ import {
 import { manuscriptIdForPath } from "../features/persistence/manuscript-path-id";
 import { openProject } from "../features/projects/project-catalog";
 import { GitBranchChip } from "../components/GitBranchChip";
-import { useLibraryViewMode } from "../hooks/useLibraryViewMode";
 import { useProjectGitStatus } from "../hooks/useProjectGitStatus";
 import { useSidebarProjectView } from "../hooks/useSidebarProjectView";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
@@ -71,7 +70,6 @@ export function App() {
   const [versionControlRefreshKey, setVersionControlRefreshKey] = useState(0);
   const [explorerRefreshKey, setExplorerRefreshKey] = useState(0);
   const { theme, toggleTheme } = useTheme();
-  const { libraryViewMode, setLibraryViewMode } = useLibraryViewMode();
   const { sidebarProjectView, setSidebarProjectView, showSourceControl } = useSidebarProjectView();
   const {
     initialized: gitInitialized,
@@ -624,8 +622,6 @@ export function App() {
           activeId={activeId}
           libraryPath={libraryPath}
           projectTitle={projectTitle}
-          libraryViewMode={libraryViewMode}
-          onLibraryViewModeChange={setLibraryViewMode}
           sidebarProjectView={sidebarProjectView}
           onSidebarProjectViewChange={setSidebarProjectView}
           changedFiles={changedFiles}

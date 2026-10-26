@@ -244,90 +244,100 @@ export function SourceControlPanel({
 
   return (
     <section className="source-control" aria-label="Source control">
-      <BranchSwitcher
-        branches={branches}
-        currentBranch={current}
-        disabled={busy}
-        mergeDisabled={busy || status.merge.inProgress}
-        onSwitch={(name) => void run(() => checkoutProjectBranch(name))}
-        onCreate={(name) => void run(() => createProjectBranch(name))}
-        onMerge={(name) => void run(() => mergeProjectBranch(name))}
-      />
-
-      {status.merge.inProgress ? (
-        <MergeConflictPanel
-          currentBranch={current}
-          merge={status.merge}
-          busy={busy}
-          onAbort={() => void run(() => abortProjectMerge())}
-          onComplete={() => void run(() => completeProjectMerge())}
-        />
-      ) : null}
-
-      <div className="sc-tabs" role="tablist">
-        <button
-          type="button"
-          role="tab"
-          className="sc-tab"
-          aria-selected={tab === "changes"}
-          onClick={() => setTab("changes")}
-        >
-          Changes
-        </button>
-        <button
-          type="button"
-          role="tab"
-          className="sc-tab"
-          aria-selected={tab === "graph"}
-          onClick={() => setTab("graph")}
-        >
-          Graph
-        </button>
-      </div>
-
-      {tab === "changes" ? (
-        <div className="sc-changes" role="tabpanel">
-          {status.dirty ? (
-            <p className="sc-changes-hint">
-              You have saved changes that are not in the last checkpoint on{" "}
-              <strong>{current}</strong>.
-            </p>
-          ) : (
-            <p className="sc-changes-hint sc-changes-hint-muted">No uncheckpointed changes.</p>
-          )}
-          <ChangedFilesList files={status.changedFiles ?? []} onOpenPath={onOpenChangedPath} />
-          <label className="sc-label" htmlFor="sc-summary">
-            Summary
-          </label>
-          <textarea
-            id="sc-summary"
-            className="sc-summary"
-            rows={3}
-            placeholder="Describe what you changed"
-            value={summary}
+      <div className="sidebar-panel-scroll source-control-body">
+        <div className="sc-section sc-section-branch">
+          <BranchSwitcher
+            branches={branches}
+            currentBranch={current}
             disabled={busy}
-            onChange={(event) => setSummary(event.target.value)}
+            mergeDisabled={busy || status.merge.inProgress}
+            onSwitch={(name) => void run(() => checkoutProjectBranch(name))}
+            onCreate={(name) => void run(() => createProjectBranch(name))}
+            onMerge={(name) => void run(() => mergeProjectBranch(name))}
           />
-          <button
-            type="button"
-            className="sc-btn sc-btn-primary sc-btn-block"
-            disabled={busy || status.merge.inProgress}
-            onClick={() =>
-              void run(async () => {
-                const next = await commitProjectCheckpoint(summary);
-                setSummary("");
-                return next;
-              })
-            }
-          >
-            Commit to {current}
-          </button>
         </div>
-      ) : (
-        <div className="sc-graph-panel" role="tabpanel">
-          <CommitGraphView commits={graphCommits} currentBranch={current} />
+
+        {status.merge.inProgress ? (
+          <div className="sc-section sc-section-merge">
+            <MergeConflictPanel
+              currentBranch={current}
+              merge={status.merge}
+              busy={busy}
+              onAbort={() => void run(() => abortProjectMerge())}
+              onComplete={() => void run(() => completeProjectMerge())}
+            />
+          </div>
+        ) : null}
+
+        <div className="sc-section sc-section-main">
+          <div className="sc-tabs" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              className="sc-tab"
+              aria-selected={tab === "changes"}
+              onClick={() => setTab("changes")}
+            >
+              Changes
+            </button>
+            <button
+              type="button"
+              role="tab"
+              className="sc-tab"
+              aria-selected={tab === "graph"}
+              onClick={() => setTab("graph")}
+            >
+              Graph
+            </button>
+          </div>
+
+          {tab === "changes" ? (
+            <div className="sc-changes" role="tabpanel">
+              {status.dirty ? (
+                <p className="sc-changes-hint">
+                  You have saved changes that are not in the last checkpoint on{" "}
+                  <strong>{current}</strong>.
+                </p>
+              ) : (
+                <p className="sc-changes-hint sc-changes-hint-muted">No uncheckpointed changes.</p>
+              )}
+              <ChangedFilesList files={status.changedFiles ?? []} onOpenPath={onOpenChangedPath} />
+              <div className="sc-commit-box">
+                <label className="sc-label" htmlFor="sc-summary">
+                  Summary
+                </label>
+                <textarea
+                  id="sc-summary"
+                  className="sc-summary"
+                  rows={3}
+                  placeholder="Describe what you changed"
+                  value={summary}
+                  disabled={busy}
+                  onChange={(event) => setSummary(event.target.value)}
+                />
+                <button
+                  type="button"
+                  className="sc-btn sc-btn-primary sc-btn-block"
+                  disabled={busy || status.merge.inProgress}
+                  onClick={() =>
+                    void run(async () => {
+                      const next = await commitProjectCheckpoint(summary);
+                      setSummary("");
+                      return next;
+                    })
+                  }
+                >
+                  Commit to {current}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="sc-graph-panel" role="tabpanel">
+              <CommitGraphView commits={graphCommits} currentBranch={current} />
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </section>
   );
 }

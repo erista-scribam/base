@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import type { ManuscriptSummary } from "@scribo/core";
 import type { GitChangedFile } from "../features/version-control/project-version-control";
-import type { LibraryViewMode } from "../hooks/useLibraryViewMode";
 import type { SidebarProjectView } from "../hooks/useSidebarProjectView";
 import { useSidebarLayout } from "../hooks/useSidebarLayout";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
@@ -16,8 +15,6 @@ export interface ManuscriptNavProps {
   activeId: string | null;
   libraryPath: string | null;
   projectTitle: string | null;
-  libraryViewMode: LibraryViewMode;
-  onLibraryViewModeChange: (mode: LibraryViewMode) => void;
   sidebarProjectView: SidebarProjectView;
   onSidebarProjectViewChange: (view: SidebarProjectView) => void;
   changedFiles: GitChangedFile[];
@@ -41,19 +38,11 @@ export interface ManuscriptNavProps {
   onGitOperationComplete: (workspaceUpdated: boolean) => void | Promise<void>;
 }
 
-const VIEW_LABELS: Record<LibraryViewMode, string> = {
-  compact: "List",
-  comfortable: "Details",
-  grid: "Grid",
-};
-
 export function ManuscriptNav({
   manuscripts,
   activeId,
   libraryPath,
   projectTitle,
-  libraryViewMode,
-  onLibraryViewModeChange,
   sidebarProjectView,
   onSidebarProjectViewChange,
   changedFiles,
@@ -128,16 +117,16 @@ export function ManuscriptNav({
 
       {libraryPath ? (
         <section className="sidebar-project" aria-label="Project">
+          {showActivityBar ? (
+            <SidebarActivityBar
+              activeView={sidebarProjectView}
+              changeCount={changeCount}
+              mergeInProgress={mergeInProgress}
+              onSelectView={onSidebarProjectViewChange}
+            />
+          ) : null}
           <div className="sidebar-project-body">
-            {showActivityBar ? (
-              <SidebarActivityBar
-                activeView={sidebarProjectView}
-                changeCount={changeCount}
-                mergeInProgress={mergeInProgress}
-                onSelectView={onSidebarProjectViewChange}
-              />
-            ) : null}
-            <div className="sidebar-view-panel">
+            <div className="sidebar-view-panel" data-sidebar-view={sidebarProjectView}>
               {sidebarProjectView === "sourceControl" && showActivityBar ? (
                 <SourceControlPanel
                   refreshKey={versionControlRefreshKey}
@@ -150,28 +139,9 @@ export function ManuscriptNav({
                 />
               ) : (
                 <>
-                  <div className="app-sidebar-header sidebar-project-header">
-                    <span className="app-sidebar-label">Explorer</span>
+                  <div className="sidebar-panel-toolbar">
+                    <span className="sidebar-panel-title">Explorer</span>
                     <div className="app-sidebar-actions">
-                      <div
-                        className="library-view-switch"
-                        role="group"
-                        aria-label="Manuscript layout"
-                      >
-                        {(["compact", "comfortable", "grid"] as const).map((mode) => (
-                          <button
-                            key={mode}
-                            type="button"
-                            className="library-view-btn"
-                            data-active={libraryViewMode === mode ? "true" : undefined}
-                            aria-pressed={libraryViewMode === mode}
-                            title={`${VIEW_LABELS[mode]} view`}
-                            onClick={() => onLibraryViewModeChange(mode)}
-                          >
-                            {VIEW_LABELS[mode]}
-                          </button>
-                        ))}
-                      </div>
                       <button
                         type="button"
                         className="text-btn"
@@ -205,49 +175,50 @@ export function ManuscriptNav({
                     </div>
                   </div>
 
-                  {createKind ? (
-                    <form
-                      className="explorer-create-form"
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        submitCreate();
-                      }}
-                    >
-                      <input
-                        type="text"
-                        className="explorer-create-input"
-                        value={createName}
-                        placeholder={createKind === "file" ? "File name" : "Folder name"}
-                        autoFocus
-                        onChange={(event) => setCreateName(event.target.value)}
-                      />
-                      <button type="submit" className="sc-btn sc-btn-primary">
-                        Create
-                      </button>
-                      <button
-                        type="button"
-                        className="sc-btn"
-                        onClick={() => {
-                          setCreateKind(null);
-                          setCreateName("");
+                  <div className="sidebar-panel-scroll sidebar-explorer-body">
+                    {createKind ? (
+                      <form
+                        className="explorer-create-form"
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          submitCreate();
                         }}
                       >
-                        Cancel
-                      </button>
-                    </form>
-                  ) : null}
+                        <input
+                          type="text"
+                          className="explorer-create-input"
+                          value={createName}
+                          placeholder={createKind === "file" ? "File name" : "Folder name"}
+                          autoFocus
+                          onChange={(event) => setCreateName(event.target.value)}
+                        />
+                        <button type="submit" className="sc-btn sc-btn-primary">
+                          Create
+                        </button>
+                        <button
+                          type="button"
+                          className="sc-btn"
+                          onClick={() => {
+                            setCreateKind(null);
+                            setCreateName("");
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </form>
+                    ) : null}
 
-                  <ProjectFilesExplorer
-                    refreshKey={explorerRefreshKey}
-                    activeId={activeId}
-                    libraryViewMode={libraryViewMode}
-                    changedFiles={changedFiles}
-                    selectedFolderPath={selectedFolderPath}
-                    onSelectFolder={setSelectedFolderPath}
-                    onSelectManuscript={onSelect}
-                    onDelete={onDelete}
-                    manuscriptsById={manuscriptsById}
-                  />
+                    <ProjectFilesExplorer
+                      refreshKey={explorerRefreshKey}
+                      activeId={activeId}
+                      changedFiles={changedFiles}
+                      selectedFolderPath={selectedFolderPath}
+                      onSelectFolder={setSelectedFolderPath}
+                      onSelectManuscript={onSelect}
+                      onDelete={onDelete}
+                      manuscriptsById={manuscriptsById}
+                    />
+                  </div>
 
                   {activeId ? (
                     <div className="app-sidebar-footer">

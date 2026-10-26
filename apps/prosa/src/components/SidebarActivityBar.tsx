@@ -22,11 +22,11 @@ export function SidebarActivityBar({
         className="sidebar-activity-btn"
         data-active={activeView === "files" ? "true" : undefined}
         aria-pressed={activeView === "files"}
-        title="Manuscripts"
+        title="Explorer"
+        aria-label="Explorer"
         onClick={() => onSelectView("files")}
       >
         <IconFiles />
-        <span className="sidebar-activity-label">Files</span>
       </button>
       <button
         type="button"
@@ -34,6 +34,7 @@ export function SidebarActivityBar({
         data-active={activeView === "sourceControl" ? "true" : undefined}
         aria-pressed={activeView === "sourceControl"}
         title="Source control"
+        aria-label="Source control"
         onClick={() => onSelectView("sourceControl")}
       >
         <IconSourceControl />
@@ -45,7 +46,6 @@ export function SidebarActivityBar({
             {badge}
           </span>
         ) : null}
-        <span className="sidebar-activity-label">Changes</span>
       </button>
     </nav>
   );
@@ -54,8 +54,8 @@ export function SidebarActivityBar({
 function IconFiles() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -63,7 +63,7 @@ function IconFiles() {
       aria-hidden
     >
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <path d="M14 2v6h6M8 13h8M8 17h8M8 9h2" />
+      <path d="M14 2v6h6" />
     </svg>
   );
 }
@@ -71,8 +71,8 @@ function IconFiles() {
 function IconSourceControl() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
