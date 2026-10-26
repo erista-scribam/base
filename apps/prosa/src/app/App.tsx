@@ -399,14 +399,20 @@ export function App() {
 
   const handleOpenConflictFile = useCallback(
     (relativePath: string) => {
-      const normalized = relativePath.replace(/\\/g, "/");
-      const match = manuscripts.find((item) => item.filePath?.replace(/\\/g, "/") === normalized);
+      const normalized = relativePath.replace(/\\/g, "/").replace(/^\.\//, "");
+      const match = manuscripts.find((item) => {
+        const filePath = item.filePath?.replace(/\\/g, "/").replace(/^\.\//, "");
+        if (!filePath) {
+          return false;
+        }
+        return filePath === normalized || filePath.endsWith(`/${normalized}`);
+      });
       if (match) {
         void openManuscript(match.id, { preferDisk: true });
         return;
       }
       setNotice(
-        `Open ${relativePath} from the project folder in Finder if it is not in the list yet.`,
+        `Could not open ${relativePath} in the editor. Reload the manuscript list or open the file from the sidebar.`,
       );
     },
     [manuscripts, openManuscript],

@@ -30,6 +30,7 @@ export function MergeConflictOverlay({
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [preview, setPreview] = useState<MergeConflictFilePreview | null>(null);
   const [previewPath, setPreviewPath] = useState<string | null>(null);
+  const [resolverOpen, setResolverOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -78,6 +79,27 @@ export function MergeConflictOverlay({
     };
   }, [selectedPath, merge?.inProgress, onError]);
 
+  useEffect(() => {
+    if (!resolverOpen) {
+      return;
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setResolverOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [resolverOpen]);
+
+  const openInEditor = useCallback(
+    (relativePath: string) => {
+      setResolverOpen(false);
+      onOpenFile(relativePath);
+    },
+    [onOpenFile],
+  );
+
   const run = useCallback(
     async (action: () => Promise<void>) => {
       setBusy(true);
@@ -105,7 +127,6 @@ export function MergeConflictOverlay({
 
   const source = merge.sourceBranch ?? "incoming branch";
   const pending = merge.conflictedPaths;
-  const showOverlay = pending.length > 0;
   const region = previewPath === selectedPath && preview ? preview.regions[0] : undefined;
 
   return (
@@ -118,20 +139,47 @@ export function MergeConflictOverlay({
             ? ` · ${pending.length} file${pending.length === 1 ? "" : "s"} need resolution`
             : " · ready to complete"}
         </span>
+        {pending.length > 0 ? (
+          <button
+            type="button"
+            className="sc-btn sc-btn-primary merge-conflict-banner-btn"
+            disabled={busy}
+            onClick={() => setResolverOpen(true)}
+          >
+            Resolve conflicts…
+          </button>
+        ) : null}
       </div>
 
-      {showOverlay ? (
+      {resolverOpen && merge.inProgress && pending.length > 0 ? (
         <div
           className="merge-conflict-overlay"
           role="dialog"
           aria-modal="true"
           aria-label="Resolve merge conflicts"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setResolverOpen(false);
+            }
+          }}
         >
           <div className="merge-conflict-dialog">
             <header className="merge-conflict-header">
-              <h2 className="merge-conflict-heading">Resolve merge conflicts</h2>
+              <div className="merge-conflict-header-row">
+                <h2 className="merge-conflict-heading">Resolve merge conflicts</h2>
+                <button
+                  type="button"
+                  className="merge-conflict-close"
+                  aria-label="Close"
+                  disabled={busy}
+                  onClick={() => setResolverOpen(false)}
+                >
+                  ×
+                </button>
+              </div>
               <p className="merge-conflict-subheading">
-                Compare versions, pick what to keep, or open the file in the editor.
+                Pick a version, or open the file in the editor and edit conflict markers there.
+                Close this dialog anytime to keep writing.
               </p>
             </header>
 
@@ -144,6 +192,7 @@ export function MergeConflictOverlay({
                       className="merge-conflict-file"
                       data-selected={path === selectedPath ? "true" : undefined}
                       onClick={() => setSelectedPath(path)}
+                      onDoubleClick={() => openInEditor(path)}
                     >
                       {path}
                     </button>
@@ -172,9 +221,9 @@ export function MergeConflictOverlay({
             <footer className="merge-conflict-footer">
               <button
                 type="button"
-                className="sc-btn"
+                className="sc-btn sc-btn-primary"
                 disabled={!selectedPath || busy}
-                onClick={() => selectedPath && onOpenFile(selectedPath)}
+                onClick={() => selectedPath && openInEditor(selectedPath)}
               >
                 Open in editor
               </button>

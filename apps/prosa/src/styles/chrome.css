@@ -235,6 +235,36 @@
   justify-content: flex-end;
 }
 
+.merge-conflict-banner-btn {
+  margin-left: auto;
+}
+
+.merge-conflict-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--scribo-space-2);
+}
+
+.merge-conflict-close {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--scribo-radius-sm);
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--scribo-ui-muted);
+  cursor: pointer;
+}
+
+.merge-conflict-close:hover:not(:disabled) {
+  background: var(--scribo-ui-canvas);
+  color: var(--scribo-ui-text);
+}
+
 .merge-conflict-overlay {
   position: fixed;
   inset: 0;
@@ -570,6 +600,14 @@
 
 .sc-merge-conflict:last-child {
   border-bottom: none;
+}
+
+.sc-merge-conflicts-compact .sc-merge-conflict {
+  padding: 0.25rem 0;
+}
+
+.sc-merge-conflicts-compact .sc-merge-actions {
+  display: none;
 }
 
 .sc-merge-path {

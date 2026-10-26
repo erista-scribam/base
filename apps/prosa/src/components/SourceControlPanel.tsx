@@ -8,10 +8,8 @@ import {
   getProjectGitGraph,
   getProjectVersionControl,
   mergeProjectBranch,
-  resolveProjectMergeFile,
   type GitBranchSummary,
   type GitGraphCommit,
-  type MergeConflictResolution,
   type ProjectVersionControl,
 } from "../features/version-control/project-version-control";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
@@ -260,9 +258,6 @@ export function SourceControlPanel({
           busy={busy}
           onAbort={() => void run(() => abortProjectMerge())}
           onComplete={() => void run(() => completeProjectMerge())}
-          onResolve={(path, resolution) =>
-            void run(() => resolveProjectMergeFile(path, resolution))
-          }
         />
       ) : null}
 
@@ -339,14 +334,12 @@ function MergeConflictPanel({
   busy,
   onAbort,
   onComplete,
-  onResolve,
 }: {
   currentBranch: string;
   merge: ProjectVersionControl["merge"];
   busy: boolean;
   onAbort: () => void;
   onComplete: () => void;
-  onResolve: (path: string, resolution: MergeConflictResolution) => void;
 }) {
   const source = merge.sourceBranch ?? "branch";
   const pending = merge.conflictedPaths;
@@ -358,37 +351,14 @@ function MergeConflictPanel({
       </p>
       {pending.length > 0 ? (
         <>
-          <p className="sc-merge-hint">Resolve conflicts in these files:</p>
-          <ul className="sc-merge-conflicts">
+          <p className="sc-merge-hint">
+            {pending.length} conflicted file{pending.length === 1 ? "" : "s"}. Use{" "}
+            <strong>Resolve conflicts…</strong> in the banner above the editor.
+          </p>
+          <ul className="sc-merge-conflicts sc-merge-conflicts-compact">
             {pending.map((path) => (
               <li key={path} className="sc-merge-conflict">
                 <code className="sc-merge-path">{path}</code>
-                <div className="sc-merge-actions">
-                  <button
-                    type="button"
-                    className="sc-btn sc-btn-compact"
-                    disabled={busy}
-                    onClick={() => onResolve(path, "ours")}
-                  >
-                    Keep {currentBranch}
-                  </button>
-                  <button
-                    type="button"
-                    className="sc-btn sc-btn-compact"
-                    disabled={busy}
-                    onClick={() => onResolve(path, "theirs")}
-                  >
-                    Keep {source}
-                  </button>
-                  <button
-                    type="button"
-                    className="sc-btn sc-btn-compact"
-                    disabled={busy}
-                    onClick={() => onResolve(path, "both")}
-                  >
-                    Keep both
-                  </button>
-                </div>
               </li>
             ))}
           </ul>
