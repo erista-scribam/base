@@ -592,6 +592,15 @@
   flex-direction: column;
 }
 
+.editor-markdown-workspace,
+.editor-split-source,
+.editor-split-preview-scroll,
+.markdown-source-stack,
+.markdown-source-stack .cm-editor,
+.markdown-source-stack .cm-scroller {
+  cursor: text;
+}
+
 .editor-markdown-workspace {
   border-top: 3px solid color-mix(in srgb, var(--scribo-ui-accent) 40%, transparent);
 }
@@ -660,6 +669,13 @@
   gap: 2px;
 }
 
+.editor-side-tab,
+.editor-split-preview-scroll .text-btn,
+.editor-split-preview-scroll button,
+.markdown-guide-select {
+  cursor: pointer;
+}
+
 .editor-side-tab {
   border: none;
   border-radius: var(--scribo-radius-sm);
@@ -670,7 +686,6 @@
   text-transform: uppercase;
   color: var(--scribo-ui-muted);
   background: transparent;
-  cursor: pointer;
 }
 
 .editor-side-tab[data-active="true"] {
@@ -829,7 +844,7 @@
 }
 
 .markdown-source-stack[data-ruler="full"] .cm-content {
-  max-width: var(--scribo-ms-max-width);
+  max-width: var(--md-content-max-width, min(100%, 72rem));
 }
 
 .markdown-source-stack .markdown-codemirror {
@@ -881,16 +896,25 @@
 /* Prosa markdown: one source line = one paragraph (Enter creates a new line) */
 /* Use padding (not margin) so CodeMirror vertical arrow keys see one row per source line. */
 .markdown-source-stack .cm-line.cm-md-paragraph {
-  padding-bottom: 0.62em;
+  padding-bottom: 0.95em;
+}
+
+.markdown-source-stack .cm-line.cm-md-paragraph.cm-md-after-quote {
+  padding-top: 0.75em;
+}
+
+.markdown-source-stack .cm-line.cm-md-quote {
+  padding-top: 0.55em;
+  padding-bottom: 0.55em;
 }
 
 .markdown-source-stack .cm-line.cm-md-heading {
-  padding-top: 0.35em;
-  padding-bottom: 0.45em;
+  padding-top: 0.65em;
+  padding-bottom: 0.55em;
 }
 
 .markdown-source-stack .cm-line.cm-md-list {
-  padding-bottom: 0.2em;
+  padding-bottom: 0.45em;
 }
 
 .markdown-source-stack .cm-line.cm-md-break {

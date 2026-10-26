@@ -7,6 +7,7 @@ import { prosaMarkdownNavigationExtensions } from "./markdown-source-arrows";
 import { prosaMarkdownShiftEnterKeymap } from "./markdown-source-enter";
 import { isSceneBreakLineRaw } from "./markdown-source-layout";
 import { markdownEditorBottomSpace } from "./markdown-editor-bottom-space";
+import { markdownActiveSentenceExtension } from "./markdown-active-sentence";
 
 /** Fixed marker column width (`##### `). Body text starts after this. */
 export const MARKDOWN_MARKER_COLUMNS = 6;
@@ -52,6 +53,7 @@ export function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number
 
 function buildLineDecorations(view: EditorView): DecorationSet {
   const builder = new RangeSetBuilder<Decoration>();
+  let previousKind: LineKind | null = null;
   for (let lineNumber = 1; lineNumber <= view.state.doc.lines; lineNumber += 1) {
     const line = view.state.doc.line(lineNumber);
     const meta = lineMarkerMeta(line.text);
@@ -59,7 +61,11 @@ function buildLineDecorations(view: EditorView): DecorationSet {
     if (meta.kind === "body") {
       classes.push("cm-md-paragraph");
     }
+    if (previousKind === "quote" && meta.kind === "body") {
+      classes.push("cm-md-after-quote");
+    }
 
+    previousKind = meta.kind;
     builder.add(
       line.from,
       line.from,
@@ -131,7 +137,7 @@ const markdownSourceEditorTheme = EditorView.theme({
   ".cm-content": {
     caretColor: "var(--scribo-ui-caret)",
     padding: "var(--scribo-ms-pad-y) var(--scribo-ms-pad-x) 0",
-    maxWidth: "var(--scribo-ms-max-width)",
+    maxWidth: "var(--md-content-max-width, min(100%, var(--scribo-ms-max-width)))",
     width: "100%",
     margin: "0 auto",
     boxSizing: "border-box",
@@ -151,6 +157,10 @@ const markdownSourceEditorTheme = EditorView.theme({
   },
   ".cm-cursor": {
     borderLeftColor: "var(--scribo-ui-caret)",
+  },
+  ".cm-md-active-sentence": {
+    backgroundColor: "color-mix(in srgb, var(--scribo-ui-accent) 14%, transparent)",
+    borderRadius: "2px",
   },
   ".cm-md-line": {
     paddingLeft: "var(--md-marker-width, calc(6 * 0.6em))",
@@ -180,6 +190,7 @@ export function markdownSourceExtensions() {
     markdownSourceLayoutPlugin,
     markdownSourceEditorTheme,
     markdownEditorBottomSpace,
+    markdownActiveSentenceExtension,
     markdownScrollMargins,
     syntaxHighlighting(prosaMarkdownHighlight, { fallback: true }),
     EditorView.lineWrapping,

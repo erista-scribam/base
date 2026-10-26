@@ -5,7 +5,12 @@ import type { ProsaDocument } from "@scribo/document-model";
 import { ManuscriptNav } from "../components/ManuscriptNav";
 import { EditorToolbar } from "../components/EditorToolbar";
 import { EmptyWorkspace } from "../components/EmptyWorkspace";
-import { EditorWorkspace, type EditorViewMode } from "../components/EditorWorkspace";
+import {
+  EditorWorkspace,
+  type EditorViewMode,
+  type EditorWorkspaceHandle,
+} from "../components/EditorWorkspace";
+import type { MarkdownFormatAction } from "../features/markdown/markdown-source-format";
 import { useManuscriptPersistence } from "../hooks/useManuscriptPersistence";
 import { useMarkdownPreviewVisible } from "../hooks/useMarkdownPreviewVisible";
 import {
@@ -58,6 +63,7 @@ export function App() {
   const { zoom, zoomIn, zoomOut, resetZoom, canZoomIn, canZoomOut } = useEditorZoom();
 
   const activeSummary = manuscripts.find((item) => item.id === activeId) ?? null;
+  const workspaceRef = useRef<EditorWorkspaceHandle>(null);
   const editorDocumentRef = useRef(document);
   const saveStateRef = useRef(saveState);
 
@@ -283,6 +289,10 @@ export function App() {
     setEditor(instance);
   }, []);
 
+  const handleMarkdownFormat = useCallback((action: MarkdownFormatAction) => {
+    workspaceRef.current?.applyMarkdownFormat(action);
+  }, []);
+
   const handleChooseLibrary = useCallback(async () => {
     if (!isTauriRuntime()) {
       return;
@@ -423,6 +433,7 @@ export function App() {
                 onZoomIn={zoomIn}
                 onZoomOut={zoomOut}
                 onZoomReset={resetZoom}
+                onMarkdownFormat={viewMode === "split" ? handleMarkdownFormat : undefined}
               />
               <div
                 className="editor-scroll"
@@ -433,6 +444,7 @@ export function App() {
                   data-view={viewMode === "split" ? "markdown" : "classic"}
                 >
                   <EditorWorkspace
+                    ref={workspaceRef}
                     key={document.id}
                     document={document}
                     viewMode={viewMode}

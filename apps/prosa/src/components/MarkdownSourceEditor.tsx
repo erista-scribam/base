@@ -10,9 +10,13 @@ import { markdownSourceExtensions } from "../features/markdown/codemirror-markdo
 import { useTheme } from "../hooks/useTheme";
 import {
   columnsForWrapMode,
-  type IaLineLength,
+  type MarkdownLineLengthPresetId,
   type MarkdownWrapMode,
 } from "../hooks/useMarkdownRuler";
+import {
+  applyMarkdownFormat,
+  type MarkdownFormatAction,
+} from "../features/markdown/markdown-source-format";
 import { MarkdownRuler } from "./MarkdownRuler";
 
 const guideCompartment = new Compartment();
@@ -27,13 +31,14 @@ function guideExtensionFor(mode: MarkdownWrapMode, editorZoom: number) {
 
 export interface MarkdownSourceEditorHandle {
   goToLine(line: number): void;
+  applyFormat(action: MarkdownFormatAction): void;
 }
 
 export interface MarkdownSourceEditorProps {
   value: string;
   onChange: (value: string) => void;
   rulerMode: MarkdownWrapMode;
-  onSelectLineLength: (columns: IaLineLength) => void;
+  onSelectLineLengthPreset: (presetId: MarkdownLineLengthPresetId) => void;
   onRulerSelectFullWidth: () => void;
   editorZoom: number;
   onCursorLineChange?: (line: number) => void;
@@ -48,7 +53,7 @@ export const MarkdownSourceEditor = forwardRef<
     value,
     onChange,
     rulerMode,
-    onSelectLineLength,
+    onSelectLineLengthPreset,
     onRulerSelectFullWidth,
     editorZoom,
     onCursorLineChange,
@@ -90,6 +95,13 @@ export const MarkdownSourceEditor = forwardRef<
           onCursorLineChange?.(lineNumber);
         });
       },
+      applyFormat(action: MarkdownFormatAction) {
+        const view = editorViewRef.current;
+        if (!view) {
+          return;
+        }
+        applyMarkdownFormat(view, action);
+      },
     }),
     [onCursorLineChange],
   );
@@ -108,7 +120,7 @@ export const MarkdownSourceEditor = forwardRef<
     <div className="markdown-source-stack">
       <MarkdownRuler
         mode={rulerMode}
-        onSelectLineLength={onSelectLineLength}
+        onSelectPreset={onSelectLineLengthPreset}
         onSelectFullWidth={onRulerSelectFullWidth}
       />
       <CodeMirror

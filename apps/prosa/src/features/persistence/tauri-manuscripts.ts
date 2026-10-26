@@ -8,6 +8,7 @@ import {
   tryValidateProsaDocument,
 } from "@scribo/document-model";
 import { markdownToProsaDocument, prosaDocumentToMarkdown } from "../markdown/prosa-markdown";
+import { normalizeMarkdownSource } from "../markdown/markdown-normalize";
 import type { RecoveryCandidate } from "./recovery-policy";
 import { isLegacyInternalManuscriptId, isLibraryManuscript } from "./manuscript-id";
 
@@ -166,10 +167,11 @@ export async function saveManuscriptDocument(
 ): Promise<ManuscriptSummary> {
   const documentJson = serializeProsaDocument(document);
   if (isLibraryManuscript(summary, id)) {
+    const markdown = normalizeMarkdownSource(prosaDocumentToMarkdown(document));
     return invoke<ManuscriptSummary>("save_manuscript", {
       id,
       documentJson,
-      markdown: prosaDocumentToMarkdown(document),
+      markdown,
     });
   }
   return invoke<ManuscriptSummary>("save_manuscript", {
