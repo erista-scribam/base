@@ -1,3 +1,5 @@
+@import "../../../../docs/brands/scribam-brand-kit/brand-tokens.css";
+
 :root {
   --scribam-app-height: 100vh;
   --scribam-app-width: 100vw;
@@ -30,10 +32,11 @@
   --scribam-radius-md: 6px;
 
   --scribam-font-ui:
-    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
-  --scribam-font-ms:
-    "Literata", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  --scribam-font-mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+    "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --scribam-font-brand: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+  --scribam-font-ms: var(--scribam-font-brand);
+  --scribam-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --scribam-font-screenplay: "Courier Prime", "Courier New", Courier, monospace;
 
   --scribam-transition-fast: 120ms ease;
 }
@@ -42,27 +45,27 @@
 [data-theme="light"] {
   color-scheme: light;
 
-  --scribam-ui-bg: #f7f5f0;
-  --scribam-ui-canvas: #fdfcf9;
-  --scribam-ui-surface: #f0ede6;
-  --scribam-ui-border: #e0dcd3;
-  --scribam-ui-border-subtle: #ebe7de;
+  --scribam-ui-bg: var(--scribam-paper);
+  --scribam-ui-canvas: #ffffff;
+  --scribam-ui-surface: #f1f5f9;
+  --scribam-ui-border: var(--scribam-border);
+  --scribam-ui-border-subtle: #eef2f6;
 
-  --scribam-ui-text: #1a1814;
-  --scribam-ui-text-secondary: #5c574f;
-  --scribam-ui-muted: #8a847a;
+  --scribam-ui-text: var(--scribam-ink);
+  --scribam-ui-text-secondary: var(--scribam-muted);
+  --scribam-ui-muted: #64748b;
 
-  --scribam-ui-accent: #3d5a73;
-  --scribam-ui-accent-hover: #2f475c;
-  --scribam-ui-on-accent: #f7f5f0;
+  --scribam-ui-accent: var(--scribam-indigo-focus);
+  --scribam-ui-accent-hover: #4f46e5;
+  --scribam-ui-on-accent: var(--scribam-paper);
 
-  --scribam-ui-hover: rgba(26, 24, 20, 0.04);
-  --scribam-ui-active: rgba(26, 24, 20, 0.07);
-  --scribam-ui-selected: rgba(61, 90, 115, 0.1);
+  --scribam-ui-hover: rgba(15, 23, 42, 0.04);
+  --scribam-ui-active: rgba(15, 23, 42, 0.07);
+  --scribam-ui-selected: color-mix(in srgb, var(--scribam-indigo-focus) 12%, transparent);
 
-  --scribam-ui-selection-bg: rgba(61, 90, 115, 0.22);
+  --scribam-ui-selection-bg: color-mix(in srgb, var(--scribam-indigo-focus) 22%, transparent);
   --scribam-ui-selection-fg: var(--scribam-ui-text);
-  --scribam-ui-caret: #1a1814;
+  --scribam-ui-caret: var(--scribam-ink);
 
   --scribam-ui-danger-bg: #fef2f2;
   --scribam-ui-danger-text: #991b1b;
@@ -79,27 +82,27 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --scribam-ui-bg: #1a1917;
-  --scribam-ui-canvas: #21201d;
-  --scribam-ui-surface: #262522;
-  --scribam-ui-border: #3a3834;
-  --scribam-ui-border-subtle: #2e2c28;
+  --scribam-ui-bg: var(--scribam-ink);
+  --scribam-ui-canvas: #1e293b;
+  --scribam-ui-surface: #334155;
+  --scribam-ui-border: #475569;
+  --scribam-ui-border-subtle: #3d4f63;
 
-  --scribam-ui-text: #eceae4;
-  --scribam-ui-text-secondary: #b5b0a6;
-  --scribam-ui-muted: #8a857c;
+  --scribam-ui-text: var(--scribam-paper);
+  --scribam-ui-text-secondary: #cbd5e1;
+  --scribam-ui-muted: #94a3b8;
 
-  --scribam-ui-accent: #7a9bb8;
-  --scribam-ui-accent-hover: #94b3cc;
-  --scribam-ui-on-accent: #1a1917;
+  --scribam-ui-accent: #818cf8;
+  --scribam-ui-accent-hover: #a5b4fc;
+  --scribam-ui-on-accent: var(--scribam-ink);
 
-  --scribam-ui-hover: rgba(255, 255, 255, 0.05);
-  --scribam-ui-active: rgba(255, 255, 255, 0.08);
-  --scribam-ui-selected: rgba(122, 155, 184, 0.15);
+  --scribam-ui-hover: rgba(248, 250, 252, 0.05);
+  --scribam-ui-active: rgba(248, 250, 252, 0.08);
+  --scribam-ui-selected: color-mix(in srgb, var(--scribam-indigo-focus) 22%, transparent);
 
-  --scribam-ui-selection-bg: rgba(122, 155, 184, 0.35);
+  --scribam-ui-selection-bg: color-mix(in srgb, var(--scribam-indigo-focus) 32%, transparent);
   --scribam-ui-selection-fg: var(--scribam-ui-text);
-  --scribam-ui-caret: #eceae4;
+  --scribam-ui-caret: var(--scribam-paper);
 
   --scribam-ui-danger-bg: #3f1d1d;
   --scribam-ui-danger-text: #fecaca;

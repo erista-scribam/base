@@ -9,7 +9,7 @@ This document is the **governing law** for product and engineering decisions. De
 
 ## Central proposition
 
-**Scribam** (Latin _scribam_ — “I will write,” “let me write”) names the writer’s request: to put words down, on their terms. That is the brand’s first meaning—the moment of writing, not the machinery around it.
+**Scribam** (Latin _scribam_ — “I will write,” “let me write”) names the writer’s request: to put words down, on their terms. On brand lockups that reads **LET ME WRITE**, with **(instead of edit)** as the secondary line—not a feature list, but the same philosophy in fewer words.
 
 The **product philosophy** under that name is unchanged:
 
