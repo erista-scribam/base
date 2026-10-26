@@ -1,6 +1,6 @@
 # Plan 005 — Project workspace, Git, and unified storage
 
-**Status:** **Paused** (2026-10-26) — execution superseded by [006-scribo-lanista-platform.md](./006-scribo-lanista-platform.md). Shipped Phase 1–2 (and partial Phase 4) remain in the codebase until migrated under 006.  
+**Status:** **Superseded / closed for execution** (2026-10-26) — family architecture [multi-application-project-architecture.md](../../specs/multi-application-project-architecture.md) and [multi-application-architecture-roadmap.md](./multi-application-architecture-roadmap.md). Shipped: Phase 1–2 IDs + layout, Phase 4–5 project Git UI/commands. **Not pursued under 005:** workspace entities (Phase 6), knowledge (7), portable package (8) — tracked on multi-app roadmap / future plans.  
 **Adopted:** 2026-10-26
 
 ## What changed from plan 003

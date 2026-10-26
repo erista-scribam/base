@@ -1,6 +1,6 @@
 # Plan — Git repository strategy decision
 
-**Status:** Draft — **decision not finalized**  
+**Status:** **Provisional default — Option A** (2026-10-26). Formal ADR acceptance still pending; implementation matches Option A today.  
 **Spec:** [multi-application-project-architecture.md](../../specs/multi-application-project-architecture.md) §6  
 **Conflict:** [006-scribo-lanista-platform.md](./006-scribo-lanista-platform.md) proposes **per-manuscript Git**
 

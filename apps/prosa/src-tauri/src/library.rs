@@ -264,11 +264,28 @@ fn library_info_for_root(
     })
 }
 
+/// When Lanista (or dev) sets `SCRIBO_PROJECT_ROOT`, open that project instead of the catalog default.
+pub fn open_library_from_env(app: &AppHandle) -> Option<Result<LibraryInfo, String>> {
+    let root = std::env::var("SCRIBO_PROJECT_ROOT").ok()?;
+    let trimmed = root.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    Some(open_project_root(app, PathBuf::from(trimmed)))
+}
+
 pub fn ensure_default_library(app: &AppHandle) -> Result<LibraryInfo, String> {
     let config = ensure_config_normalized(app)?;
     let home = resolve_home_path(app, &config)?;
     let existed = config.root_path.exists();
     library_info_for_root(config.root_path, home, existed)
+}
+
+pub fn init_library(app: &AppHandle) -> Result<LibraryInfo, String> {
+    if let Some(result) = open_library_from_env(app) {
+        return result;
+    }
+    ensure_default_library(app)
 }
 
 pub fn get_library_info(app: &AppHandle) -> Result<LibraryInfo, String> {

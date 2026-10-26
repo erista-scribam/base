@@ -4,7 +4,7 @@
 **Adopted:** 2026-10-26  
 **Pauses:** [005-project-workspace-and-git.md](./005-project-workspace-and-git.md) (project-root Git, Prosa-as-hub, `.md` manuscripts)
 
-**Note:** Family architecture spec recommends **unified project Git (Option A)** by default; this plan’s **per-manuscript Git** must be reconciled via [project-git-strategy.md](./project-git-strategy.md) before implementation.
+**Note:** **Per-manuscript Git** in this plan is **deferred**. Execution uses **unified project Git (Option A)** per [project-git-strategy.md](./project-git-strategy.md). Lanista MVP shipped in `apps/lanista`.
 
 ## Executive summary
 

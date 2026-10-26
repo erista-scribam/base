@@ -93,25 +93,29 @@ flowchart LR
 
 ## Phase R5 — Git scope (depends on ADR)
 
+**Status:** **Default locked — Option A** (unified project `.git` per [project-git-strategy.md](./project-git-strategy.md)). Per-manuscript split **deferred** (006 reconciled).
+
 | If Option A | Refactor VC UI filters by domain path; keep project root repo |
 | If Option B/C | Implement per [manuscript-git-v1.md](../../specs/manuscript-git-v1.md) + migration |
 
-**Acceptance:** [project-git-strategy.md](./project-git-strategy.md) checklist.
+**Acceptance:** [project-git-strategy.md](./project-git-strategy.md) checklist (production gate still applies).
 
 ---
 
 ## Phase R6 — Lanista MVP
 
+**Status:** **Shipped** — `apps/lanista`, `lanista.json`, spawn Prosa with `SCRIBO_PROJECT_ROOT`. See [apps/lanista/README.md](../../../apps/lanista/README.md).
+
 | Scope | `apps/lanista` (new): list projects, register Prosa, spawn with grants |
 | Retain | Prosa still openable standalone in **dev** until R7 |
-
-**Verified prerequisite gap:** No Lanista app in repo today — greenfield.
 
 **Acceptance:** Manual QA open project in Prosa via Lanista; catalog persists in Lanista config.
 
 ---
 
 ## Phase R7 — Prosa production entry
+
+**Status:** **Partial** — Prosa honors `SCRIBO_PROJECT_ROOT` on `init_library`; dual catalog (Lanista + Prosa `library.json`) until migration wizard.
 
 | Scope | Optional: hide hub switcher; “Return to Lanista” |
 | Migration | Move `library.json` catalog duties to Lanista |
@@ -121,6 +125,8 @@ flowchart LR
 ---
 
 ## Phase R8 — Folio / Drama (future)
+
+**Status:** **Stub** — empty `contents/canon/folia`, `contents/canon/drama`, `contents/shared/*` created on new Lanista projects.
 
 | Scope | App stubs, manifest entries, canon paths only |
 | Non-goals | Full editors |
@@ -142,13 +148,14 @@ flowchart LR
 
 ## What requires migration (not yet)
 
-| Item                           | Roadmap phase |
-| ------------------------------ | ------------- |
-| `content/` → `contents/canon/` | R2 + wizard   |
-| `.md` → `.mdprosa`             | R3            |
-| Prosa hub → Lanista            | R6–R7         |
-| Git split (if any)             | R5            |
-| Folio/Drama trees              | R8            |
+| Item                                        | Roadmap phase              |
+| ------------------------------------------- | -------------------------- |
+| `content/` → `contents/canon/`              | R2 + wizard                |
+| `.md` → `.mdprosa` on save                  | R3 **shipped** (dual-read) |
+| Full layout v2 `contents/canon/manuscripts` | R2 adapter only            |
+| Prosa hub → Lanista-only catalog            | R7 partial                 |
+| Git split (if any)                          | R5 **deferred (Option A)** |
+| Folio/Drama apps                            | R8 stub dirs only          |
 
 ---
 

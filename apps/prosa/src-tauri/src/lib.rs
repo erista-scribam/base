@@ -17,10 +17,10 @@ use library::{
     LibraryInfo, ProjectSummary, absolute_path_for_entry, clear_library_recovery,
     create_library_markdown_in_parent, create_library_markdown_with_content, create_project_folder,
     create_project_root, delete_library_manuscript, ensure_default_library, get_library_info,
-    import_external_markdown, is_library_manuscript_id, library_recovery_path,
-    list_library_manuscripts, list_project_entries, list_projects, migrate_legacy_root_markdown,
-    open_project_root, path_key_for_manuscript_id, read_library_markdown, set_library_root,
-    write_library_markdown,
+    import_external_markdown, init_library as init_library_impl, is_library_manuscript_id,
+    library_recovery_path, list_library_manuscripts, list_project_entries, list_projects,
+    migrate_legacy_root_markdown, open_project_root, path_key_for_manuscript_id,
+    read_library_markdown, set_library_root, write_library_markdown,
 };
 use persistence::{
     ManuscriptSummary, clear_recovery_snapshot as clear_internal_recovery_snapshot,
@@ -92,7 +92,7 @@ fn get_library(app: tauri::AppHandle) -> Result<LibraryInfo, String> {
 
 #[tauri::command]
 fn init_library(app: tauri::AppHandle) -> Result<LibraryInfo, String> {
-    ensure_default_library(&app)
+    init_library_impl(&app)
 }
 
 #[tauri::command]
