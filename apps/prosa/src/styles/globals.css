@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./tokens.css";
+@import "./brand.css";
 @import "./chrome.css";
 @import "./manuscript.css";
 

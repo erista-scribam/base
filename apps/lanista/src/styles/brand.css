@@ -1,0 +1,66 @@
+@import "../../../../docs/brands/scribo-brand-kit/brand-tokens.css";
+
+:root {
+  font-family:
+    Inter,
+    "Plus Jakarta Sans",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background: var(--scribo-ink);
+  color: var(--scribo-paper);
+}
+
+.lanista-brand-header {
+  margin-bottom: 1.75rem;
+}
+
+.lanista-wordmark {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin-bottom: 1.25rem;
+  border-radius: 12px;
+}
+
+.lanista-product-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.lanista-product-row img {
+  border-radius: 12px;
+}
+
+.lanista-product-copy h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--scribo-paper);
+}
+
+.lanista-product-copy .sub {
+  margin: 0.15rem 0 0;
+}
+
+button.primary {
+  background: var(--scribo-indigo-focus);
+  border-color: var(--scribo-indigo-focus);
+}
+
+button.primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+li.project {
+  border-color: color-mix(in srgb, var(--scribo-paper) 12%, transparent);
+  background: color-mix(in srgb, var(--scribo-paper) 4%, var(--scribo-ink));
+}
+
+button {
+  border-color: color-mix(in srgb, var(--scribo-paper) 18%, transparent);
+  background: color-mix(in srgb, var(--scribo-paper) 6%, var(--scribo-ink));
+}

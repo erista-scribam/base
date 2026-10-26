@@ -1,0 +1,57 @@
+@import "../../../../docs/brands/scribo-brand-kit/brand-tokens.css";
+
+:root,
+[data-theme="light"] {
+  --scribo-ui-accent: var(--scribo-prosa);
+  --scribo-ui-accent-hover: #047857;
+  --scribo-ui-on-accent: var(--scribo-paper);
+  --scribo-ui-selected: color-mix(in srgb, var(--scribo-prosa) 14%, transparent);
+  --scribo-ui-selection-bg: color-mix(in srgb, var(--scribo-prosa) 22%, transparent);
+  --scribo-md-dialog-fg: color-mix(in srgb, var(--scribo-prosa) 55%, var(--scribo-ink));
+}
+
+[data-theme="dark"] {
+  --scribo-ui-accent: #34d399;
+  --scribo-ui-accent-hover: #6ee7b7;
+  --scribo-ui-on-accent: var(--scribo-ink);
+  --scribo-ui-selected: color-mix(in srgb, var(--scribo-prosa) 22%, transparent);
+  --scribo-ui-selection-bg: color-mix(in srgb, var(--scribo-prosa) 28%, transparent);
+}
+
+.prosa-brand-bar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--scribo-space-2);
+  padding: var(--scribo-space-3) var(--scribo-space-3) var(--scribo-space-2);
+  border-bottom: 1px solid var(--scribo-ui-border-subtle);
+  background: color-mix(in srgb, var(--scribo-ui-canvas) 70%, var(--scribo-ui-surface));
+}
+
+.prosa-brand-bar img {
+  display: block;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.prosa-brand-bar-text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.05rem;
+  line-height: 1.2;
+}
+
+.prosa-brand-bar-kicker {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--scribo-ui-muted);
+}
+
+.prosa-brand-bar-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--scribo-ui-text);
+}

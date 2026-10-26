@@ -9,6 +9,7 @@ import { ProjectSwitcher } from "./ProjectSwitcher";
 import { SidebarActivityBar } from "./SidebarActivityBar";
 import { SidebarResizeSash } from "./SidebarResizeSash";
 import { SourceControlPanel } from "./SourceControlPanel";
+import { ProsaBrandBar } from "./ProsaBrandBar";
 
 export interface ManuscriptNavProps {
   manuscripts: ManuscriptSummary[];
@@ -82,6 +83,7 @@ export function ManuscriptNav({
 
   return (
     <aside className="app-sidebar" aria-label="Navigation">
+      <ProsaBrandBar />
       <SidebarResizeSash
         orientation="vertical"
         className="sidebar-width-sash"

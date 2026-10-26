@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { LanistaBrandHeader } from "./components/LanistaBrandHeader";
 import {
   createLanistaProject,
   getLanistaHome,
@@ -76,8 +77,8 @@ export function App() {
 
   return (
     <div className="app">
-      <h1>Scribo Lanista</h1>
-      <p className="sub">Open a project in Scribo Prosa — {homePath ?? "…"}</p>
+      <LanistaBrandHeader />
+      <p className="sub home-path">Projects home — {homePath ?? "…"}</p>
       {error ? <p className="error">{error}</p> : null}
       <div className="toolbar">
         <input

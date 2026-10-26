@@ -1,11 +1,11 @@
 :root {
-  --scribo-ink: #0F172A;
-  --scribo-paper: #F8FAFC;
-  --scribo-indigo-focus: #6366F1;
+  --scribo-ink: #0f172a;
+  --scribo-paper: #f8fafc;
+  --scribo-indigo-focus: #6366f1;
   --scribo-lanista: #334155;
   --scribo-prosa: #059669;
-  --scribo-drama: #D97706;
-  --scribo-folia: #2563EB;
+  --scribo-drama: #d97706;
+  --scribo-folia: #2563eb;
   --scribo-muted: #475569;
-  --scribo-border: #E2E8F0;
+  --scribo-border: #e2e8f0;
 }
