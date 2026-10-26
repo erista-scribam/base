@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Editor } from "@tiptap/core";
-import type { ManuscriptSummary } from "@scribo/core";
-import type { ProsaDocument } from "@scribo/document-model";
+import type { ManuscriptSummary } from "@scribam/core";
+import type { ProsaDocument } from "@scribam/document-model";
 import { ManuscriptNav } from "../components/ManuscriptNav";
 import { MergeConflictOverlay } from "../components/MergeConflictOverlay";
 import { EditorTabBar } from "../components/EditorTabBar";
@@ -563,7 +563,7 @@ export function App() {
     const selected = await open({
       multiple: false,
       title: "Import prose file",
-      filters: [{ name: "Scribo prose", extensions: ["mdprosa", "md", "markdown"] }],
+      filters: [{ name: "Scribam prose", extensions: ["mdprosa", "md", "markdown"] }],
     });
     if (typeof selected !== "string") {
       return;

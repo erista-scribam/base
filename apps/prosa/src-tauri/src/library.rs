@@ -8,16 +8,20 @@ use serde::{Deserialize, Serialize};
 use tauri::AppHandle;
 use tauri::Manager;
 
+use crate::app_paths::{
+    APP_LOCAL_DIR, LEGACY_APP_LOCAL_DIR, LEGACY_PROJECT_MANIFEST_FILE, recovery_dir,
+};
 use crate::atomic_io::atomic_write;
 use crate::grants::assert_prosa_manuscript_absolute;
 use crate::persistence::ManuscriptSummary;
 use crate::project::{
-    PROJECT_MANIFEST_FILE, ScriboProjectManifest, ensure_project_manifest, manuscripts_dir,
+    PROJECT_MANIFEST_FILE, ScribamProjectManifest, ensure_project_manifest, manuscripts_dir,
     read_project_manifest,
 };
 use crate::project_layout::{MANUSCRIPT_PROSE_EXTENSION, is_manuscript_prose_file};
 
-const LIBRARY_DIR_NAME: &str = "Scribo Prosa";
+const LIBRARY_DIR_NAME: &str = "Scribam Prosa";
+const LEGACY_LIBRARY_DIR_NAME: &str = "Scribo Prosa";
 const PATH_ID_PREFIX: &str = "ms_path_";
 
 const MAX_RECENT_PROJECTS: usize = 12;
@@ -34,7 +38,7 @@ struct RecentProjectEntry {
 struct LibraryConfig {
     /// Active project root (Git, manuscripts, explorer).
     root_path: PathBuf,
-    /// Prosa container folder (Documents/Scribo Prosa); projects live in subfolders.
+    /// Prosa container folder (Documents/Scribam Prosa); projects live in subfolders.
     #[serde(default)]
     home_path: Option<PathBuf>,
     #[serde(default)]
@@ -57,7 +61,7 @@ pub struct LibraryInfo {
     pub root_path: String,
     pub home_path: String,
     pub exists: bool,
-    pub project: Option<ScriboProjectManifest>,
+    pub project: Option<ScribamProjectManifest>,
 }
 
 fn config_path(app: &AppHandle) -> Result<PathBuf, String> {
@@ -86,12 +90,24 @@ fn write_config(app: &AppHandle, config: &LibraryConfig) -> Result<(), String> {
     fs::write(path, raw).map_err(|error| error.to_string())
 }
 
+fn resolve_library_home(docs: &Path) -> PathBuf {
+    let preferred = docs.join(LIBRARY_DIR_NAME);
+    if preferred.is_dir() {
+        return preferred;
+    }
+    let legacy = docs.join(LEGACY_LIBRARY_DIR_NAME);
+    if legacy.is_dir() {
+        return legacy;
+    }
+    preferred
+}
+
 pub fn default_library_root(app: &AppHandle) -> Result<PathBuf, String> {
     let docs = app
         .path()
         .document_dir()
         .map_err(|error| error.to_string())?;
-    Ok(docs.join(LIBRARY_DIR_NAME))
+    Ok(resolve_library_home(&docs))
 }
 
 fn touch_recent_project(config: &mut LibraryConfig, root: &Path) {
@@ -130,7 +146,7 @@ fn paths_equal(a: &Path, b: &Path) -> bool {
 }
 
 fn is_project_directory(path: &Path) -> bool {
-    path.join(PROJECT_MANIFEST_FILE).is_file()
+    path.join(PROJECT_MANIFEST_FILE).is_file() || path.join(LEGACY_PROJECT_MANIFEST_FILE).is_file()
 }
 
 fn resolve_home_path(app: &AppHandle, config: &LibraryConfig) -> Result<PathBuf, String> {
@@ -162,7 +178,14 @@ fn migrate_embedded_project_from_home(home: &Path) -> Result<PathBuf, String> {
     let dest = unique_folder_path(home, &manifest.title);
     fs::create_dir_all(&dest).map_err(|error| error.to_string())?;
 
-    for name in ["scribo.project.json", "content", ".git", ".scribo"] {
+    for name in [
+        "scribam.project.json",
+        LEGACY_PROJECT_MANIFEST_FILE,
+        "content",
+        ".git",
+        APP_LOCAL_DIR,
+        LEGACY_APP_LOCAL_DIR,
+    ] {
         let src = home.join(name);
         if src.exists() {
             fs::rename(&src, dest.join(name))
@@ -264,9 +287,9 @@ fn library_info_for_root(
     })
 }
 
-/// When `SCRIBO_PROJECT_ROOT` is set (dev/tests), open that project instead of the catalog default.
+/// When `SCRIBAM_PROJECT_ROOT` is set (dev/tests), open that project instead of the catalog default.
 pub fn open_library_from_env(app: &AppHandle) -> Option<Result<LibraryInfo, String>> {
-    let root = std::env::var("SCRIBO_PROJECT_ROOT").ok()?;
+    let root = std::env::var("SCRIBAM_PROJECT_ROOT").ok()?;
     let trimmed = root.trim();
     if trimmed.is_empty() {
         return None;
@@ -689,16 +712,18 @@ fn walk_markdown_files(
         let entry = entry.map_err(|error| error.to_string())?;
         let path = entry.path();
         if path.file_name().is_some_and(|name| {
-            name == ".scribo" || name == ".git" || name.to_str().is_some_and(|n| n.starts_with('.'))
+            name == APP_LOCAL_DIR
+                || name == LEGACY_APP_LOCAL_DIR
+                || name == ".git"
+                || name.to_str().is_some_and(|n| n.starts_with('.'))
         }) {
             continue;
         }
         let file_type = entry.file_type().map_err(|error| error.to_string())?;
         if file_type.is_dir() {
-            if path
-                .file_name()
-                .is_some_and(|name| name == ".scribo" || name == ".git")
-            {
+            if path.file_name().is_some_and(|name| {
+                name == APP_LOCAL_DIR || name == LEGACY_APP_LOCAL_DIR || name == ".git"
+            }) {
                 continue;
             }
             walk_markdown_files(root, &path, entries)?;
@@ -903,7 +928,7 @@ pub fn delete_library_manuscript(app: &AppHandle, id: &str) -> Result<(), String
 
 pub fn library_recovery_path(app: &AppHandle, path_key: &str) -> Result<PathBuf, String> {
     let config = read_config(app)?.ok_or("Library is not configured")?;
-    let dir = config.root_path.join(".scribo/recovery");
+    let dir = recovery_dir(&config.root_path);
     fs::create_dir_all(&dir).map_err(|error| error.to_string())?;
     let hash = URL_SAFE_NO_PAD.encode(path_key.as_bytes());
     Ok(dir.join(format!("{hash}.json")))
@@ -919,7 +944,7 @@ pub fn clear_library_recovery(app: &AppHandle, path_key: &str) -> Result<(), Str
 
 /// Wipe crash-recovery sidecars after Git checkout so editors reload branch files from disk.
 pub fn clear_all_library_recovery_at_root(root: &Path) -> Result<(), String> {
-    let dir = root.join(".scribo/recovery");
+    let dir = recovery_dir(root);
     if !dir.exists() {
         return Ok(());
     }
@@ -1054,7 +1079,7 @@ mod tests {
     #[test]
     fn migrate_embedded_project_from_home_moves_manifest_and_content() {
         let home =
-            std::env::temp_dir().join(format!("scribo-home-migrate-{}", uuid::Uuid::new_v4()));
+            std::env::temp_dir().join(format!("scribam-home-migrate-{}", uuid::Uuid::new_v4()));
         fs::create_dir_all(&home).unwrap();
         ensure_project_manifest(&home).unwrap();
         fs::create_dir_all(home.join("content/manuscripts")).unwrap();
@@ -1063,10 +1088,10 @@ mod tests {
 
         let dest = migrate_embedded_project_from_home(&home).unwrap();
         assert!(dest.starts_with(&home));
-        assert!(dest.join("scribo.project.json").is_file());
+        assert!(dest.join("scribam.project.json").is_file());
         assert!(dest.join("content/manuscripts/intro.md").is_file());
         assert!(dest.join("orphan-at-root.md").is_file());
-        assert!(!home.join("scribo.project.json").exists());
+        assert!(!home.join("scribam.project.json").exists());
         assert!(!home.join("content").exists());
 
         fs::remove_dir_all(&home).ok();
@@ -1074,7 +1099,7 @@ mod tests {
 
     #[test]
     fn sibling_markdown_path_renames_without_collision() {
-        let dir = std::env::temp_dir().join(format!("scribo-lib-test-{}", uuid::Uuid::new_v4()));
+        let dir = std::env::temp_dir().join(format!("scribam-lib-test-{}", uuid::Uuid::new_v4()));
         fs::create_dir_all(&dir).unwrap();
         let current = dir.join("Old Name.md");
         fs::write(&current, "# old").unwrap();

@@ -13,8 +13,8 @@ function isTauriRuntime(): boolean {
 function syncViewportSize() {
   const height = window.innerHeight;
   const width = window.innerWidth;
-  document.documentElement.style.setProperty("--scribo-app-height", `${height}px`);
-  document.documentElement.style.setProperty("--scribo-app-width", `${width}px`);
+  document.documentElement.style.setProperty("--scribam-app-height", `${height}px`);
+  document.documentElement.style.setProperty("--scribam-app-width", `${width}px`);
 }
 
 export interface ViewportLayoutOptions {

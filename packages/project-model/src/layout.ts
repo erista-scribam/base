@@ -9,7 +9,7 @@ export const LAYOUT_V2_DRAMA = "contents/canon/drama" as const;
 export const LAYOUT_V2_SHARED_RESEARCH = "contents/shared/research" as const;
 export const LAYOUT_V2_SHARED_ASSETS = "contents/shared/assets" as const;
 
-export const PROJECT_MANIFEST_FILE = "scribo.project.json" as const;
+export const PROJECT_MANIFEST_FILE = "scribam.project.json" as const;
 
 export const PROJECT_LAYOUT_VERSION_V1 = 1 as const;
 export const PROJECT_LAYOUT_VERSION_V2 = 2 as const;

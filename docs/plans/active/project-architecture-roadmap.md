@@ -1,6 +1,6 @@
 # Project architecture implementation roadmap
 
-**Status:** Draft — **005 execution paused**; new work follows [006-scribo-lanista-platform.md](./006-scribo-lanista-platform.md) phases  
+**Status:** Draft — **005 execution paused**; new work follows [006-scribam-lanista-platform.md](./006-scribam-lanista-platform.md) phases  
 **Depends on:** [project-architecture-and-storage.md](../../specs/project-architecture-and-storage.md) (audit), [lanista-platform-and-storage.md](../../specs/lanista-platform-and-storage.md) (forward)
 
 Phases below describe the **005** track. **Do not start Phase 4–8 extensions** until 006 Phase A specs are approved. Shipped Phase 1–2 remain; project-root Git UI is **legacy** pending per-manuscript migration (006).
@@ -48,7 +48,7 @@ flowchart TB
 
 |                  |                                                                                                                   |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Objective**    | Open/create `scribo.project.json` + `content/`; import current library                                            |
+| **Objective**    | Open/create `scribam.project.json` + `content/`; import current library                                           |
 | **Deliverables** | Rust project module; Tauri commands; UI “Open project”                                                            |
 | **Acceptance**   | Existing library imports; single-manuscript project works without Git                                             |
 | **Migration**    | Read-only legacy library path still supported one release                                                         |
@@ -98,7 +98,7 @@ flowchart TB
 | **Scope**      | `knowledge/` entities, sources, links |
 | **Depends on** | Stable IDs, project manifest          |
 
-## Phase 8 — Portable `.scribo` package
+## Phase 8 — Portable `.scribam` package
 
 |                |                                        |
 | -------------- | -------------------------------------- |
@@ -111,7 +111,7 @@ flowchart TB
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | **User value** | Share projects, backup, optional co-editing—without leaving the writer mental model                                            |
 | **Direction**  | **GitHub for writing**: branches, diffs, and review built for manuscripts, not generic repos                                   |
-| **Depends on** | Phases 4–8 (local Git, branches/merge, workspace entities, portable `.scribo`)                                                 |
+| **Depends on** | Phases 4–8 (local Git, branches/merge, workspace entities, portable `.scribam`)                                                |
 | **Non-goals**  | Exposing raw Git CLI; treating non-markdown files as first-class manuscripts; shipping sync before local-first invariants hold |
 
 ## Parallel work

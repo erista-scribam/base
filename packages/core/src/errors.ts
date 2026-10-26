@@ -1,20 +1,20 @@
-export type ScriboErrorCode =
+export type ScribamErrorCode =
   | "validation_failed"
   | "schema_version_unsupported"
   | "serialization_failed"
   | "deserialization_failed";
 
-export class ScriboError extends Error {
-  readonly code: ScriboErrorCode;
+export class ScribamError extends Error {
+  readonly code: ScribamErrorCode;
 
-  constructor(code: ScriboErrorCode, message: string, options?: { cause?: unknown }) {
+  constructor(code: ScribamErrorCode, message: string, options?: { cause?: unknown }) {
     super(message, options);
-    this.name = "ScriboError";
+    this.name = "ScribamError";
     this.code = code;
   }
 }
 
-export class ValidationError extends ScriboError {
+export class ValidationError extends ScribamError {
   readonly details: unknown;
 
   constructor(message: string, details?: unknown) {

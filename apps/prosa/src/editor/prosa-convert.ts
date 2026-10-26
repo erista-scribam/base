@@ -1,6 +1,6 @@
 import type { JSONContent } from "@tiptap/core";
-import type { ProsaBlock, ProsaDocument, ProsaInlineNode } from "@scribo/document-model";
-import { validateProsaDocument } from "@scribo/document-model";
+import type { ProsaBlock, ProsaDocument, ProsaInlineNode } from "@scribam/document-model";
+import { validateProsaDocument } from "@scribam/document-model";
 
 function inlineId(): string {
   return `inl_${crypto.randomUUID()}`;
@@ -11,7 +11,7 @@ function blockId(): string {
 }
 
 function blockIdFromNode(node: JSONContent): string {
-  const attr = node.attrs?.scriboBlockId;
+  const attr = node.attrs?.scribamBlockId ?? node.attrs?.scriboBlockId;
   if (typeof attr === "string" && attr.startsWith("blk_")) {
     return attr;
   }
@@ -19,7 +19,7 @@ function blockIdFromNode(node: JSONContent): string {
 }
 
 function blockAttrs(block: ProsaBlock): Record<string, unknown> {
-  return { scriboBlockId: block.id };
+  return { scribamBlockId: block.id };
 }
 
 function listItemId(): string {

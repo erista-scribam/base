@@ -1,9 +1,9 @@
-# Scribo Engineering Operating Model
+# Scribam Engineering Operating Model
 
 ## Repository-First Knowledge, GitHub Coordination, and Historical Baseline
 
 **Status:** Adopted 2026-10-26 — living summary in [operating-model.md](../../engineering/operating-model.md), baseline in [project-baseline.md](../../engineering/project-baseline.md)\
-**Applies to:** Scribo monorepo, Scribo Prosa, shared packages, AI
+**Applies to:** Scribam monorepo, Scribam Prosa, shared packages, AI
 coding agents, and future contributors\
 **Decision:** Repository-first, GitHub-enabled, with an explicit
 baseline for work completed before this policy.
@@ -12,13 +12,13 @@ baseline for work completed before this policy.
 
 ## 1. Purpose
 
-Scribo needs an engineering workflow that is auditable, AI-native, and
+Scribam needs an engineering workflow that is auditable, AI-native, and
 ready for future open-source collaboration without creating unnecessary
 administration for a solo developer.
 
 The operating model must answer four questions:
 
-1.  Where is the canonical knowledge about how Scribo should work?
+1.  Where is the canonical knowledge about how Scribam should work?
 2.  Where are active tasks, proposals, and discussions managed?
 3.  How are implementation and correctness evidenced?
 4.  How do we record the project's existing state without retroactively
@@ -257,7 +257,7 @@ It is not an attempt to recreate a perfect historical ledger.
     - Working-tree status if the baseline is recorded while the tree
       has uncommitted changes.
 2.  **Current product state**
-    - What Scribo Prosa does today.
+    - What Scribam Prosa does today.
     - Current supported editing modes and major workflows.
     - Known limitations, without implying that unverified capabilities
       are complete.
@@ -448,7 +448,7 @@ feature. Replace the example feature name and adapt the requested
 sections as appropriate.
 
 ```text
-I want to plan [FEATURE NAME] for Scribo Prosa.
+I want to plan [FEATURE NAME] for Scribam Prosa.
 
 First, read AGENTS.md, docs/engineering/operating-model.md, the product
 philosophy, and relevant architecture documentation, specifications,
@@ -796,5 +796,5 @@ require evidence for claims about correctness.**
 
 The purpose of the process is not to maximize documentation volume. It
 is to preserve enough context that future-you, another engineer, or an
-AI agent can understand why Scribo works the way it does, safely change
+AI agent can understand why Scribam works the way it does, safely change
 it, and verify the result.

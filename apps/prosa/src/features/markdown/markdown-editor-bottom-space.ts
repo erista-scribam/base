@@ -10,7 +10,7 @@ import { RangeSetBuilder } from "@codemirror/state";
 function bottomPadStyle(view: EditorView): string {
   const stack = view.dom.closest(".markdown-source-stack");
   const raw = stack
-    ? getComputedStyle(stack).getPropertyValue("--scribo-editor-pad-bottom").trim()
+    ? getComputedStyle(stack).getPropertyValue("--scribam-editor-pad-bottom").trim()
     : "";
   const pad = raw || "max(12rem, 48vh)";
   return `--md-bottom-pad:${pad};padding-bottom:var(--md-bottom-pad);`;

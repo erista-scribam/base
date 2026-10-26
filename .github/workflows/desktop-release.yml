@@ -57,7 +57,7 @@ jobs:
         with:
           projectPath: apps/prosa
           tagName: ${{ github.ref_name }}
-          releaseName: Scribo Prosa ${{ github.ref_name }}
+          releaseName: Scribam Prosa ${{ github.ref_name }}
           releaseBody: |
             See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md).
           releaseDraft: true

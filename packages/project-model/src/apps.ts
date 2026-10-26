@@ -1,7 +1,7 @@
-export type ScriboAppId =
-  "com.scribo.lanista" | "com.scribo.prosa" | "com.scribo.folia" | "com.scribo.drama";
+export type ScribamAppId =
+  "com.scribam.lanista" | "com.scribam.prosa" | "com.scribam.folia" | "com.scribam.drama";
 
-export const SCRIBO_APP_PROSA: ScriboAppId = "com.scribo.prosa";
-export const SCRIBO_APP_FOLIA: ScriboAppId = "com.scribo.folia";
-export const SCRIBO_APP_DRAMA: ScriboAppId = "com.scribo.drama";
-export const SCRIBO_APP_LANISTA: ScriboAppId = "com.scribo.lanista";
+export const SCRIBAM_APP_PROSA: ScribamAppId = "com.scribam.prosa";
+export const SCRIBAM_APP_FOLIA: ScribamAppId = "com.scribam.folia";
+export const SCRIBAM_APP_DRAMA: ScribamAppId = "com.scribam.drama";
+export const SCRIBAM_APP_LANISTA: ScribamAppId = "com.scribam.lanista";

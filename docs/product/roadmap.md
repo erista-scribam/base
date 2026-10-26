@@ -1,4 +1,4 @@
-# Scribo Prosa roadmap
+# Scribam Prosa roadmap
 
 **Status:** Living document  
 **Constitution:** [philosophy.md](./philosophy.md)  

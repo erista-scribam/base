@@ -1,4 +1,4 @@
-import type { ScriboAppId } from "./apps";
+import type { ScribamAppId } from "./apps";
 import { isProsaManuscriptRelativePath, normalizeRelativePath } from "./layout";
 
 export type PathOperation = "read" | "write" | "createDelete";
@@ -10,7 +10,7 @@ export interface AppPathOperations {
 }
 
 export interface AppCapabilityDeclaration {
-  appId: ScriboAppId;
+  appId: ScribamAppId;
   allowedOperations?: AppPathOperations;
 }
 
@@ -20,19 +20,19 @@ export interface ProjectAppsBlock {
   drama?: AppCapabilityDeclaration;
 }
 
-export const SCRIBO_PATH_FORBIDDEN = "ERR_SCRIBO_PATH_FORBIDDEN" as const;
+export const SCRIBAM_PATH_FORBIDDEN = "ERR_SCRIBAM_PATH_FORBIDDEN" as const;
 
 const DEFAULT_PROSA_WRITE = ["content/manuscripts", "contents/canon/manuscripts"] as const;
 
 const DEFAULT_PROSA_READ = [
   ...DEFAULT_PROSA_WRITE,
   "contents/shared",
-  "scribo.project.json",
+  "scribam.project.json",
 ] as const;
 
 export function defaultProsaCapabilities(): AppCapabilityDeclaration {
   return {
-    appId: "com.scribo.prosa",
+    appId: "com.scribam.prosa",
     allowedOperations: {
       read: [...DEFAULT_PROSA_READ],
       write: [...DEFAULT_PROSA_WRITE],
@@ -43,9 +43,9 @@ export function defaultProsaCapabilities(): AppCapabilityDeclaration {
 
 export function defaultFoliaCapabilities(): AppCapabilityDeclaration {
   return {
-    appId: "com.scribo.folia",
+    appId: "com.scribam.folia",
     allowedOperations: {
-      read: ["contents/canon/folia", "contents/shared", "scribo.project.json"],
+      read: ["contents/canon/folia", "contents/shared", "scribam.project.json"],
       write: ["contents/canon/folia"],
       createDelete: ["contents/canon/folia"],
     },
@@ -54,9 +54,9 @@ export function defaultFoliaCapabilities(): AppCapabilityDeclaration {
 
 export function defaultDramaCapabilities(): AppCapabilityDeclaration {
   return {
-    appId: "com.scribo.drama",
+    appId: "com.scribam.drama",
     allowedOperations: {
-      read: ["contents/canon/drama", "contents/shared", "scribo.project.json"],
+      read: ["contents/canon/drama", "contents/shared", "scribam.project.json"],
       write: ["contents/canon/drama"],
       createDelete: ["contents/canon/drama"],
     },
@@ -87,7 +87,7 @@ export function assertPathAllowed(
 ): void {
   const rel = normalizeRelativePath(relativePath);
   if (rel.includes("..")) {
-    throw new Error(SCRIBO_PATH_FORBIDDEN);
+    throw new Error(SCRIBAM_PATH_FORBIDDEN);
   }
   const allowed = prefixesForOp(cap, op);
   const ok = allowed.some((prefix) => {
@@ -95,13 +95,13 @@ export function assertPathAllowed(
     return rel === base || rel.startsWith(`${base}/`);
   });
   if (!ok) {
-    throw new Error(SCRIBO_PATH_FORBIDDEN);
+    throw new Error(SCRIBAM_PATH_FORBIDDEN);
   }
 }
 
 /** Manuscript prose files must live under a manuscript tree (stricter than manifest read). */
 export function assertProsaManuscriptPath(relativePath: string): void {
   if (!isProsaManuscriptRelativePath(relativePath)) {
-    throw new Error(SCRIBO_PATH_FORBIDDEN);
+    throw new Error(SCRIBAM_PATH_FORBIDDEN);
   }
 }

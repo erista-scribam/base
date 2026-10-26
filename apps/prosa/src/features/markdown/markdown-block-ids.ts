@@ -3,4 +3,4 @@ export {
   isBlockIdCommentLine,
   parseBlockIdComment,
   stripBlockIdComments,
-} from "@scribo/mdprosa";
+} from "@scribam/mdprosa";

@@ -1,12 +1,12 @@
 # Project architecture and storage specification
 
-**Status:** Draft — **historical / audit baseline**; **execution** moved to [006-scribo-lanista-platform.md](../plans/active/006-scribo-lanista-platform.md) and [lanista-platform-and-storage.md](./lanista-platform-and-storage.md)  
+**Status:** Draft — **historical / audit baseline**; **execution** moved to [006-scribam-lanista-platform.md](../plans/active/006-scribam-lanista-platform.md) and [lanista-platform-and-storage.md](./lanista-platform-and-storage.md)  
 **Plan:** [005-project-workspace-and-git.md](../plans/active/005-project-workspace-and-git.md) (paused)  
 **Philosophy:** [philosophy.md](../product/philosophy.md)
 
 **Legend:** **Verified** = inspected in repo; **Documented** = docs only; **Recommended** = proposal; **Assumption** = needs spike.
 
-**Product context:** [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md) — IDE-like UI for navigation/history; writing app first; not forking an IDE; **Scribo Prosa home** as default root with **projects as subfolders**.
+**Product context:** [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md) — IDE-like UI for navigation/history; writing app first; not forking an IDE; **Scribam Prosa home** as default root with **projects as subfolders**.
 
 ---
 
@@ -14,12 +14,12 @@
 
 **Recommended direction (Recommended):**
 
-1. **Live format:** A **project directory** on disk (user-visible folder) with a `scribo.project.json` manifest, a `content/` tree of versioned manuscripts, optional `workspace/` and `knowledge/` JSON/YAML, and a **Git repository** at project root for authored + manifest history.
+1. **Live format:** A **project directory** on disk (user-visible folder) with a `scribam.project.json` manifest, a `content/` tree of versioned manuscripts, optional `workspace/` and `knowledge/` JSON/YAML, and a **Git repository** at project root for authored + manifest history.
 2. **Git engine:** Integrate **libgit2** (`git2` crate) in the Rust/Tauri layer for commits, branches, merges, and diffs; expose writer-oriented commands to TypeScript—**after** a bounded feasibility spike (**Not executed**).
 3. **SQLite:** **Rebuildable indexes only** (search, backlinks, entity occurrence lists)—never an authoritative copy of prose (**Recommended**).
-4. **Portable package:** Optional `.scribo` archive (zip or custom container) for backup/import—**not** the live editing format (**Recommended**).
+4. **Portable package:** Optional `.scribam` archive (zip or custom container) for backup/import—**not** the live editing format (**Recommended**).
 5. **Migration:** Current **library folder** (flat `.md` + app config) maps to **single-manuscript projects** or **multi-doc projects** via import tool (**Assumption**—details in roadmap).
-6. **Prosa home (Recommended):** Default `Documents/Scribo Prosa/` (or user-chosen) is the **app home**; each **writing project** is a **child folder** with its own manifest and Git root—not manuscripts scattered at the home root long term.
+6. **Prosa home (Recommended):** Default `Documents/Scribam Prosa/` (or user-chosen) is the **app home**; each **writing project** is a **child folder** with its own manifest and Git root—not manuscripts scattered at the home root long term.
 
 **Principal risk:** Stable **entity IDs** across TipTap/Markdown round-trips are **not verified** today (`blockId()` regenerates UUIDs in `prosa-convert.ts`, `prosa-markdown.ts`)—Git merges and workspace references **require** ID stability first.
 
@@ -36,8 +36,8 @@ See [§2 detail table](#22-audit-table) and [implementation-audit.md](../archite
 | One manuscript ≈ one `.md` file | `library.rs` `write_library_markdown`, `walk_markdown_files` | Multi-doc = new manifest, not just UI         |
 | Library root in app config      | `library.json` in app config dir                             | Project path ≠ library path today             |
 | No Git / no SQLite in app       | `Cargo.toml` deps; repo grep                                 | Greenfield integration                        |
-| Autosave + recovery             | `ManuscriptPersistence`, `.scribo/recovery/`                 | Must coexist with Git commits—define ordering |
-| No project entity               | `ManuscriptSummary` only                                     | New `@scribo/core` types needed               |
+| Autosave + recovery             | `ManuscriptPersistence`, `.scribam/recovery/`                | Must coexist with Git commits—define ordering |
+| No project entity               | `ManuscriptSummary` only                                     | New `@scribam/core` types needed              |
 | Block IDs unstable on convert   | `blockId()` in `prosa-convert.ts:9`, `prosa-markdown.ts:6`   | Blocker for merge + workspace refs            |
 
 ### 2.2 Audit table
@@ -50,7 +50,7 @@ See [§2 detail table](#22-audit-table) and [implementation-audit.md](../archite
 | Recovery          | Sidecar JSON hashed by path key                                     | `library_recovery_path`, `recovery-policy.ts`  | Keep orthogonal to Git                          |
 | Editor modes      | Shared `ProsaDocument` in React; Md via CodeMirror string           | `App.tsx`, `prosa-markdown.ts`                 | Commit snapshots should use normalized Markdown |
 | Git/versioning    | **None**                                                            | No `git2` dep                                  | Spike required                                  |
-| Project structure | **Library folder** only; no manifest                                | `LibraryConfig` in `library.rs:19-21`          | Introduce `scribo.project.json`                 |
+| Project structure | **Library folder** only; no manifest                                | `LibraryConfig` in `library.rs:19-21`          | Introduce `scribam.project.json`                |
 | Database          | **None**                                                            | No SQLite                                      | Indexes optional later                          |
 | External sync     | Documented out of scope                                             | `MASTERPLAN.md`, `RELIABILITY.md`              | Drive/iCloud = **High** conflict risk           |
 | Tests             | Vitest persistence/markdown; Rust `library.rs` tests                | `manuscript-persistence.test.ts`               | Extend for Git/project                          |
@@ -65,7 +65,7 @@ See [§2 detail table](#22-audit-table) and [implementation-audit.md](../archite
 | Single authority per data category                                 | Spec rules §6; lint/review; no duplicate prose in SQLite                            |
 | Displayed doc matches last successful save or explicit dirty state | Existing save-state UI + new Git state machine                                      |
 | Branch switch/merge explicit                                       | UI confirmation; `pre-branch` commit or stash                                       |
-| Schema evolution explicit                                          | `scribo.project.json` `schemaVersion`; migrations in Rust + TS                      |
+| Schema evolution explicit                                          | `scribam.project.json` `schemaVersion`; migrations in Rust + TS                     |
 | Git history ≠ recovery sidecar                                     | Document lifecycle in §14                                                           |
 | Unsupported concurrent access fails safe                           | Detect external mtime / Git index mismatch; no silent merge with open editor        |
 
@@ -75,7 +75,7 @@ See [§2 detail table](#22-audit-table) and [implementation-audit.md](../archite
 
 ## 4. Architecture options compared
 
-| Criterion            | A. Flat library + snapshot revisions (old spec) | B. Project dir + Git (recommended) | C. Monolithic `.scribo` SQLite blob  |
+| Criterion            | A. Flat library + snapshot revisions (old spec) | B. Project dir + Git (recommended) | C. Monolithic `.scribam` SQLite blob |
 | -------------------- | ----------------------------------------------- | ---------------------------------- | ------------------------------------ |
 | Integrity / recovery | Medium (linear checkpoints)                     | **High** (Git + atomic files)      | Medium (single-file corruption risk) |
 | Branching / merges   | Poor                                            | **Native**                         | Poor                                 |
@@ -86,7 +86,7 @@ See [§2 detail table](#22-audit-table) and [implementation-audit.md](../archite
 | Portability          | `.md` only                                      | `.md` + `.git` or package          | Single file                          |
 | Drive sync           | Risky                                           | **Risky** (document §16)           | **Critical** risk                    |
 
-**Recommendation:** **B** — project directory + Git for all authored content and manifest; `.scribo` as optional export. **Sacrifices:** implementation complexity, mandatory migration from library-only users, ID stability work upfront.
+**Recommendation:** **B** — project directory + Git for all authored content and manifest; `.scribam` as optional export. **Sacrifices:** implementation complexity, mandatory migration from library-only users, ID stability work upfront.
 
 **Could change recommendation if:** Git spike fails packaging on macOS/Tauri, or ID stability proves intractable without full editor rewrite.
 
@@ -97,7 +97,7 @@ See [§2 detail table](#22-audit-table) and [implementation-audit.md](../archite
 ### 5.1 Prosa home vs project folder (Recommended)
 
 ```text
-Documents/Scribo Prosa/           # Prosa home (default; may hold many projects)
+Documents/Scribam Prosa/           # Prosa home (default; may hold many projects)
 ├── My Novel/                     # Project folder (Git root + manifest)
 │   └── …                         # See tree below
 ├── Essays/
@@ -111,7 +111,7 @@ Legacy/transitional: app config may still point at a single folder that acts as 
 ```text
 MyNovel/                          # User-facing project root (also Git root)
 ├── .git/                         # Version history (authoritative for tracked files)
-├── scribo.project.json           # Project manifest (tracked)
+├── scribam.project.json           # Project manifest (tracked)
 ├── content/
 │   ├── manuscripts/
 │   │   ├── novel/
@@ -127,7 +127,7 @@ MyNovel/                          # User-facing project root (also Git root)
 │   └── milestones.json
 ├── knowledge/                    # Entities, sources (tracked JSON)
 │   └── entities.json
-└── .scribo/                      # App-local, **not** in Git (or gitignored)
+└── .scribam/                      # App-local, **not** in Git (or gitignored)
     ├── index.sqlite              # Rebuildable search/backlinks
     ├── recovery/                 # Crash recovery
     └── ui-state.json             # Panel layout, last cursor (optional)
@@ -137,8 +137,8 @@ MyNovel/                          # User-facing project root (also Git root)
 
 | Component                    | Owns                                      | Must not                     |
 | ---------------------------- | ----------------------------------------- | ---------------------------- |
-| `@scribo/document-model`     | Schema, validation, serialization         | Git, FS, React               |
-| `@scribo/core`               | IDs, project/manuscript **types**, errors | I/O                          |
+| `@scribam/document-model`    | Schema, validation, serialization         | Git, FS, React               |
+| `@scribam/core`              | IDs, project/manuscript **types**, errors | I/O                          |
 | Rust `project/` module (new) | Manifest I/O, Git ops, migrations         | UI                           |
 | Rust `library.rs` (evolve)   | Back-compat import from legacy library    | Duplicate Git logic          |
 | React app                    | Editor, writer UI, invoke Git as verbs    | Direct filesystem            |
@@ -151,33 +151,33 @@ MyNovel/                          # User-facing project root (also Git root)
 | -------------------------- | ----------------------------- | -------------------- |
 | Prose (Markdown)           | `content/**/*.md`             | Yes                  |
 | Manuscript structure / IDs | `_manuscript.json` + manifest | Yes                  |
-| Project manifest           | `scribo.project.json`         | Yes                  |
+| Project manifest           | `scribam.project.json`        | Yes                  |
 | Workspace tasks/issues     | `workspace/*.json`            | Yes (optional track) |
 | Knowledge entities         | `knowledge/*.json`            | Yes                  |
-| Search index               | `.scribo/index.sqlite`        | No (rebuild)         |
-| Recovery                   | `.scribo/recovery/`           | No                   |
+| Search index               | `.scribam/index.sqlite`       | No (rebuild)         |
+| Recovery                   | `.scribam/recovery/`          | No                   |
 | App preferences            | Tauri app config              | No                   |
 
 **Rule:** No prose in SQLite; no Git objects without working tree files for primary content.
 
 ### 5.5 Stable identity (Recommended)
 
-- **ProjectId**, **ManuscriptId**, **DocumentId** — UUID in manifest (`@scribo/core`).
-- **BlockId** — stable across saves; assigned at creation, preserved in Markdown via HTML comments or `.md` front-matter map (`<!-- scribo:id=blk_... -->`) **Assumption—spike needed**.
+- **ProjectId**, **ManuscriptId**, **DocumentId** — UUID in manifest (`@scribam/core`).
+- **BlockId** — stable across saves; assigned at creation, preserved in Markdown via HTML comments or `.md` front-matter map (`<!-- scribam:id=blk_... -->`) **Assumption—spike needed**.
 - **Scene/chapter** — first-class entries in `_manuscript.json` pointing to file paths.
 - Workspace references store `{ entityId, anchor? }` not line numbers alone.
 
 ### 5.6 Package boundaries
 
-New package **`@scribo/project-model`** (Recommended) for manifest + workspace types—only when manifest stabilizes; until then types in `@scribo/core`.
+New package **`@scribam/project-model`** (Recommended) for manifest + workspace types—only when manifest stabilizes; until then types in `@scribam/core`.
 
 ---
 
 ## 6. Git integration and versioning policy
 
-### 6.1 Git provides vs Scribo must build
+### 6.1 Git provides vs Scribam must build
 
-| Capability             | Git | Scribo layer                             |
+| Capability             | Git | Scribam layer                            |
 | ---------------------- | --- | ---------------------------------------- |
 | Commits, DAG, branches | Yes | Writer labels, autosave→commit policy    |
 | Text diff              | Yes | Section/scene aggregation UI             |
@@ -206,7 +206,7 @@ New package **`@scribo/project-model`** (Recommended) for manifest + workspace t
 
 ## 7. Branching, merge, conflicts
 
-- **Switch branch:** require clean working tree or explicit stash commit (`scribo-stash/*` branch **Assumption**).
+- **Switch branch:** require clean working tree or explicit stash commit (`scribam-stash/*` branch **Assumption**).
 - **Merge:** Git merge with conflict markers in `.md`; UI for accept/keep both for prose paragraphs.
 - **Delete branch:** Git delete; warn if workspace refs point to branch-only entities.
 - **Rename/move file:** Git mv + update manifest in same commit.
@@ -221,7 +221,7 @@ Rebuildable from Git + manifest:
 - Backlinks (workspace → manuscript)
 - Entity occurrence cache
 
-Rebuild command: `scribo reindex` (Tauri) wipes and repopulates `.scribo/index.sqlite`.
+Rebuild command: `scribam reindex` (Tauri) wipes and repopulates `.scribam/index.sqlite`.
 
 ---
 
@@ -234,7 +234,7 @@ Rebuild command: `scribo reindex` (Tauri) wipes and repopulates `.scribo/index.s
 
 ## 10. Schema version and migration
 
-- `scribo.project.json`: `projectSchemaVersion`, `appMinVersion`.
+- `scribam.project.json`: `projectSchemaVersion`, `appMinVersion`.
 - Migrations: Rust entrypoint `migrate_project(path)` run before open; backup branch commit first.
 - Legacy library: detect flat `.md` folder → wizard creates project + initial commit.
 
@@ -253,7 +253,7 @@ Rebuild command: `scribo reindex` (Tauri) wipes and repopulates `.scribo/index.s
 
 ---
 
-## 12. Import, export, `.scribo` package
+## 12. Import, export, `.scribam` package
 
 - **Export package:** zip(project tree) or git bundle + manifest checksum.
 - **Import:** validate schema, optional clone as new project id.
@@ -268,7 +268,7 @@ Rebuild command: `scribo reindex` (Tauri) wipes and repopulates `.scribo/index.s
 **Recommended policy:**
 
 - Projects **may** live in synced folders at user risk.
-- Scribo **must not** claim safe multi-device concurrent edit via Drive.
+- Scribam **must not** claim safe multi-device concurrent edit via Drive.
 - Detect index lock / mtime races; prompt reload or copy-out.
 - Premium sync (future) = separate protocol with conflict rules—not Drive file polling alone.
 
@@ -305,7 +305,7 @@ TypeScript: project shell, contextual workspace panel, no direct Git.
 
 ## 17. Alternatives considered
 
-- Linear `.scribo/revisions/` ([revision-history-v1.md](./revision-history-v1.md)) — simpler but no real branches; **superseded**.
+- Linear `.scribam/revisions/` ([revision-history-v1.md](./revision-history-v1.md)) — simpler but no real branches; **superseded**.
 - Single SQLite document blob — rejected (§4).
 - CRDT/real-time — out of scope.
 

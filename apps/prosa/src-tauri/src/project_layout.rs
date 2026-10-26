@@ -67,7 +67,7 @@ mod tests {
 
     #[test]
     fn resolve_prefers_v2_when_directory_exists() {
-        let root = std::env::temp_dir().join(format!("scribo-layout-{}", uuid::Uuid::new_v4()));
+        let root = std::env::temp_dir().join(format!("scribam-layout-{}", uuid::Uuid::new_v4()));
         fs::create_dir_all(root.join(LAYOUT_V2_MANUSCRIPTS)).unwrap();
         assert_eq!(
             resolve_manuscripts_dir(&root),
@@ -78,7 +78,7 @@ mod tests {
 
     #[test]
     fn migrate_moves_v1_manuscripts_to_v2() {
-        let root = std::env::temp_dir().join(format!("scribo-migrate-{}", uuid::Uuid::new_v4()));
+        let root = std::env::temp_dir().join(format!("scribam-migrate-{}", uuid::Uuid::new_v4()));
         let v1 = root.join(LAYOUT_V1_MANUSCRIPTS);
         fs::create_dir_all(&v1).unwrap();
         fs::write(v1.join("chapter.mdprosa"), "# hi").unwrap();

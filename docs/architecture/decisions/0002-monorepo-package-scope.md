@@ -5,7 +5,7 @@
 
 ## Decision
 
-Start with `@scribo/core` and `@scribo/document-model` only. Defer additional packages (`editor`, `rendering`, `export`, etc.) until a concrete boundary exists.
+Start with `@scribam/core` and `@scribam/document-model` only. Defer additional packages (`editor`, `rendering`, `export`, etc.) until a concrete boundary exists.
 
 ## Consequences
 

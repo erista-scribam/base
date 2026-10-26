@@ -1,5 +1,5 @@
-import type { ManuscriptSummary } from "@scribo/core";
-import type { ProsaDocument } from "@scribo/document-model";
+import type { ManuscriptSummary } from "@scribam/core";
+import type { ProsaDocument } from "@scribam/document-model";
 import {
   clearRecoverySnapshot,
   saveManuscriptDocument,

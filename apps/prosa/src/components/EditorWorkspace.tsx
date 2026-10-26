@@ -8,7 +8,7 @@ import {
   forwardRef,
 } from "react";
 import type { Editor } from "@tiptap/core";
-import { serializeProsaDocument, type ProsaDocument } from "@scribo/document-model";
+import { serializeProsaDocument, type ProsaDocument } from "@scribam/document-model";
 import { ProsaEditor } from "../editor/ProsaEditor";
 import { ManuscriptPreview } from "./ManuscriptPreview";
 import { MarkdownSectionOutline } from "./MarkdownSectionOutline";

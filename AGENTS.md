@@ -1,6 +1,6 @@
 # Instructions for AI coding agents
 
-Scribo Prosa is a local-first Tauri desktop writing app. Follow this file before changing code or docs.
+Scribam Prosa is a local-first Tauri desktop writing app. Follow this file before changing code or docs.
 
 ## Non-negotiables
 
@@ -49,7 +49,7 @@ Touch Rust → `pnpm verify:all`. Docs-only → `pnpm format:check` at minimum.
 
 ## Document model
 
-- Authoritative types live in `@scribo/document-model`.
+- Authoritative types live in `@scribam/document-model`.
 - TipTap and CodeMirror are adapters; do not treat editor JSON as canonical.
 - Library manuscripts persist as `.mdprosa` (dual-read legacy `.md`); Proper mode uses `ProsaDocument` in memory.
 

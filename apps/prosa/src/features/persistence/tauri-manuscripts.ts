@@ -1,12 +1,12 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { ManuscriptSummary, ScriboProjectManifest } from "@scribo/core";
-import type { ProsaDocument } from "@scribo/document-model";
+import type { ManuscriptSummary, ScribamProjectManifest } from "@scribam/core";
+import type { ProsaDocument } from "@scribam/document-model";
 import {
   createEmptyProsaDocument,
   deserializeProsaDocument,
   serializeProsaDocument,
   tryValidateProsaDocument,
-} from "@scribo/document-model";
+} from "@scribam/document-model";
 import { markdownToProsaDocument, prosaDocumentToMarkdown } from "../markdown/prosa-markdown";
 import { normalizeMarkdownSource } from "../markdown/markdown-normalize";
 import type { RecoveryCandidate } from "./recovery-policy";
@@ -21,7 +21,7 @@ export interface LibraryInfo {
   rootPath: string;
   homePath: string;
   exists: boolean;
-  project?: ScriboProjectManifest;
+  project?: ScribamProjectManifest;
 }
 
 interface LoadedManuscriptPayload {

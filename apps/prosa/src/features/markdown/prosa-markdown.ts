@@ -1,12 +1,12 @@
-import type { ProsaBlock, ProsaDocument, ProsaListBlock } from "@scribo/document-model";
-import { PROSA_SCHEMA_VERSION, tryValidateProsaDocument } from "@scribo/document-model";
+import type { ProsaBlock, ProsaDocument, ProsaListBlock } from "@scribam/document-model";
+import { PROSA_SCHEMA_VERSION, tryValidateProsaDocument } from "@scribam/document-model";
 import { isSceneBreakLineRaw, stripLegacySourceIndent } from "./markdown-source-layout";
 import { parseInlineMarkdown, serializeInline } from "./markdown-inline";
 import { formatBlockIdComment, parseBlockIdComment } from "./markdown-block-ids";
 import { preserveBlockIdsFromBase } from "./markdown-block-id-reconcile";
 
 export type ProsaMarkdownSerializeOptions = {
-  /** Embed `<!-- scribo:block=... -->` anchors for on-disk / Git stability. Default true. */
+  /** Embed `<!-- scribam:block=... -->` anchors for on-disk / Git stability. Default true. */
   embedBlockIds?: boolean;
 };
 

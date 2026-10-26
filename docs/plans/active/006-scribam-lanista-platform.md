@@ -1,4 +1,4 @@
-# Plan 006 — Scribo Lanista platform, app sandbox, per-manuscript Git, `.mdprosa`
+# Plan 006 — Scribam Lanista platform, app sandbox, per-manuscript Git, `.mdprosa`
 
 **Status:** **Withdrawn** (2026-10-26) — Lanista is a **future paid product**; this monorepo ships **standalone apps only**. See [lanista-future.md](../../product/lanista-future.md).  
 **Adopted:** 2026-10-26 (historical)  
@@ -8,7 +8,7 @@
 
 ## Executive summary
 
-**Scribo Lanista** is a new **central desktop app** that owns the user’s Scribo **home**, **project catalog**, and **which Scribo app opens which work**. **Scribo Prosa** becomes one **satellite app**: it launches only through Lanista (or equivalent deep link) with a **narrow filesystem contract**—today **only** `content/manuscripts/` inside an opened project.
+**Scribam Lanista** is a new **central desktop app** that owns the user’s Scribam **home**, **project catalog**, and **which Scribam app opens which work**. **Scribam Prosa** becomes one **satellite app**: it launches only through Lanista (or equivalent deep link) with a **narrow filesystem contract**—today **only** `content/manuscripts/` inside an opened project.
 
 This plan **re-bases** storage and versioning:
 
@@ -16,7 +16,7 @@ This plan **re-bases** storage and versioning:
 | -------------- | ----------------------------------------- | --------------------------------------------------------------------------------------- |
 | Hub            | Prosa manages projects + Git UI           | **Lanista** manages projects; Prosa edits prose                                         |
 | Git scope      | One `.git` at **project root**            | One `.git` **per manuscript** (under `content/manuscripts/…`)                           |
-| Prose on disk  | `.md` (Markdown)                          | **`.mdprosa`** (Scribo prose format; owned parser package)                              |
+| Prose on disk  | `.md` (Markdown)                          | **`.mdprosa`** (Scribam prose format; owned parser package)                             |
 | App FS access  | Single Tauri app, full project tree       | **Per-app allowlist**; Prosa cannot read `workspace/`, `knowledge/`, other apps’ trees  |
 | Canonical tree | `content/` + optional workspace/knowledge | **`content/manuscripts/` mandatory for Prosa**; other subtrees reserved for future apps |
 
@@ -24,13 +24,13 @@ Plan 005 **philosophy and shipped foundations** (stable block IDs, project manif
 
 ---
 
-## 1. Scribo Lanista (central app)
+## 1. Scribam Lanista (central app)
 
 ### 1.1 Responsibilities
 
 | Lanista owns                                                    | Prosa (and future apps) own                            |
 | --------------------------------------------------------------- | ------------------------------------------------------ |
-| Default Scribo home path (e.g. `Documents/Scribo/`)             | Editing experience inside granted paths                |
+| Default Scribam home path (e.g. `Documents/Scribam/`)           | Editing experience inside granted paths                |
 | Project registry (create, rename, remove from catalog, recents) | Manuscript UI, autosave, recovery within allowlist     |
 | Launch satellite apps with **project id + capability grant**    | Invoke Rust/TS only within granted roots               |
 | Global preferences (optional): default app per project type     | App-local UI state                                     |
@@ -45,7 +45,7 @@ Plan 005 **philosophy and shipped foundations** (stable block IDs, project manif
 ### 1.3 Technical shape (Recommended)
 
 - **New Tauri app:** `apps/lanista` (name TBD in ADR).
-- **IPC / launch:** Lanista spawns Prosa (and later apps) with arguments or env: `SCRIBO_PROJECT_ROOT`, `SCRIBO_GRANT_PATHS` (JSON array of relative paths), `SCRIBO_MANUSCRIPT_ID` (optional).
+- **IPC / launch:** Lanista spawns Prosa (and later apps) with arguments or env: `SCRIBAM_PROJECT_ROOT`, `SCRIBAM_GRANT_PATHS` (JSON array of relative paths), `SCRIBAM_MANUSCRIPT_ID` (optional).
 - **Shared Rust crate(s):** project registry, grant validation, migration runners—**not** duplicated in each app.
 - **Config split:** Lanista persists `lanista.json` (or equivalent) in app config; **project** data stays under user-visible project folders.
 
@@ -63,17 +63,17 @@ Plan 005 **philosophy and shipped foundations** (stable block IDs, project manif
 ### 2.1 Project layout (normative for 006)
 
 ```text
-Documents/Scribo/                    # Lanista home (default name TBD in ADR)
+Documents/Scribam/                    # Lanista home (default name TBD in ADR)
 ├── .lanista/                        # Lanista-local index (optional; not authoritative prose)
 └── My Novel/                        # Project folder
-    ├── scribo.project.json          # Project manifest + app capability map
+    ├── scribam.project.json          # Project manifest + app capability map
     └── content/
         └── manuscripts/             # **Prosa-only** (enforced read/write for Prosa)
             └── ch-01/               # Manuscript package (Recommended)
                 ├── ch-01.mdprosa    # Authoritative prose file (v1: one file per package)
                 ├── _manuscript.json # IDs, title, schema pointers (tracked in ms Git)
                 ├── .git/            # **Per-manuscript** version history
-                └── .scribo/
+                └── .scribam/
                     └── recovery/    # Crash recovery (not in Git)
 ```
 
@@ -82,11 +82,11 @@ Documents/Scribo/                    # Lanista home (default name TBD in ADR)
 - Prosa **must refuse** to open paths outside `content/manuscripts/` (except read-only manifest slice needed for title/id—define minimal manifest API in spec).
 - Creating manuscripts **must** create under `content/manuscripts/` only.
 - No `.md` manuscripts in Prosa UI after migration window (see §7).
-- Future apps get **their own** top-level subtrees (e.g. `content/storyboard/`, `workspace/`) declared in `scribo.project.json`; absent declaration = no access.
+- Future apps get **their own** top-level subtrees (e.g. `content/storyboard/`, `workspace/`) declared in `scribam.project.json`; absent declaration = no access.
 
 ### 2.2 Manifest extension (Recommended)
 
-Extend `scribo.project.json` with:
+Extend `scribam.project.json` with:
 
 ```json
 {
@@ -115,11 +115,11 @@ Lanista validates on open; satellite apps re-validate on every Tauri FS command 
 
 | Tracked in manuscript `.git`          | Not tracked           |
 | ------------------------------------- | --------------------- |
-| `*.mdprosa`                           | `.scribo/recovery/`   |
+| `*.mdprosa`                           | `.scribam/recovery/`  |
 | `_manuscript.json`                    | Rebuildable indexes   |
 | Optional small sidecars (TBD in spec) | Lanista-only UI state |
 
-**Project-level** `scribo.project.json` changes: either **unversioned** (Lanista writes with explicit “project settings changed”), **Lanista-managed** lightweight repo at project root (`.git` **only** for manifest—**not** prose), or **event log** in `.lanista/`—**decision required** (ADR, §9).
+**Project-level** `scribam.project.json` changes: either **unversioned** (Lanista writes with explicit “project settings changed”), **Lanista-managed** lightweight repo at project root (`.git` **only** for manifest—**not** prose), or **event log** in `.lanista/`—**decision required** (ADR, §9).
 
 ### 3.3 UI impact
 
@@ -134,27 +134,27 @@ Lanista validates on open; satellite apps re-validate on every Tauri FS command 
 
 ---
 
-## 4. `.mdprosa` format and `@scribo/mdprosa` (or `@scribo/prosa-format`)
+## 4. `.mdprosa` format and `@scribam/mdprosa` (or `@scribam/prosa-format`)
 
 ### 4.1 Why not `.md`
 
-- Clear **product boundary**: generic Markdown tools must not treat Scribo files as plain CommonMark without adapters.
+- Clear **product boundary**: generic Markdown tools must not treat Scribam files as plain CommonMark without adapters.
 - Room for **evolving** syntax (directives, stable IDs, scene markers) without fighting `.md` ecosystem expectations.
 - Posterity: versioned **format spec** independent of editor UI.
 
 ### 4.2 v1 format scope (Recommended)
 
 - **Superset of today’s normalized Markdown** plus **mandatory** stable block-id encoding (from Phase 1 anchors).
-- **Media type / extension:** `.mdprosa`; optional shebang or front matter `scribo-format-version: 1`.
+- **Media type / extension:** `.mdprosa`; optional shebang or front matter `scribam-format-version: 1`.
 - **Round-trip:** `ProsaDocument` ↔ `.mdprosa` via new package; TipTap/CodeMirror adapters call **only** this package at the boundary (aligns with invariants).
 
 ### 4.3 New package
 
-| Package                      | Role                                                                       |
-| ---------------------------- | -------------------------------------------------------------------------- |
-| `@scribo/mdprosa` (name TBD) | Parse, serialize, validate, normalize; **no** React/Tauri                  |
-| `@scribo/document-model`     | Unchanged canonical in-memory model                                        |
-| App adapters                 | Thin wrappers; deprecate direct “generic markdown” paths for library saves |
+| Package                       | Role                                                                       |
+| ----------------------------- | -------------------------------------------------------------------------- |
+| `@scribam/mdprosa` (name TBD) | Parse, serialize, validate, normalize; **no** React/Tauri                  |
+| `@scribam/document-model`     | Unchanged canonical in-memory model                                        |
+| App adapters                  | Thin wrappers; deprecate direct “generic markdown” paths for library saves |
 
 ### 4.4 Breaking change
 
@@ -168,7 +168,7 @@ Lanista validates on open; satellite apps re-validate on every Tauri FS command 
 ### 5.1 Enforcement layers
 
 1. **Grant at launch** (Lanista → Prosa).
-2. **Rust command guard:** every library/Git/path command resolves path under grant; reject with **stable error code** (`ERR_SCRIBO_PATH_FORBIDDEN`).
+2. **Rust command guard:** every library/Git/path command resolves path under grant; reject with **stable error code** (`ERR_SCRIBAM_PATH_FORBIDDEN`).
 3. **No “open arbitrary folder” in Prosa** for production builds (developer override behind feature flag only).
 
 ### 5.2 Failure mode
@@ -209,17 +209,17 @@ Lanista validates on open; satellite apps re-validate on every Tauri FS command 
 
 ### 6.3 Dependencies on shipped 005 work
 
-| Shipped                                        | Action under 006                                                   |
-| ---------------------------------------------- | ------------------------------------------------------------------ |
-| Block ID anchors in Markdown                   | **Port** to `.mdprosa` serializer in new package                   |
-| `scribo.project.json` + `content/manuscripts/` | **Extend** layoutVersion; keep path                                |
-| Home → project subfolder migration             | **Move** to Lanista; same on-disk outcome                          |
-| Project-root Git UI/commands                   | **Refactor** to per-manuscript or **feature-freeze** until Phase B |
-| Markdown-only explorer                         | Switch to `.mdprosa`-only after migration phase                    |
+| Shipped                                         | Action under 006                                                   |
+| ----------------------------------------------- | ------------------------------------------------------------------ |
+| Block ID anchors in Markdown                    | **Port** to `.mdprosa` serializer in new package                   |
+| `scribam.project.json` + `content/manuscripts/` | **Extend** layoutVersion; keep path                                |
+| Home → project subfolder migration              | **Move** to Lanista; same on-disk outcome                          |
+| Project-root Git UI/commands                    | **Refactor** to per-manuscript or **feature-freeze** until Phase B |
+| Markdown-only explorer                          | Switch to `.mdprosa`-only after migration phase                    |
 
 ### 6.4 Open decisions (ADR / spec gates)
 
-1. Lanista home directory name: `Documents/Scribo` vs retain `Documents/Scribo Prosa` for compatibility.
+1. Lanista home directory name: `Documents/Scribam` vs retain `Documents/Scribam Prosa` for compatibility.
 2. Project manifest versioning: Git at project root for manifest-only vs Lanista event log.
 3. Manuscript package: flat `foo.mdprosa` vs directory `foo/foo.mdprosa` (directory recommended for per-ms Git).
 4. Multi-window Prosa: one grant per window vs one process per manuscript.
@@ -232,7 +232,7 @@ Lanista validates on open; satellite apps re-validate on every Tauri FS command 
 | Step | Actor                      | Outcome                                                              |
 | ---- | -------------------------- | -------------------------------------------------------------------- |
 | M0   | Lanista (or migration CLI) | Backup zip prompt                                                    |
-| M1   | Lanista                    | Register existing `Documents/Scribo Prosa/**` projects in catalog    |
+| M1   | Lanista                    | Register existing `Documents/Scribam Prosa/**` projects in catalog   |
 | M2   | Tooling                    | Rename `.md` → `.mdprosa` under `content/manuscripts/`               |
 | M3   | Tooling                    | Split project `.git` → per-manuscript repos (or re-init with import) |
 | M4   | Manifest                   | `layoutVersion: 2`, `apps.prosa.allowedRelativePaths`                |
@@ -263,7 +263,7 @@ flowchart TB
 | Phase | Deliverable                                                                                  | Gate                           |
 | ----- | -------------------------------------------------------------------------------------------- | ------------------------------ |
 | **A** | [lanista-platform-and-storage.md](../../specs/lanista-platform-and-storage.md), pending ADRs | Human approval before code     |
-| **B** | `@scribo/mdprosa` parse/serialize; tests from existing markdown fixtures                     | `pnpm verify`                  |
+| **B** | `@scribam/mdprosa` parse/serialize; tests from existing markdown fixtures                    | `pnpm verify`                  |
 | **C** | Lanista lists/opens projects; spawns Prosa with grants (dev builds)                          | Manual QA                      |
 | **D** | Rust path guard; Prosa refuses out-of-grant I/O                                              | Contract tests                 |
 | **E** | Git init/commit/history per manuscript package; Prosa VC panel scoped                        | Interrupt + corrupt repo tests |
@@ -278,7 +278,7 @@ flowchart TB
 
 | Deliverable             | Path                                                                                 | Purpose                                |
 | ----------------------- | ------------------------------------------------------------------------------------ | -------------------------------------- |
-| **This plan**           | [006-scribo-lanista-platform.md](./006-scribo-lanista-platform.md)                   | Master execution                       |
+| **This plan**           | [006-scribam-lanista-platform.md](./006-scribam-lanista-platform.md)                 | Master execution                       |
 | Platform & storage spec | [specs/lanista-platform-and-storage.md](../../specs/lanista-platform-and-storage.md) | Source of truth (to author in Phase A) |
 | `.mdprosa` format spec  | [specs/mdprosa-format-v1.md](../../specs/mdprosa-format-v1.md)                       | Format contract                        |
 | App sandbox spec        | [specs/app-filesystem-grants.md](../../specs/app-filesystem-grants.md)               | Grant enforcement                      |
@@ -292,9 +292,9 @@ flowchart TB
 ## 10. Non-negotiables (unchanged)
 
 - Local-first; no silent loss of authored content.
-- `@scribo/document-model` canonical for Classic; adapters at app edge.
+- `@scribam/document-model` canonical for Classic; adapters at app edge.
 - Analysis must not silently mutate prose.
-- `@scribo/core` free of HTTP, ORM, React, Node I/O.
+- `@scribam/core` free of HTTP, ORM, React, Node I/O.
 - Persistence/recovery/schema changes require failure-mode thinking and tests.
 
 ---

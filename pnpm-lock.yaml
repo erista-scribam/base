@@ -50,13 +50,13 @@ importers:
       '@codemirror/view':
         specifier: ^6.43.15
         version: 6.43.15
-      '@scribo/core':
+      '@scribam/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@scribo/document-model':
+      '@scribam/document-model':
         specifier: workspace:*
         version: link:../../packages/document-model
-      '@scribo/mdprosa':
+      '@scribam/mdprosa':
         specifier: workspace:*
         version: link:../../packages/mdprosa
       '@tauri-apps/api':
@@ -177,7 +177,7 @@ importers:
 
   packages/document-model:
     dependencies:
-      '@scribo/core':
+      '@scribam/core':
         specifier: workspace:*
         version: link:../core
       zod:
@@ -202,7 +202,7 @@ importers:
 
   packages/project-model:
     dependencies:
-      '@scribo/core':
+      '@scribam/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

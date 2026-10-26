@@ -1,6 +1,6 @@
 # Writing friction log (Phase 0)
 
-Record **concrete friction** from real Scribo Prosa sessions. This grounds the roadmap in evidence, not competitor features.
+Record **concrete friction** from real Scribam Prosa sessions. This grounds the roadmap in evidence, not competitor features.
 
 ## How to add an entry
 

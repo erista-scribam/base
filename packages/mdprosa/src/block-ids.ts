@@ -2,12 +2,12 @@ const BLOCK_ID_PATTERN = /^blk_[0-9a-f-]+$/i;
 
 /** HTML comment embedded in sources to preserve block identity. */
 export function formatBlockIdComment(blockId: string): string {
-  return `<!-- scribo:block=${blockId} -->`;
+  return `<!-- scribam:block=${blockId} -->`;
 }
 
 export function parseBlockIdComment(line: string): string | null {
   const trimmed = line.trim();
-  const match = /^<!--\s*scribo:block=(\S+)\s*-->$/u.exec(trimmed);
+  const match = /^<!--\s*scribam:block=(\S+)\s*-->$/u.exec(trimmed);
   if (!match?.[1] || !BLOCK_ID_PATTERN.test(match[1])) {
     return null;
   }

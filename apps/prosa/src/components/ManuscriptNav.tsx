@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { ManuscriptSummary } from "@scribo/core";
+import type { ManuscriptSummary } from "@scribam/core";
 import type { GitChangedFile } from "../features/version-control/project-version-control";
 import type { SidebarProjectView } from "../hooks/useSidebarProjectView";
 import { useSidebarLayout } from "../hooks/useSidebarLayout";

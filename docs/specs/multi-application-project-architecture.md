@@ -1,9 +1,9 @@
 # Multi-application project architecture
 
 **Status:** Draft — awaiting architectural review  
-**Scope:** Scribo product family (Lanista, Prosa, Folia, Drama, future apps)  
+**Scope:** Scribam product family (Lanista, Prosa, Folia, Drama, future apps)  
 **Related plans:** [project-format-and-storage.md](../plans/active/project-format-and-storage.md), [project-git-strategy.md](../plans/active/project-git-strategy.md), [multi-application-architecture-roadmap.md](../plans/active/multi-application-architecture-roadmap.md)  
-**Prior art:** [project-architecture-and-storage.md](./project-architecture-and-storage.md) (005 audit), [006-scribo-lanista-platform.md](../plans/active/006-scribo-lanista-platform.md) (partial overlap — see §12)
+**Prior art:** [project-architecture-and-storage.md](./project-architecture-and-storage.md) (005 audit), [006-scribam-lanista-platform.md](../plans/active/006-scribam-lanista-platform.md) (partial overlap — see §12)
 
 ---
 
@@ -11,12 +11,12 @@
 
 **Recommended direction:**
 
-1. **Three levels:** (a) **Scribo applications** with distinct domain models; (b) **Scribo projects** as user-visible folders; (c) **shared infrastructure** (identity, storage contracts, Git, migrations, integrity) in typed packages and Rust services—not a universal document model.
-2. **Scribo Lanista** (future paid hub): integrated project + app switching; satellites (Prosa, Folia, Drama) remain domain apps. **Not shipped** — see [lanista-future.md](../product/lanista-future.md). Prosa is standalone today.
+1. **Three levels:** (a) **Scribam applications** with distinct domain models; (b) **Scribam projects** as user-visible folders; (c) **shared infrastructure** (identity, storage contracts, Git, migrations, integrity) in typed packages and Rust services—not a universal document model.
+2. **Scribam Lanista** (future paid hub): integrated project + app switching; satellites (Prosa, Folia, Drama) remain domain apps. **Not shipped** — see [lanista-future.md](../product/lanista-future.md). Prosa is standalone today.
 3. **Project layout (evolution):** adopt a **`contents/canon/` + `contents/shared/`** tree (see §5), evolving from today’s verified `content/manuscripts/` via adapters—not a big-bang rename without migration.
 4. **Git (default):** **one repository per project** (Option A) tracking all **canonical** paths; **capability checks** at app/Tauri boundaries—not folder names alone. Revisit **domain-separated repos** (Option B) only with measured evidence (§6).
 5. **Formats:** **typed extensions** (e.g. `.mdprosa`, future `.folia`, `.drama`) where they encode an **enforceable contract**; shared research/assets use neutral formats + manifest typing.
-6. **Packages:** extend `@scribo/core` for project/capability types; add **`@scribo/project-model`** (or split crates) for manifest; domain packages (`@scribo/mdprosa`, future `@scribo/folia-model`) stay product-specific; Rust **`scribo-project`** (name TBD) for FS/Git guards shared by Tauri apps.
+6. **Packages:** extend `@scribam/core` for project/capability types; add **`@scribam/project-model`** (or split crates) for manifest; domain packages (`@scribam/mdprosa`, future `@scribam/folia-model`) stay product-specific; Rust **`scribam-project`** (name TBD) for FS/Git guards shared by Tauri apps.
 
 **Immediate next action:** Human review of this spec + [project-git-strategy.md](../plans/active/project-git-strategy.md) experiments; **do not** implement until gates in §11 pass.
 
@@ -30,33 +30,33 @@ Evidence classes: **Verified** (inspected in repo), **Documented** (docs only), 
 
 ### 2.1 Monorepo and applications
 
-| Finding                                         | Class               | Evidence                                                                                                                     | Implication                                                                                             |
-| ----------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Single shipped app: **Scribo Prosa**            | Verified            | `apps/prosa/` only; `pnpm-workspace.yaml` `apps/*`; root `package.json` scripts target `@scribo/prosa`                       | Scribo Folia, Drama, Lanista are not in tree                                                            |
-| Rust workspace = Prosa Tauri only               | Verified            | Root `Cargo.toml` members: `apps/prosa/src-tauri`                                                                            | Shared native project crate not extracted                                                               |
-| **Scribo Lanista** as runnable launcher         | **Unknown in repo** | Grep: no `apps/lanista`, no Lanista Rust/TS sources; only [006](../plans/active/006-scribo-lanista-platform.md) + stub specs | User-facing “Lanista exists” may refer to **product intent** or **external binary**—not verifiable here |
-| Lanista documented as **future** `apps/lanista` | Documented          | [006 §1.3](../plans/active/006-scribo-lanista-platform.md)                                                                   | Conflicts with “already exists” until another repo/path provided                                        |
-| **Scribo Folia** (presentations) / **Drama**    | Documented          | `README.md` lists future product lines; no `apps/folia`                                                                      | Naming: **Scribo Folia** (not “Presentation”)                                                           |
-| Prosa acts as **interim hub**                   | Verified            | `ProjectSwitcher.tsx`, `library.json` via `library.rs`, `open_project` / `create_project` in `lib.rs`                        | Hub responsibilities live in Prosa today                                                                |
+| Finding                                         | Class               | Evidence                                                                                                                      | Implication                                                                                             |
+| ----------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Single shipped app: **Scribam Prosa**           | Verified            | `apps/prosa/` only; `pnpm-workspace.yaml` `apps/*`; root `package.json` scripts target `@scribam/prosa`                       | Scribam Folia, Drama, Lanista are not in tree                                                           |
+| Rust workspace = Prosa Tauri only               | Verified            | Root `Cargo.toml` members: `apps/prosa/src-tauri`                                                                             | Shared native project crate not extracted                                                               |
+| **Scribam Lanista** as runnable launcher        | **Unknown in repo** | Grep: no `apps/lanista`, no Lanista Rust/TS sources; only [006](../plans/active/006-scribam-lanista-platform.md) + stub specs | User-facing “Lanista exists” may refer to **product intent** or **external binary**—not verifiable here |
+| Lanista documented as **future** `apps/lanista` | Documented          | [006 §1.3](../plans/active/006-scribam-lanista-platform.md)                                                                   | Conflicts with “already exists” until another repo/path provided                                        |
+| **Scribam Folia** (presentations) / **Drama**   | Documented          | `README.md` lists future product lines; no `apps/folia`                                                                       | Naming: **Scribam Folia** (not “Presentation”)                                                          |
+| Prosa acts as **interim hub**                   | Verified            | `ProjectSwitcher.tsx`, `library.json` via `library.rs`, `open_project` / `create_project` in `lib.rs`                         | Hub responsibilities live in Prosa today                                                                |
 
 ### 2.2 Shared packages
 
-| Finding                                                                    | Class    | Evidence                                     |
-| -------------------------------------------------------------------------- | -------- | -------------------------------------------- |
-| `@scribo/core` — IDs, errors, `ManuscriptSummary`, `ScriboProjectManifest` | Verified | `packages/core/src/index.ts`, `project.ts`   |
-| `@scribo/document-model` — `ProsaDocument`, Zod validation                 | Verified | `packages/document-model/src/prosa/types.ts` |
-| No `@scribo/mdprosa`, `@scribo/project-model`, Folia/Drama models          | Verified | Only `core` + `document-model` packages      |
-| `@scribo/core` free of HTTP/React/I/O                                      | Verified | `package.json` deps empty; AGENTS.md law     |
+| Finding                                                                      | Class    | Evidence                                     |
+| ---------------------------------------------------------------------------- | -------- | -------------------------------------------- |
+| `@scribam/core` — IDs, errors, `ManuscriptSummary`, `ScribamProjectManifest` | Verified | `packages/core/src/index.ts`, `project.ts`   |
+| `@scribam/document-model` — `ProsaDocument`, Zod validation                  | Verified | `packages/document-model/src/prosa/types.ts` |
+| No `@scribam/mdprosa`, `@scribam/project-model`, Folia/Drama models          | Verified | Only `core` + `document-model` packages      |
+| `@scribam/core` free of HTTP/React/I/O                                       | Verified | `package.json` deps empty; AGENTS.md law     |
 
 ### 2.3 Prosa document model and editing
 
-| Finding                                                      | Class    | Evidence                                               |
-| ------------------------------------------------------------ | -------- | ------------------------------------------------------ |
-| Canonical in-memory: `ProsaDocument`                         | Verified | `document-model`, `App.tsx`                            |
-| Classic: TipTap; Markdown: CodeMirror                        | Verified | `EditorWorkspace.tsx`, `MarkdownSourceEditor.tsx`      |
-| Disk for library: **Markdown** `.md`                         | Verified | `library.rs` `is_markdown_file`, `walk_markdown_files` |
-| Block IDs on disk: HTML comments `<!-- scribo:block=... -->` | Verified | `markdown-block-ids.ts`, tests                         |
-| Adapters at app boundary                                     | Verified | `prosa-markdown.ts`, `prosa-convert.ts`                |
+| Finding                                                       | Class    | Evidence                                               |
+| ------------------------------------------------------------- | -------- | ------------------------------------------------------ |
+| Canonical in-memory: `ProsaDocument`                          | Verified | `document-model`, `App.tsx`                            |
+| Classic: TipTap; Markdown: CodeMirror                         | Verified | `EditorWorkspace.tsx`, `MarkdownSourceEditor.tsx`      |
+| Disk for library: **Markdown** `.md`                          | Verified | `library.rs` `is_markdown_file`, `walk_markdown_files` |
+| Block IDs on disk: HTML comments `<!-- scribam:block=... -->` | Verified | `markdown-block-ids.ts`, tests                         |
+| Adapters at app boundary                                      | Verified | `prosa-markdown.ts`, `prosa-convert.ts`                |
 
 ### 2.4 Persistence, autosave, recovery
 
@@ -65,22 +65,22 @@ Evidence classes: **Verified** (inspected in repo), **Documented** (docs only), 
 | Debounced autosave 800ms, max wait 3s                             | Verified | `manuscript-persistence.ts`                          |
 | Revision counter / inflight serialization                         | Verified | `ManuscriptPersistence.revision`, `inflightRevision` |
 | Library save: Rust `atomic_write`                                 | Verified | `atomic_io.rs`, `write_library_markdown`             |
-| Recovery sidecars under project `.scribo/recovery/`               | Verified | `library_recovery_path` in `library.rs`              |
+| Recovery sidecars under project `.scribam/recovery/`              | Verified | `library_recovery_path` in `library.rs`              |
 | Legacy internal storage `app_data/manuscripts/{id}/document.json` | Verified | `persistence.rs` `manuscripts_root`                  |
 | Migration commands for legacy → library                           | Verified | `migrate_*` in `tauri-manuscripts.ts`, `lib.rs`      |
 
 ### 2.5 Project layout (today)
 
-| Finding                                                              | Class    | Evidence                                                                                  |
-| -------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------- |
-| Manifest file: **`scribo.project.json`** (not `project.scribo`)      | Verified | `project.rs` `PROJECT_MANIFEST_FILE`                                                      |
-| Manuscripts dir: **`content/manuscripts`**                           | Verified | `CONTENT_MANUSCRIPTS_DIR`                                                                 |
-| `layoutVersion` 1 creates `.scribo/recovery` + `content/manuscripts` | Verified | `ensure_project_layout`                                                                   |
-| Prosa home + project subfolder migration                             | Verified | `library.rs` `ensure_config_normalized`, `migrate_embedded_project_from_home`             |
-| App config: `library.json` — `root_path`, `home_path`, recents       | Verified | `LibraryConfig` in `library.rs`                                                           |
-| No `contents/canon/`, no Folia/Drama trees                           | Verified | No code references                                                                        |
-| No filesystem **grant** enforcement                                  | Verified | All library ops use full `config.root_path`                                               |
-| `workspace/`, `knowledge/` not implemented                           | Verified | Spec only in [project-architecture-and-storage.md](./project-architecture-and-storage.md) |
+| Finding                                                               | Class    | Evidence                                                                                  |
+| --------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------- |
+| Manifest file: **`scribam.project.json`** (not `project.scribam`)     | Verified | `project.rs` `PROJECT_MANIFEST_FILE`                                                      |
+| Manuscripts dir: **`content/manuscripts`**                            | Verified | `CONTENT_MANUSCRIPTS_DIR`                                                                 |
+| `layoutVersion` 1 creates `.scribam/recovery` + `content/manuscripts` | Verified | `ensure_project_layout`                                                                   |
+| Prosa home + project subfolder migration                              | Verified | `library.rs` `ensure_config_normalized`, `migrate_embedded_project_from_home`             |
+| App config: `library.json` — `root_path`, `home_path`, recents        | Verified | `LibraryConfig` in `library.rs`                                                           |
+| No `contents/canon/`, no Folia/Drama trees                            | Verified | No code references                                                                        |
+| No filesystem **grant** enforcement                                   | Verified | All library ops use full `config.root_path`                                               |
+| `workspace/`, `knowledge/` not implemented                            | Verified | Spec only in [project-architecture-and-storage.md](./project-architecture-and-storage.md) |
 
 ### 2.6 Git integration
 
@@ -88,7 +88,7 @@ Evidence classes: **Verified** (inspected in repo), **Documented** (docs only), 
 | ---------------------------------------------------------------- | -------- | ---------------------------------------------------------------------- |
 | Git via **libgit2** (`git2` crate), feature `git-vcs` default on | Verified | `apps/prosa/src-tauri/Cargo.toml`                                      |
 | **Project-root** repository                                      | Verified | `ensure_project_git(root)` in `project_git.rs`                         |
-| `.scribo/` gitignored in default template                        | Verified | `DEFAULT_GITIGNORE` in `project_git.rs`                                |
+| `.scribam/` gitignored in default template                       | Verified | `DEFAULT_GITIGNORE` in `project_git.rs`                                |
 | Branch, merge, conflict UI + commands                            | Verified | `project_git.rs`, `SourceControlPanel.tsx`, `MergeConflictOverlay.tsx` |
 | Changed-file list filtered to **markdown** under project         | Verified | `list_changed_files` (library/project_git)                             |
 | Git **not** per-manuscript today                                 | Verified | Single `Repository::open` at project root                              |
@@ -116,12 +116,12 @@ Evidence classes: **Verified** (inspected in repo), **Documented** (docs only), 
 
 ### 2.9 Documentation vs code discrepancies
 
-| Topic              | Docs say                                                                                                                     | Code says            | Resolution                                                                            |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------- |
-| Lanista is hub     | [006](../plans/active/006-scribo-lanista-platform.md), [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md) | Prosa is hub         | Treat Lanista as **target**; audit Prosa hub as **transitional**                      |
-| Per-manuscript Git | 006, [manuscript-git-v1.md](./manuscript-git-v1.md) stub                                                                     | Project-root Git     | **Open ADR** — see [project-git-strategy.md](../plans/active/project-git-strategy.md) |
-| `.mdprosa`         | 006 stub                                                                                                                     | `.md` only           | Planned migration                                                                     |
-| Revision subsystem | [implementation-audit.md](../architecture/implementation-audit.md) says “not present”                                        | Git + recovery exist | Audit stale on Git; recovery ≠ named revisions                                        |
+| Topic              | Docs say                                                                                                                      | Code says            | Resolution                                                                            |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------- |
+| Lanista is hub     | [006](../plans/active/006-scribam-lanista-platform.md), [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md) | Prosa is hub         | Treat Lanista as **target**; audit Prosa hub as **transitional**                      |
+| Per-manuscript Git | 006, [manuscript-git-v1.md](./manuscript-git-v1.md) stub                                                                      | Project-root Git     | **Open ADR** — see [project-git-strategy.md](../plans/active/project-git-strategy.md) |
+| `.mdprosa`         | 006 stub                                                                                                                      | `.md` only           | Planned migration                                                                     |
+| Revision subsystem | [implementation-audit.md](../architecture/implementation-audit.md) says “not present”                                         | Git + recovery exist | Audit stale on Git; recovery ≠ named revisions                                        |
 
 ---
 
@@ -144,7 +144,7 @@ Evidence classes: **Verified** (inspected in repo), **Documented** (docs only), 
 | I2  | Unknown files under `contents/` remain **preserved** on disk; apps skip or read-only unless capability allows. |
 | I3  | Grant checks run at **Rust command boundary** (and optionally TS guard for UX).                                |
 | I4  | Autosave → atomic file → optional Git commit ordering documented per domain.                                   |
-| I5  | SQLite/indexes under `.scribo/indexes/` are **derived** only.                                                  |
+| I5  | SQLite/indexes under `.scribam/indexes/` are **derived** only.                                                 |
 
 ---
 
@@ -153,12 +153,12 @@ Evidence classes: **Verified** (inspected in repo), **Documented** (docs only), 
 ```mermaid
 flowchart TB
   subgraph platform
-    L[Scribo Lanista]
+    L[Scribam Lanista]
   end
   subgraph apps
-    P[Scribo Prosa]
-    F[Scribo Folia]
-    D[Scribo Drama]
+    P[Scribam Prosa]
+    F[Scribam Folia]
+    D[Scribam Drama]
   end
   subgraph project
     PR[Project folder]
@@ -174,16 +174,16 @@ flowchart TB
   D -->|read shared| PR
 ```
 
-### 4.1 Scribo Lanista (launcher)
+### 4.1 Scribam Lanista (launcher)
 
-| Responsibility                      | Status             | Notes                                                                                  |
-| ----------------------------------- | ------------------ | -------------------------------------------------------------------------------------- |
-| Discover projects under Scribo home | **Proposed** (006) | **Verified today:** Prosa `list_projects`, `discover_projects_in_home` in `library.rs` |
-| Register installed Scribo apps      | **Proposed**       | No registry code                                                                       |
-| Open project in compatible app      | **Proposed**       | Prosa: `open_project_root`                                                             |
-| Capability grant at launch          | **Proposed**       | [app-filesystem-grants.md](./app-filesystem-grants.md) stub                            |
-| Check app availability / version    | **Proposed**       | —                                                                                      |
-| Own catalog config (`lanista.json`) | **Proposed**       | **Verified today:** `library.json` in Prosa app config dir                             |
+| Responsibility                       | Status             | Notes                                                                                  |
+| ------------------------------------ | ------------------ | -------------------------------------------------------------------------------------- |
+| Discover projects under Scribam home | **Proposed** (006) | **Verified today:** Prosa `list_projects`, `discover_projects_in_home` in `library.rs` |
+| Register installed Scribam apps      | **Proposed**       | No registry code                                                                       |
+| Open project in compatible app       | **Proposed**       | Prosa: `open_project_root`                                                             |
+| Capability grant at launch           | **Proposed**       | [app-filesystem-grants.md](./app-filesystem-grants.md) stub                            |
+| Check app availability / version     | **Proposed**       | —                                                                                      |
+| Own catalog config (`lanista.json`)  | **Proposed**       | **Verified today:** `library.json` in Prosa app config dir                             |
 
 **Boundary rule:** Lanista validates manifest schema, app compatibility, and grants; it does **not** interpret `.mdprosa`, folia decks, or drama scripts.
 
@@ -191,30 +191,30 @@ flowchart TB
 
 | Concern                                                 | Owner                                                       |
 | ------------------------------------------------------- | ----------------------------------------------------------- |
-| Project discovery, recents                              | Lanista + shared `@scribo/project-model` types              |
+| Project discovery, recents                              | Lanista + shared `@scribam/project-model` types             |
 | Manifest read/write (project title, layout, apps block) | Shared Rust/TS library; Lanista writes project-level fields |
 | Grant enforcement                                       | Shared Rust crate used by **each** Tauri app                |
 | Domain parse/serialize                                  | Domain packages + each app                                  |
 
 ### 4.2 Authoring applications
 
-| App          | Domain                                  | Primary canon path (recommended) |
-| ------------ | --------------------------------------- | -------------------------------- |
-| Scribo Prosa | Manuscripts / long-form prose           | `contents/canon/manuscripts/`    |
-| Scribo Folia | Presentations (formerly “Presentation”) | `contents/canon/folia/`          |
-| Scribo Drama | Scripts / dramatic structure            | `contents/canon/drama/`          |
+| App           | Domain                                  | Primary canon path (recommended) |
+| ------------- | --------------------------------------- | -------------------------------- |
+| Scribam Prosa | Manuscripts / long-form prose           | `contents/canon/manuscripts/`    |
+| Scribam Folia | Presentations (formerly “Presentation”) | `contents/canon/folia/`          |
+| Scribam Drama | Scripts / dramatic structure            | `contents/canon/drama/`          |
 
 ---
 
 ## 5. Project hierarchy and proposed layout
 
-### 5.1 Hypothesis evaluation (`project.scribo` tree)
+### 5.1 Hypothesis evaluation (`project.scribam` tree)
 
 User hypothesis:
 
 ```text
 MyProject/
-├── project.scribo
+├── project.scribam
 ├── contents/
 │   ├── canon/
 │   │   ├── manuscripts/
@@ -223,7 +223,7 @@ MyProject/
 │   └── shared/
 │       ├── research/
 │       └── assets/
-├── .scribo/
+├── .scribam/
 │   ├── metadata/
 │   └── indexes/
 └── .git/
@@ -231,30 +231,30 @@ MyProject/
 
 **Assessment:** **Directionally appropriate** with naming adjustments:
 
-| Hypothesis element                 | Recommendation                                                                                                                |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `project.scribo`                   | Use **`project.scribo.json`** or retain **`scribo.project.json`** through v2 adapter (avoid two filenames). **ADR required.** |
-| `contents/` vs `content/`          | Prefer **`contents/`** for multi-domain clarity; migrate from verified `content/manuscripts` with symlink or one-time move    |
-| `canon/`                           | **Yes** — separates authoritative app-owned trees from shared material                                                        |
-| `shared/research`, `shared/assets` | **Yes** — read-heavy for all apps; write rules per capability                                                                 |
-| `.scribo/metadata`                 | **Derived/local** — project-scoped indexes, not authoritative prose                                                           |
-| `.scribo/indexes`                  | **Derived** — rebuildable SQLite/JSON indexes                                                                                 |
-| `.git/` at project root            | **Default** — see §6 (Option A)                                                                                               |
+| Hypothesis element                 | Recommendation                                                                                                                  |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `project.scribam`                  | Use **`project.scribam.json`** or retain **`scribam.project.json`** through v2 adapter (avoid two filenames). **ADR required.** |
+| `contents/` vs `content/`          | Prefer **`contents/`** for multi-domain clarity; migrate from verified `content/manuscripts` with symlink or one-time move      |
+| `canon/`                           | **Yes** — separates authoritative app-owned trees from shared material                                                          |
+| `shared/research`, `shared/assets` | **Yes** — read-heavy for all apps; write rules per capability                                                                   |
+| `.scribam/metadata`                | **Derived/local** — project-scoped indexes, not authoritative prose                                                             |
+| `.scribam/indexes`                 | **Derived** — rebuildable SQLite/JSON indexes                                                                                   |
+| `.git/` at project root            | **Default** — see §6 (Option A)                                                                                                 |
 
 ### 5.2 Recommended target tree (v2)
 
 ```text
 MyProject/
-├── scribo.project.json          # or project.scribo.json (ADR)
+├── scribam.project.json          # or project.scribam.json (ADR)
 ├── contents/
 │   ├── canon/
 │   │   ├── manuscripts/         # Prosa — .mdprosa (target)
-│   │   ├── folia/               # Scribo Folia
+│   │   ├── folia/               # Scribam Folia
 │   │   └── drama/               # Drama
 │   └── shared/
 │       ├── research/            # Neutral notes, biblio, .md or .mdresearch TBD
 │       └── assets/              # Binaries; Git LFS or gitignore + sidecar ADR
-├── .scribo/
+├── .scribam/
 │   ├── recovery/                # Per-app or per-manuscript recovery (domain rules)
 │   └── indexes/                 # Rebuildable
 └── .git/                        # Unified project repo (default)
@@ -265,13 +265,13 @@ MyProject/
 | Data              | Authority                   | Canonical location            | Git (default)     |
 | ----------------- | --------------------------- | ----------------------------- | ----------------- |
 | Prose manuscripts | Prosa + `.mdprosa` contract | `contents/canon/manuscripts/` | Tracked           |
-| Presentations     | Scribo Folia + `.folia`     | `contents/canon/folia/`       | Tracked           |
+| Presentations     | Scribam Folia + `.folia`    | `contents/canon/folia/`       | Tracked           |
 | Drama scripts     | Drama + drama contract      | `contents/canon/drama/`       | Tracked           |
 | Shared research   | Shared read; scoped write   | `contents/shared/research/`   | Tracked           |
 | Assets            | Manifest + sidecars         | `contents/shared/assets/`     | LFS/gitignore TBD |
-| Project identity  | Manifest                    | `scribo.project.json`         | Tracked           |
-| Search/backlinks  | Derived                     | `.scribo/indexes/`            | Ignored           |
-| Crash recovery    | Ephemeral                   | `.scribo/recovery/`           | Ignored           |
+| Project identity  | Manifest                    | `scribam.project.json`        | Tracked           |
+| Search/backlinks  | Derived                     | `.scribam/indexes/`           | Ignored           |
+| Crash recovery    | Ephemeral                   | `.scribam/recovery/`          | Ignored           |
 | Lanista catalog   | Lanista app config          | Outside project               | N/A               |
 
 ### 5.4 Unknown and unsupported content
@@ -286,16 +286,16 @@ MyProject/
 
 Full decision plan: [project-git-strategy.md](../plans/active/project-git-strategy.md).
 
-| Criterion                         | A: One repo / project    | B: Repo per domain   | C: Hybrid    |
-| --------------------------------- | ------------------------ | -------------------- | ------------ |
-| Cross-domain atomic commit        | **Strong**               | Weak                 | Medium       |
-| Coherent “project milestone”      | **Strong**               | Requires meta-repo   | Medium       |
-| Domain isolation (blast radius)   | Weak (path grants only)  | **Strong**           | Medium       |
-| Shared assets + references        | **Simple**               | Cross-repo refs hard | Medium       |
-| Repo size / binaries              | Single growth            | Split                | Configurable |
-| Backup/portable `.scribo` package | **One bundle**           | Multiple bundles     | Complex      |
-| Implementation (current code)     | **Matches today**        | Major refactor       | Highest      |
-| Multi-app concurrent edit + Drive | **Unsafe** (all options) | **Unsafe**           | **Unsafe**   |
+| Criterion                          | A: One repo / project    | B: Repo per domain   | C: Hybrid    |
+| ---------------------------------- | ------------------------ | -------------------- | ------------ |
+| Cross-domain atomic commit         | **Strong**               | Weak                 | Medium       |
+| Coherent “project milestone”       | **Strong**               | Requires meta-repo   | Medium       |
+| Domain isolation (blast radius)    | Weak (path grants only)  | **Strong**           | Medium       |
+| Shared assets + references         | **Simple**               | Cross-repo refs hard | Medium       |
+| Repo size / binaries               | Single growth            | Split                | Configurable |
+| Backup/portable `.scribam` package | **One bundle**           | Multiple bundles     | Complex      |
+| Implementation (current code)      | **Matches today**        | Major refactor       | Highest      |
+| Multi-app concurrent edit + Drive  | **Unsafe** (all options) | **Unsafe**           | **Unsafe**   |
 
 **Default recommendation:** **Option A — one Git repository per project** tracking `contents/` + manifest, with **capability-enforced writes** and domain-specific Git UI filters.
 
@@ -321,25 +321,25 @@ Capabilities are **typed**, declared in manifest — not inferred from folder na
   "layoutVersion": 2,
   "apps": {
     "prosa": {
-      "appId": "com.scribo.prosa",
+      "appId": "com.scribam.prosa",
       "allowedOperations": {
-        "read": ["contents/canon/manuscripts/**", "contents/shared/**", "scribo.project.json"],
+        "read": ["contents/canon/manuscripts/**", "contents/shared/**", "scribam.project.json"],
         "write": ["contents/canon/manuscripts/**"],
         "createDelete": ["contents/canon/manuscripts/**"]
       },
       "documentTypes": [{ "extension": "mdprosa", "formatVersion": 1 }]
     },
     "folia": {
-      "appId": "com.scribo.folia",
+      "appId": "com.scribam.folia",
       "allowedOperations": {
-        "read": ["contents/canon/folia/**", "contents/shared/**", "scribo.project.json"],
+        "read": ["contents/canon/folia/**", "contents/shared/**", "scribam.project.json"],
         "write": ["contents/canon/folia/**"]
       }
     },
     "drama": {
-      "appId": "com.scribo.drama",
+      "appId": "com.scribam.drama",
       "allowedOperations": {
-        "read": ["contents/canon/drama/**", "contents/shared/**", "scribo.project.json"],
+        "read": ["contents/canon/drama/**", "contents/shared/**", "scribam.project.json"],
         "write": ["contents/canon/drama/**"]
       }
     }
@@ -360,7 +360,7 @@ Capabilities are **typed**, declared in manifest — not inferred from folder na
 
 - Extension + magic/header must match registered `documentTypes`.
 - Parse failure → **block save**, show error (invariant: no silent empty doc).
-- Wrong app → `ERR_SCRIBO_PATH_FORBIDDEN`.
+- Wrong app → `ERR_SCRIBAM_PATH_FORBIDDEN`.
 
 ### 7.4 Registration (not a plugin marketplace)
 
@@ -383,7 +383,7 @@ Capabilities are **typed**, declared in manifest — not inferred from folder na
 | 3. Markdown + front matter contract     | Portable                        | Weak enforcement; easy to break IDs          | Complement inside `.mdprosa`         |
 | 4. Structured JSON canonical on disk    | Strong schema                   | Poor writer UX for prose                     | Keep **in-memory** (`ProsaDocument`) |
 
-**Prosa:** Recommend **`.mdprosa`** as Markdown-dialect + **`scribo-format-version`** + block anchors ([mdprosa-format-v1.md](./mdprosa-format-v1.md)). Package **`@scribo/mdprosa`** owns parse/serialize/normalize.
+**Prosa:** Recommend **`.mdprosa`** as Markdown-dialect + **`scribam-format-version`** + block anchors ([mdprosa-format-v1.md](./mdprosa-format-v1.md)). Package **`@scribam/mdprosa`** owns parse/serialize/normalize.
 
 **Folia / Drama:** Define extensions when apps exist; do not reuse `.mdprosa`.
 
@@ -395,14 +395,14 @@ Capabilities are **typed**, declared in manifest — not inferred from folder na
 
 ```mermaid
 flowchart TB
-  Core["@scribo/core"]
-  PM["@scribo/project-model"]
-  MD["@scribo/mdprosa"]
-  DM["@scribo/document-model"]
-  FoliaM["@scribo/folia-model (future)"]
-  Prosa["@scribo/prosa app"]
-  Folia["@scribo/folia app (future)"]
-  RustP["scribo-project Rust crate"]
+  Core["@scribam/core"]
+  PM["@scribam/project-model"]
+  MD["@scribam/mdprosa"]
+  DM["@scribam/document-model"]
+  FoliaM["@scribam/folia-model (future)"]
+  Prosa["@scribam/prosa app"]
+  Folia["@scribam/folia app (future)"]
+  RustP["scribam-project Rust crate"]
 
   DM --> Core
   PM --> Core
@@ -418,27 +418,27 @@ flowchart TB
   Folia --> RustP
 ```
 
-| Package / crate                | Owns                                          | Must not              |
-| ------------------------------ | --------------------------------------------- | --------------------- |
-| `@scribo/core`                 | IDs, errors, cross-app summary types          | I/O, React            |
-| `@scribo/project-model`        | Manifest v2, capabilities, layout constants   | Domain prose          |
-| `@scribo/document-model`       | Prosa in-memory schema                        | Git, FS               |
-| `@scribo/mdprosa`              | `.mdprosa` ↔ `ProsaDocument`                  | UI                    |
-| `@scribo/folia-model` (future) | Folia deck schema                             | Prosa types           |
-| `scribo-project` (Rust)        | Grant checks, manifest I/O, shared migrations | TipTap                |
-| Each Tauri app                 | UI, invoke adapters, editor                   | Duplicate grant logic |
+| Package / crate                 | Owns                                          | Must not              |
+| ------------------------------- | --------------------------------------------- | --------------------- |
+| `@scribam/core`                 | IDs, errors, cross-app summary types          | I/O, React            |
+| `@scribam/project-model`        | Manifest v2, capabilities, layout constants   | Domain prose          |
+| `@scribam/document-model`       | Prosa in-memory schema                        | Git, FS               |
+| `@scribam/mdprosa`              | `.mdprosa` ↔ `ProsaDocument`                  | UI                    |
+| `@scribam/folia-model` (future) | Folia deck schema                             | Prosa types           |
+| `scribam-project` (Rust)        | Grant checks, manifest I/O, shared migrations | TipTap                |
+| Each Tauri app                  | UI, invoke adapters, editor                   | Duplicate grant logic |
 
 ---
 
 ## 10. Project identity, versioning, consistency
 
-| Field                         | Authority             | Version domain                         |
-| ----------------------------- | --------------------- | -------------------------------------- |
-| `projectSchemaVersion`        | `scribo.project.json` | Project-wide migrations                |
-| `layoutVersion`               | manifest              | Directory tree migrations              |
-| `ProsaDocument.schemaVersion` | in-memory / export    | `@scribo/document-model`               |
-| `scribo-format-version`       | `.mdprosa` header     | `@scribo/mdprosa`                      |
-| App semver                    | package               | Compatibility checks at Lanista launch |
+| Field                         | Authority              | Version domain                         |
+| ----------------------------- | ---------------------- | -------------------------------------- |
+| `projectSchemaVersion`        | `scribam.project.json` | Project-wide migrations                |
+| `layoutVersion`               | manifest               | Directory tree migrations              |
+| `ProsaDocument.schemaVersion` | in-memory / export     | `@scribam/document-model`              |
+| `scribam-format-version`      | `.mdprosa` header      | `@scribam/mdprosa`                     |
+| App semver                    | package                | Compatibility checks at Lanista launch |
 
 **Migration ownership:** Rust runs filesystem migrations; TS/domain packages run format migrations on load; manifest records `migratedFromLayout`.
 
@@ -448,10 +448,10 @@ flowchart TB
 
 ---
 
-## 11. Portable `.scribo` package (live vs archive)
+## 11. Portable `.scribam` package (live vs archive)
 
 - **Live format:** project **directory** (recommended).
-- **Portable package:** zip (or tar) with manifest signature, canonical `contents/`, optional **bundled `.git`**, excludes `.scribo/recovery` and indexes (rebuild on import).
+- **Portable package:** zip (or tar) with manifest signature, canonical `contents/`, optional **bundled `.git`**, excludes `.scribam/recovery` and indexes (rebuild on import).
 
 Requirements: atomic export, hash manifest, import validation, partial-support import (preserve unknown files).
 
@@ -493,7 +493,7 @@ Requirements: atomic export, hash manifest, import validation, partial-support i
 ## 14. Open questions (prioritized)
 
 1. **Lanista source of truth:** Same repo vs separate repo? (Currently **not in monorepo** — Verified.)
-2. **Manifest filename:** `scribo.project.json` vs `project.scribo.json`.
+2. **Manifest filename:** `scribam.project.json` vs `project.scribam.json`.
 3. **Git:** Unified (§6) vs per-manuscript (006).
 4. **Prosa shared write** to `contents/shared/research/` — yes/no?
 5. **Folia on-disk format** — defer until app spike.

@@ -9,7 +9,7 @@ These statements must remain true unless changed through an explicit document up
 
 ## Manuscript integrity
 
-1. **Canonical model** — `@scribo/document-model` is the authoritative representation of manuscript _content_ for Classic editing; library manuscripts may additionally treat normalized Markdown as the on-disk source when in Markdown-first workflows.
+1. **Canonical model** — `@scribam/document-model` is the authoritative representation of manuscript _content_ for Classic editing; library manuscripts may additionally treat normalized Markdown as the on-disk source when in Markdown-first workflows.
 2. **No silent loss** — The editor and persistence layer must not silently discard valid user content.
 3. **Schema validity** — Every persisted document must validate for its declared schema version.
 4. **Save honesty** — A successful save corresponds to a known revision; failed saves are never reported as success.
@@ -25,7 +25,7 @@ These statements must remain true unless changed through an explicit document up
 
 | Domain                   | Examples                      | Notes                                                          |
 | ------------------------ | ----------------------------- | -------------------------------------------------------------- |
-| Application version      | `@scribo/prosa` semver        | Release cadence via Changesets                                 |
+| Application version      | `@scribam/prosa` semver       | Release cadence via Changesets                                 |
 | Document schema version  | `ProsaDocument.schemaVersion` | Migrations in document-model                                   |
 | Project metadata version | Future research/entity stores | Not yet implemented                                            |
 | Revision identity        | Checkpoints, named versions   | Spec: [revision-history-v1.md](./specs/revision-history-v1.md) |
@@ -49,7 +49,7 @@ Expected behavior (deterministic, tested where feasible):
 
 ## Classic ↔ Markdown
 
-1. **Explicit adapters** — Conversion lives at the app boundary (`prosa-markdown`, TipTap adapter), not inside `@scribo/document-model`.
+1. **Explicit adapters** — Conversion lives at the app boundary (`prosa-markdown`, TipTap adapter), not inside `@scribam/document-model`.
 2. **Round-trip goal** — Common structures (headings, paragraphs, quotes, lists, scene breaks) round-trip without structural surprise; known gaps are documented in [known-limitations.md](./known-limitations.md) and [decisions/](../architecture/decisions/).
 3. **Normalize on save** — Library Markdown may be normalized on save for consistency; normalization must not remove meaningful content (see tests in `markdown-normalize`).
 
@@ -57,9 +57,9 @@ Expected behavior (deterministic, tested where feasible):
 
 ## Portability
 
-1. **Scribo Prosa home** — The app has a documented default root (e.g. `Documents/Scribo Prosa/`) where **project folders** normally live. Each project is a directory with `scribo.project.json` and markdown under `content/` (see [prosa-shell-and-projects.md](./prosa-shell-and-projects.md)).
+1. **Scribam Prosa home** — The app has a documented default root (e.g. `Documents/Scribam Prosa/`) where **project folders** normally live. Each project is a directory with `scribam.project.json` and markdown under `content/` (see [prosa-shell-and-projects.md](./prosa-shell-and-projects.md)).
 2. **Library manuscripts** — Primary artifact is human-readable `.md` inside a project tree—not an opaque app-internal blob.
-3. **Extensions** — Scribo-specific sidecars (e.g. `.scribo/recovery`) must be documented and bounded.
+3. **Extensions** — Scribam-specific sidecars (e.g. `.scribam/recovery`) must be documented and bounded.
 4. **Export** — Future export must not require mutating the canonical manuscript.
 5. **No opaque lock-in** — No storage format without a documented recovery or export path.
 

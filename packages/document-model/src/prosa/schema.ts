@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isDocumentId } from "@scribo/core";
+import { isDocumentId } from "@scribam/core";
 import { PROSA_SCHEMA_VERSION } from "./version";
 
 const inlineMarkSchema = z.enum(["bold", "italic", "underline", "link", "code", "strike"]);

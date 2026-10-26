@@ -1,18 +1,18 @@
-# Scribo — Project Foundation & Architecture
+# Scribam — Project Foundation & Architecture
 
 ## 1. Project Overview
 
-Build **Scribo**, a family of opinionated, structured writing applications designed to let writers focus on their work instead of formatting.
+Build **Scribam**, a family of opinionated, structured writing applications designed to let writers focus on their work instead of formatting.
 
-Scribo is the parent brand. Each product serves a particular writing form and enforces the conventions appropriate to that form.
+Scribam is the parent brand. Each product serves a particular writing form and enforces the conventions appropriate to that form.
 
-The first product is **Scribo Prosa**, a dedicated environment for prose-based writing, including novels, short stories, essays, memoirs, and other prose manuscripts.
+The first product is **Scribam Prosa**, a dedicated environment for prose-based writing, including novels, short stories, essays, memoirs, and other prose manuscripts.
 
 Future products may include:
 
-- **Scribo Drama** — screenplays, stage plays, and dramatic scripts.
-- **Scribo Versus** — poetry, verse, and line-oriented literary compositions.
-- **Scribo Academia** — academic papers, theses, and scholarly manuscripts.
+- **Scribam Drama** — screenplays, stage plays, and dramatic scripts.
+- **Scribam Versus** — poetry, verse, and line-oriented literary compositions.
+- **Scribam Academia** — academic papers, theses, and scholarly manuscripts.
 
 These future products are part of the architectural vision, not part of the initial implementation scope.
 
@@ -20,7 +20,7 @@ These future products are part of the architectural vision, not part of the init
 
 For writer-centred product direction, see **`docs/product/philosophy.md`** and **`docs/product/roadmap.md`** (plan 003 **execution** is tracked in **`docs/plans/active/003-prosa-deep-writing-features.md`**—phases 2–7 not started). For engineering workflow, see **`docs/engineering/operating-model.md`** and **`AGENTS.md`**.
 
-Scribo separates content, document structure, and presentation.
+Scribam separates content, document structure, and presentation.
 
 The writer controls the content and its semantic structure. The application controls the visual presentation according to explicit, consistent rules.
 
@@ -83,7 +83,7 @@ Create a pnpm-based monorepo with a clear distinction between applications, shar
 
 Use the following as the initial target structure. Adjust only where a documented technical constraint requires it.
 
-    scribo/
+    scribam/
     ├── apps/
     │   └── prosa/
     │       ├── src/
@@ -139,7 +139,7 @@ Keep the Tauri application configuration, permissions, and native commands insid
 
 ## 5. Package Responsibilities
 
-### `@scribo/core`
+### `@scribam/core`
 
 Framework-independent domain primitives and contracts.
 
@@ -157,7 +157,7 @@ Constraints:
 - No filesystem, network, or database I/O.
 - No dependency on a particular persistence implementation.
 
-### `@scribo/document-model`
+### `@scribam/document-model`
 
 Defines the canonical structured document representation.
 
@@ -172,7 +172,7 @@ Responsibilities:
 
 The document model must represent semantic structure rather than rendered HTML or arbitrary style properties.
 
-### `@scribo/editor`
+### `@scribam/editor`
 
 Provides the shared editor integration and reusable editing primitives.
 
@@ -186,7 +186,7 @@ Responsibilities:
 
 Keep product-specific policies configurable without allowing arbitrary document formatting.
 
-### `@scribo/rendering`
+### `@scribam/rendering`
 
 Defines how semantic document elements become visual output.
 
@@ -200,7 +200,7 @@ Responsibilities:
 
 Rendering must not mutate the source document.
 
-### `@scribo/design-system`
+### `@scribam/design-system`
 
 Provides shared UI components and visual tokens.
 
@@ -209,11 +209,11 @@ Responsibilities:
 - UI primitives.
 - Application-level layout components.
 - Consistent controls and interaction patterns.
-- Shared visual conventions across Scribo products.
+- Shared visual conventions across Scribam products.
 
 Keep domain logic out of this package.
 
-### `@scribo/export`
+### `@scribam/export`
 
 Defines export interfaces and format-specific implementations.
 
@@ -256,7 +256,7 @@ Use stable document identifiers where needed for structural elements and future 
 
 Treat imported HTML, Markdown, and DOCX as external representations that must be converted into the canonical model.
 
-The canonical schema must be independent of the editor library. The editor library is an implementation detail, not the authoritative definition of a Scribo manuscript.
+The canonical schema must be independent of the editor library. The editor library is an implementation detail, not the authoritative definition of a Scribam manuscript.
 
 ## 7. Presentation and Typography
 
@@ -298,7 +298,7 @@ Do not implement full pagination in the first milestone. Establish the separatio
 
 ## 8. Persistence and Data Safety
 
-Scribo is local-first.
+Scribam is local-first.
 
 The initial application must be usable without an account, network connection, or cloud service.
 
@@ -345,7 +345,7 @@ Implement the following:
 1. Initialize the pnpm monorepo.
 2. Configure a working Tauri 2, Rust, React, and TypeScript application under `apps/prosa`.
 3. Establish shared TypeScript configuration, linting, formatting, and testing.
-4. Create the initial `@scribo/core` and `@scribo/document-model` packages.
+4. Create the initial `@scribam/core` and `@scribam/document-model` packages.
 5. Define and test the initial Prosa document schema.
 6. Create a minimal application shell with a document navigation area and editing area.
 7. Integrate a structured editor that accepts only supported document elements.
@@ -390,4 +390,4 @@ Prioritize a small, coherent, testable foundation over generating large amounts 
 
 The guiding principle is:
 
-**Scribo owns the structure of the writing. The application owns its presentation.**
+**Scribam owns the structure of the writing. The application owns its presentation.**

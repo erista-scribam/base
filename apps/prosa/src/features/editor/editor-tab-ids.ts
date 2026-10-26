@@ -1,4 +1,4 @@
-const DIFF_TAB_PREFIX = "scribo-diff:";
+const DIFF_TAB_PREFIX = "scribam-diff:";
 
 export function isDiffTabId(tabId: string): boolean {
   return tabId.startsWith(DIFF_TAB_PREFIX);

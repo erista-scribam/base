@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Scribo Prosa",
+  "productName": "Scribam Prosa",
   "version": "0.4.0",
-  "identifier": "com.scribo.prosa",
+  "identifier": "com.scribam.prosa",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Scribo Prosa",
+        "title": "Scribam Prosa",
         "width": 1280,
         "height": 840,
         "minWidth": 720,

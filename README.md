@@ -1,8 +1,8 @@
-# Scribo
+# Scribam
 
-Opinionated, structured writing software. **Scribo Prosa** is the first product: a local-first desktop app for prose manuscripts (novels, essays, memoir, and similar forms).
+**Scribam** (_scribam_ — “let me write”) is structured writing software for people who write, not for the document editor as the product. **Scribam Prosa** is the first app: a local-first desktop client for prose manuscripts (novels, essays, memoir, and similar forms).
 
-Scribo owns the **structure** of the writing; the application owns **presentation**.
+Scribam owns the **structure** of the writing; the application owns **presentation**. Full product law: [docs/product/philosophy.md](docs/product/philosophy.md).
 
 **License:** [AGPL-3.0-or-later](LICENSE) ([open core & premium](docs/product/licensing.md)) · **Conduct:** [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · **Security:** [SECURITY.md](SECURITY.md)
 
@@ -73,7 +73,7 @@ pnpm tauri:build
 
 This repository implements the **initial architectural milestone** from `MASTERPLAN.md`: monorepo, canonical Prosa schema with tests, minimal shell (navigation + editor), TipTap-based structured editing, global manuscript typography, and local JSON persistence via Tauri.
 
-Not included yet: DOCX/PDF, cloud sync, full export pipeline, and additional Scribo product lines (Drama, Versus, Academia).
+Not included yet: DOCX/PDF, cloud sync, full export pipeline, and additional Scribam product lines (Drama, Versus, Academia).
 
 **Governance:** [philosophy](docs/product/philosophy.md) · [roadmap](docs/product/roadmap.md) · [invariants](docs/product/invariants.md) · [operating model](docs/engineering/operating-model.md)
 

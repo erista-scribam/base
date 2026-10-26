@@ -1,6 +1,6 @@
 # Layout v2 migration (stub)
 
-**Status:** Draft — Phase A gate for [plan 006](../plans/active/006-scribo-lanista-platform.md)
+**Status:** Draft — Phase A gate for [plan 006](../plans/active/006-scribam-lanista-platform.md)
 
 ## From → To
 
@@ -13,10 +13,10 @@
 
 ## Steps M0–M5
 
-See [plan 006 §7](../plans/active/006-scribo-lanista-platform.md).
+See [plan 006 §7](../plans/active/006-scribam-lanista-platform.md).
 
 ## Safety
 
 - M0: mandatory backup offer before M2–M3.
-- Idempotent migration flag on `scribo.project.json`.
+- Idempotent migration flag on `scribam.project.json`.
 - Block Prosa open on partial migration (fail closed).

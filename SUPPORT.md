@@ -1,6 +1,6 @@
 # Support
 
-Scribo Prosa is under active development. There is no paid support tier.
+Scribam Prosa is under active development. There is no paid support tier.
 
 ## Getting help
 

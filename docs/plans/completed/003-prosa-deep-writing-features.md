@@ -1,12 +1,12 @@
-# Scribo: Writer-Centred Software
+# Scribam: Writer-Centred Software
 
 ## Product Philosophy and Deep-Feature Plan
 
 **Status:** **Completed (strategy archive)** — superseded for execution by [005-project-workspace-and-git.md](../active/005-project-workspace-and-git.md). Philosophy remains in [philosophy.md](../../product/philosophy.md). Feature delivery follows [project-architecture-roadmap.md](../active/project-architecture-roadmap.md).\
 **Location:** `docs/plans/completed/`\
-**Product:** Scribo Prosa, with principles intended to guide the wider
-Scribo family\
-**Purpose:** Define what Scribo should optimize for before committing to
+**Product:** Scribam Prosa, with principles intended to guide the wider
+Scribam family\
+**Purpose:** Define what Scribam should optimize for before committing to
 the next wave of features.
 
 ---
@@ -17,18 +17,18 @@ Most writing software is organized around the document editor: the page,
 the formatting controls, the toolbar, the font menu, and the visible act
 of changing a document's appearance.
 
-Scribo should instead be organized around the writer's work.
+Scribam should instead be organized around the writer's work.
 
 A writer's primary job is not to operate an editor. It is to think,
 research, compose, revise, organize, and finish a piece of writing. The
 editor is only one instrument in that larger process.
 
-Scribo's central proposition:
+Scribam's central proposition:
 
 > **The document is the output. The writer's thinking and working
 > process is the product.**
 
-Scribo should therefore minimize the attention spent operating the
+Scribam should therefore minimize the attention spent operating the
 software and maximize the writer's ability to make meaningful progress.
 It should provide powerful structure and analytical tools when needed,
 but keep them quiet when they are not.
@@ -80,7 +80,7 @@ advancing the writer's work.
 
 ### The counter-position
 
-Scribo should not ask, "What controls should an editor expose?"
+Scribam should not ask, "What controls should an editor expose?"
 
 It should ask:
 
@@ -152,7 +152,7 @@ successful, or overwrite a newer revision with an older one.
 ### 3.6 The writer owns the work
 
 Manuscripts should remain accessible, exportable, and understandable
-outside Scribo. The application should avoid unnecessary lock-in and
+outside Scribam. The application should avoid unnecessary lock-in and
 preserve a clear path to recover data.
 
 **Implication:** Use documented, versioned formats; provide reliable
@@ -169,7 +169,7 @@ passages and sources while keeping the manuscript itself portable.
 
 ### 3.8 Intelligence should be inspectable
 
-When Scribo flags an issue or suggests a change, the writer should be
+When Scribam flags an issue or suggests a change, the writer should be
 able to understand why. Confidence and uncertainty should be visible
 where relevant.
 
@@ -178,7 +178,7 @@ before opaque, broad AI interventions.
 
 ### 3.9 Optimize for continuity, not engagement
 
-Scribo should help writers resume work, maintain momentum, and finish
+Scribam should help writers resume work, maintain momentum, and finish
 projects---not maximize notifications, streaks, time spent in the app,
 or other engagement metrics.
 
@@ -198,7 +198,7 @@ software has it.
 
 ## 4. The writer's workbench: a model of the product
 
-Scribo should be thought of as a **writer's workbench** with several
+Scribam should be thought of as a **writer's workbench** with several
 connected layers, not as a word processor with an expanding collection
 of panels.
 
@@ -288,7 +288,7 @@ This is the prerequisite for every other feature.
 ### Acceptance standard
 
 A user can force-quit, encounter a failed write, reopen after a crash,
-or present a malformed file without Scribo silently losing content or
+or present a malformed file without Scribam silently losing content or
 pretending that an unsuccessful operation succeeded.
 
 Do not treat "autosave exists" as proof of safety. Test failure cases
@@ -365,7 +365,7 @@ A better sequence is: 1. Build native revision history and comparison
 around writing concepts. 2. Establish a stable, portable project format. 3. Consider optional Git interoperability or export for users who want
 it.
 
-Scribo should borrow the useful properties of version control---history,
+Scribam should borrow the useful properties of version control---history,
 diff, restoration, provenance---without requiring every writer to
 understand repositories, staging, branches, and merge conflicts.
 
@@ -568,7 +568,7 @@ during composition.
 ### Capabilities
 
 - Consistent global presentation presets.
-- Export to formats appropriate to each Scribo product.
+- Export to formats appropriate to each Scribam product.
 - Preview of the actual exported result.
 - Validation of headings, quotations, citations, and other relevant
   structures.
@@ -692,7 +692,7 @@ adds maintenance cost.
 
 ## 8. Data and portability strategy
 
-Scribo should treat the user's project data as a durable asset.
+Scribam should treat the user's project data as a durable asset.
 
 ### Separate the version domains
 
@@ -716,7 +716,7 @@ synced directory contains a partially synchronized project.
 ### Prefer explicit portability
 
 - Preserve raw Markdown where it is the chosen source format.
-- Document any Scribo-specific extensions.
+- Document any Scribam-specific extensions.
 - Provide predictable exports.
 - Avoid opaque storage without a recovery or export path.
 - Keep backups and recovery data discoverable and bounded.
@@ -767,7 +767,7 @@ Work can overlap when dependencies are satisfied.
 
 ### Phase 0 --- Validate the philosophy through real use
 
-- Use Scribo Prosa for real writing sessions and at least one
+- Use Scribam Prosa for real writing sessions and at least one
   sustained project.
 - Keep a record of friction points, interruptions, repeated manual
   tasks, and moments of lost context.
@@ -867,7 +867,7 @@ core product dependent on a network or vendor.
 
 ---
 
-## 11. What Scribo should deliberately avoid
+## 11. What Scribam should deliberately avoid
 
 - Turning the writing surface into a permanent dashboard of metrics
   and panels.
@@ -890,7 +890,7 @@ core product dependent on a network or vendor.
 
 ---
 
-## 12. How to know whether Scribo is working
+## 12. How to know whether Scribam is working
 
 The most useful metrics are those that measure whether the product
 supports the writing process.
@@ -980,7 +980,7 @@ history, understand differences, and restore work safely.
 
 ## 14. Final statement of philosophy
 
-Scribo is not merely a place to type words. It is a durable,
+Scribam is not merely a place to type words. It is a durable,
 writer-controlled environment for developing ideas into finished work.
 
 Its editor should be calm because the writer's attention is valuable.
@@ -992,7 +992,7 @@ theirs.
 
 The governing principle is:
 
-> **Scribo should take responsibility for the machinery of writing so
+> **Scribam should take responsibility for the machinery of writing so
 > that the writer can take responsibility for the writing itself.**
 
 Every proposed feature should be tested against that principle. If it

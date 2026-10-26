@@ -4,18 +4,18 @@
 
 Do not conflate these version concepts (see [product/invariants.md](../product/invariants.md)):
 
-| Domain                 | Source                                   | Notes                                                       |
-| ---------------------- | ---------------------------------------- | ----------------------------------------------------------- |
-| Application            | `@scribo/prosa` semver, git tags         | Changesets fixed group                                      |
-| npm workspace packages | `@scribo/core`, `@scribo/document-model` | Same release train as app                                   |
-| Manuscript schema      | `ProsaDocument.schemaVersion`            | Migrations in `@scribo/document-model`                      |
-| Project metadata       | Future                                   | Not implemented                                             |
-| Revision identity      | Future                                   | [revision-history-v1 spec](../specs/revision-history-v1.md) |
+| Domain                 | Source                                     | Notes                                                       |
+| ---------------------- | ------------------------------------------ | ----------------------------------------------------------- |
+| Application            | `@scribam/prosa` semver, git tags          | Changesets fixed group                                      |
+| npm workspace packages | `@scribam/core`, `@scribam/document-model` | Same release train as app                                   |
+| Manuscript schema      | `ProsaDocument.schemaVersion`              | Migrations in `@scribam/document-model`                     |
+| Project metadata       | Future                                     | Not implemented                                             |
+| Revision identity      | Future                                     | [revision-history-v1 spec](../specs/revision-history-v1.md) |
 
 ## Library files
 
 - On-disk library manuscripts are **Markdown** (`.md`). Normalization on save is documented in code/tests.
-- Sidecars under `.scribo/` are Scribo-specific; document changes when format changes.
+- Sidecars under `.scribam/` are Scribam-specific; document changes when format changes.
 
 ## Breaking changes
 

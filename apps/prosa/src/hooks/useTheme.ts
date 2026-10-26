@@ -3,7 +3,7 @@ import { syncNativeWindowTheme } from "../features/shell/sync-native-window-them
 
 export type ThemeMode = "light" | "dark";
 
-const STORAGE_KEY = "scribo-prosa-theme";
+const STORAGE_KEY = "scribam-prosa-theme";
 
 function readStoredTheme(): ThemeMode {
   const stored = localStorage.getItem(STORAGE_KEY);

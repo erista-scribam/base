@@ -2,7 +2,7 @@ import {
   displayProsaManuscriptFileName,
   isProsaManuscriptFileName,
   normalizeNewManuscriptTitleInput,
-} from "@scribo/mdprosa";
+} from "@scribam/mdprosa";
 
 /** Strip manuscript extension for UI labels. */
 export function displayMarkdownFileName(fileNameOrPath: string): string {

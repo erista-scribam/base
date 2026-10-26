@@ -1,19 +1,19 @@
-# Scribo architecture (initial milestone)
+# Scribam architecture (initial milestone)
 
-Scribo is a pnpm monorepo: desktop apps under `apps/`, shared TypeScript under `packages/` (including `@scribo/project-model` and `@scribo/mdprosa`), and Rust native code colocated with each Tauri app (`apps/prosa/src-tauri`). A root `Cargo.toml` workspace includes the Prosa Tauri crate. Multi-app direction: [multi-application-project-architecture.md](../specs/multi-application-project-architecture.md).
+Scribam is a pnpm monorepo: desktop apps under `apps/`, shared TypeScript under `packages/` (including `@scribam/project-model` and `@scribam/mdprosa`), and Rust native code colocated with each Tauri app (`apps/prosa/src-tauri`). A root `Cargo.toml` workspace includes the Prosa Tauri crate. Multi-app direction: [multi-application-project-architecture.md](../specs/multi-application-project-architecture.md).
 
 ## Dependency direction
 
 ```mermaid
 flowchart TB
   subgraph apps
-    Prosa["@scribo/prosa"]
+    Prosa["@scribam/prosa"]
   end
   subgraph packages
-    DM["@scribo/document-model"]
-    Core["@scribo/core"]
-    PM["@scribo/project-model"]
-    MP["@scribo/mdprosa"]
+    DM["@scribam/document-model"]
+    Core["@scribam/core"]
+    PM["@scribam/project-model"]
+    MP["@scribam/mdprosa"]
   end
   subgraph native
     Tauri["prosa (Rust / Tauri 2)"]
@@ -28,12 +28,12 @@ flowchart TB
   Prosa --> Tauri
 ```
 
-| Layer                    | Responsibility                                                      |
-| ------------------------ | ------------------------------------------------------------------- |
-| `@scribo/core`           | IDs, metadata contracts, domain errors (no UI, I/O, or React)       |
-| `@scribo/document-model` | Canonical Prosa schema, validation, JSON serialization              |
-| `@scribo/prosa`          | Shell UI, TipTap integration, typography CSS, Tauri invoke adapters |
-| Rust / Tauri             | Local filesystem persistence, OS integration                        |
+| Layer                     | Responsibility                                                      |
+| ------------------------- | ------------------------------------------------------------------- |
+| `@scribam/core`           | IDs, metadata contracts, domain errors (no UI, I/O, or React)       |
+| `@scribam/document-model` | Canonical Prosa schema, validation, JSON serialization              |
+| `@scribam/prosa`          | Shell UI, TipTap integration, typography CSS, Tauri invoke adapters |
+| Rust / Tauri              | Local filesystem persistence, OS integration                        |
 
 Future packages (`editor`, `rendering`, `design-system`, `export`) stay out of the tree until they have a concrete boundary. TipTap lives in the app for now; the canonical model remains independent of TipTap types.
 
@@ -41,10 +41,10 @@ Future packages (`editor`, `rendering`, `design-system`, `export`) stay out of t
 
 ## Document flow
 
-1. **Authoritative state** — `ProsaDocument` JSON (validated by `@scribo/document-model`).
+1. **Authoritative state** — `ProsaDocument` JSON (validated by `@scribam/document-model`).
 2. **Editing** — TipTap enforces a constrained schema; updates convert TipTap JSON → canonical model.
 3. **Presentation** — CSS variables in `manuscript.css` style semantic elements globally (no per-node font overrides in the model).
-4. **Persistence** — Markdown manuscripts inside **project folders**; default **Scribo Prosa home** holds those projects (target layout in [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md)). Recovery under each project’s `.scribo/recovery`. Legacy internal storage may use app-data JSON (see [data-model.md](./data-model.md)).
+4. **Persistence** — Markdown manuscripts inside **project folders**; default **Scribam Prosa home** holds those projects (target layout in [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md)). Recovery under each project’s `.scribam/recovery`. Legacy internal storage may use app-data JSON (see [data-model.md](./data-model.md)).
 
 ## Toolchain (pinned in repo)
 

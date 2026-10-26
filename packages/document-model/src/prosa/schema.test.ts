@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createDocumentId } from "@scribo/core";
+import { createDocumentId } from "@scribam/core";
 import { PROSA_SCHEMA_VERSION } from "./version";
 import { createEmptyProsaDocument } from "./factory";
 import { parseProsaDocument, validateProsaDocument } from "./validate";

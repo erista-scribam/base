@@ -1,6 +1,6 @@
 # Per-manuscript Git v1 (stub)
 
-**Status:** Draft — Phase A gate for [plan 006](../plans/active/006-scribo-lanista-platform.md)
+**Status:** Draft — Phase A gate for [plan 006](../plans/active/006-scribam-lanista-platform.md)
 
 ## Intent
 
@@ -10,7 +10,7 @@ Replace project-root Git (plan 005) with one Git repository per manuscript packa
 
 | In repo                              | Out of repo                          |
 | ------------------------------------ | ------------------------------------ |
-| `*.mdprosa`, `_manuscript.json`      | `.scribo/recovery/`                  |
+| `*.mdprosa`, `_manuscript.json`      | `.scribam/recovery/`                 |
 | Tags/branches writer-facing in Prosa | Project manifest (see plan 006 §3.2) |
 
 ## UI verbs (Prosa)

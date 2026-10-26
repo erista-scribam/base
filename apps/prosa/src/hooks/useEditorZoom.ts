@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-const STORAGE_KEY = "scribo-prosa-editor-zoom";
+const STORAGE_KEY = "scribam-prosa-editor-zoom";
 
 export const EDITOR_ZOOM_MIN = 0.85;
 export const EDITOR_ZOOM_MAX = 1.35;
@@ -26,7 +26,7 @@ function readStoredZoom(): number {
 
 export function applyEditorZoom(level: number): number {
   const clamped = clampZoom(level);
-  document.documentElement.style.setProperty("--scribo-editor-zoom", String(clamped));
+  document.documentElement.style.setProperty("--scribam-editor-zoom", String(clamped));
   return clamped;
 }
 

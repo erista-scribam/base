@@ -1,6 +1,6 @@
 # App filesystem grants (stub)
 
-**Status:** Draft — Phase A gate for [plan 006](../plans/active/006-scribo-lanista-platform.md)
+**Status:** Draft — Phase A gate for [plan 006](../plans/active/006-scribam-lanista-platform.md)
 
 ## Intent
 
@@ -10,12 +10,12 @@ Define how Lanista grants path allowlists to satellite apps and how Rust Tauri c
 
 - Grant: `{ appId, projectRoot, allowedRelativePaths[] }`.
 - Every path operation: resolve → canonicalize → verify `allowedRelativePaths` prefix rules.
-- Stable error: `ERR_SCRIBO_PATH_FORBIDDEN` with user message and optional “Open in Lanista” action.
+- Stable error: `ERR_SCRIBAM_PATH_FORBIDDEN` with user message and optional “Open in Lanista” action.
 
 ## Prosa v1 allowlist
 
 - **Read/write:** `content/manuscripts/**`
-- **Read-only (TBD):** minimal fields from `scribo.project.json` for display only
+- **Read-only (TBD):** minimal fields from `scribam.project.json` for display only
 
 ## Tests required before ship
 

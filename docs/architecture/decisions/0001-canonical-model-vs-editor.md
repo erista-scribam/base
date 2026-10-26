@@ -9,7 +9,7 @@ Editors (TipTap, CodeMirror) have their own document JSON. Writers need a stable
 
 ## Decision
 
-Prosa manuscripts are defined by `@scribo/document-model`, not TipTap/ProseMirror JSON. Editors are adapters with conversion at the app boundary.
+Prosa manuscripts are defined by `@scribam/document-model`, not TipTap/ProseMirror JSON. Editors are adapters with conversion at the app boundary.
 
 ## Consequences
 

@@ -1,4 +1,4 @@
-import type { ManuscriptSummary } from "@scribo/core";
+import type { ManuscriptSummary } from "@scribam/core";
 
 export function isLibraryManuscriptId(id: string): boolean {
   return id.startsWith("ms_path_");

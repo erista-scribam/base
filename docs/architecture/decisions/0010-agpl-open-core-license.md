@@ -5,7 +5,7 @@
 
 ## Context
 
-Scribo intends to be public, open-source local-first software while offering optional **premium** services (cloud, sync, etc.). MIT would allow proprietary forks and competing hosted services without sharing improvements.
+Scribam intends to be public, open-source local-first software while offering optional **premium** services (cloud, sync, etc.). MIT would allow proprietary forks and competing hosted services without sharing improvements.
 
 ## Decision
 

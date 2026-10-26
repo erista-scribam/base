@@ -28,6 +28,6 @@ export default defineConfig(() => ({
   },
   optimizeDeps: {
     // Workspace packages change often; prebundling caches stale export lists and white-screens the app.
-    exclude: ["@scribo/document-model", "@scribo/core"],
+    exclude: ["@scribam/document-model", "@scribam/core"],
   },
 }));

@@ -1,6 +1,6 @@
 # Revision History v1 — technical specification (draft)
 
-**Status:** **Superseded** — replaced by Git-based history in [project-architecture-and-storage.md](./project-architecture-and-storage.md) (plan 005). Retained as historical alternative (linear `.scribo/revisions/`).  
+**Status:** **Superseded** — replaced by Git-based history in [project-architecture-and-storage.md](./project-architecture-and-storage.md) (plan 005). Retained as historical alternative (linear `.scribam/revisions/`).  
 **Roadmap:** Was Phase 2 under plan 003  
 **Constitution:** [philosophy.md](../product/philosophy.md) · [invariants.md](../product/invariants.md)
 
@@ -60,10 +60,10 @@ Proposed defaults (tunable constants):
 
 ## 4. Storage layout
 
-Under library root (alongside `.scribo/recovery`):
+Under library root (alongside `.scribam/recovery`):
 
 ```
-.scribo/
+.scribam/
   revisions/
     {manuscriptId}/
       manifest.json      # ordered list of revisionIds + retention cursor
@@ -168,8 +168,8 @@ Implementation lives in Rust under `library.rs` or new `revisions.rs` module; TS
 
 ## 12. Export and portability
 
-- Revisions live under `.scribo/revisions/` — document in user-facing help.
-- Export manuscript (future) copies **current** `.md` only by default; optional “export with history” bundles `.scribo/revisions/{id}/` (zip).
+- Revisions live under `.scribam/revisions/` — document in user-facing help.
+- Export manuscript (future) copies **current** `.md` only by default; optional “export with history” bundles `.scribam/revisions/{id}/` (zip).
 
 ---
 

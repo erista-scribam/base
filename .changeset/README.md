@@ -1,6 +1,6 @@
 # Changesets
 
-Scribo uses [Changesets](https://github.com/changesets/changesets) to manage versions and changelogs.
+Scribam uses [Changesets](https://github.com/changesets/changesets) to manage versions and changelogs.
 
 When your PR includes user-facing or release-notable work, add a changeset:
 

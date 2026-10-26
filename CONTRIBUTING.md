@@ -1,4 +1,4 @@
-# Contributing to Scribo
+# Contributing to Scribam
 
 Read [docs/README.md](docs/README.md) for the documentation map. AI agents: start with [AGENTS.md](AGENTS.md).
 
@@ -34,7 +34,7 @@ Details: [docs/engineering/version-control.md](docs/engineering/version-control.
 | `pnpm test`         | Vitest                                         |
 | `pnpm lint`         | ESLint                                         |
 | `pnpm format:check` | Prettier                                       |
-| `pnpm dev`          | Vite frontend only (`@scribo/prosa`)           |
+| `pnpm dev`          | Vite frontend only (`@scribam/prosa`)          |
 | `pnpm tauri:dev`    | Desktop app (requires Rust)                    |
 | `pnpm tauri:build`  | Production desktop build                       |
 
@@ -42,7 +42,7 @@ Details: [docs/engineering/version-control.md](docs/engineering/version-control.
 
 - Strict TypeScript; avoid `any`.
 - Domain logic belongs in `packages/`, not React components.
-- Do not duplicate the document schema outside `@scribo/document-model`.
+- Do not duplicate the document schema outside `@scribam/document-model`.
 - Keep Tauri permissions minimal; add native commands deliberately.
 - Run `pnpm verify` (or `pnpm verify:all` if you touched Rust) before opening a PR.
 

@@ -12,12 +12,12 @@ This maps **today's Prosa codebase** to the target subsystems. Refresh when majo
 
 | Subsystem                    | Target role                                    | Current implementation                                                                                                | Gap / notes                                                                                                             |
 | ---------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **Canonical document model** | Content + semantic structure; no UI/Tauri deps | `@scribo/document-model` (`ProsaDocument`, validation, JSON)                                                          | Stable block IDs still regenerated on some TipTap conversions ([known-limitations.md](../product/known-limitations.md)) |
+| **Canonical document model** | Content + semantic structure; no UI/Tauri deps | `@scribam/document-model` (`ProsaDocument`, validation, JSON)                                                         | Stable block IDs still regenerated on some TipTap conversions ([known-limitations.md](../product/known-limitations.md)) |
 | **Editor adapter**           | Classic + Markdown; explicit sync rules        | TipTap (Classic) in `EditorWorkspace`; Markdown via CodeMirror + `prosa-markdown.ts`                                  | Round-trip tests exist for markdown; blockquote modeling limited                                                        |
 | **Annotation engine**        | Analysis separate from content                 | Partial: `markdown-dialog-highlight`, `markdown-active-sentence` (presentation only)                                  | No provenance, categories, or non-mutating analysis store                                                               |
 | **Project knowledge store**  | Entities, sources, links                       | Not present                                                                                                           | Phase 4–5                                                                                                               |
 | **Revision subsystem**       | Checkpoints, diffs, restore                    | Not present (only crash **recovery** snapshot)                                                                        | Phase 2 — [revision-history-v1.md](./specs/revision-history-v1.md)                                                      |
-| **Persistence boundary**     | Local I/O, migration, external change          | Rust: `library.rs`, `persistence.rs`, Tauri commands in `lib.rs`; TS: `tauri-manuscripts.ts`, `ManuscriptPersistence` | Library `.md` + `.scribo/recovery`; internal legacy `ms_*` folders                                                      |
+| **Persistence boundary**     | Local I/O, migration, external change          | Rust: `library.rs`, `persistence.rs`, Tauri commands in `lib.rs`; TS: `tauri-manuscripts.ts`, `ManuscriptPersistence` | Library `.md` + `.scribam/recovery`; internal legacy `ms_*` folders                                                     |
 | **Export / rendering**       | Output without mutating canonical              | Global CSS (`manuscript.css`); no DOCX/PDF pipeline                                                                   | Deferred                                                                                                                |
 | **Integration boundary**     | Optional cloud/storage adapters                | None                                                                                                                  | Phase 7                                                                                                                 |
 
@@ -38,7 +38,7 @@ sequenceDiagram
   TS->>RS: save_manuscript (markdown + title)
   RS->>FS: atomic_write .md
   MP->>TS: saveRecoverySnapshot (parallel path)
-  RS->>FS: .scribo/recovery/*.json
+  RS->>FS: .scribam/recovery/*.json
 ```
 
 **Invariants touched:** write ordering via `ManuscriptPersistence.revision` / `inflightRevision`; recovery via `recovery-policy.ts` on open.

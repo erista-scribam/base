@@ -3,7 +3,7 @@ export const MDPROSA_FORMAT_VERSION = 1 as const;
 
 export const LEGACY_MARKDOWN_EXTENSIONS = ["md", "markdown"] as const;
 
-export const MDPROSA_FRONT_MATTER_KEY = "scribo-format-version" as const;
+export const MDPROSA_FRONT_MATTER_KEY = "scribam-format-version" as const;
 
 /** File names recognized as Prosa on-disk manuscript prose (dual-read `.md` + `.mdprosa`). */
 export function isProsaManuscriptFileName(fileNameOrPath: string): boolean {

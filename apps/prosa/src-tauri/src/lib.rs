@@ -1,3 +1,4 @@
+mod app_paths;
 mod atomic_io;
 #[cfg(feature = "git-spike")]
 mod git_spike;

@@ -1,4 +1,4 @@
-import type { ManuscriptSummary } from "@scribo/core";
+import type { ManuscriptSummary } from "@scribam/core";
 import { isDiffTabId, parseDiffTabId } from "../features/editor/editor-tab-ids";
 import { displayMarkdownFileName } from "../features/projects/manuscript-file-name";
 import { splitRepoPath } from "../features/projects/project-tree";

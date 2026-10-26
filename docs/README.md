@@ -1,4 +1,4 @@
-# Scribo documentation
+# Scribam documentation
 
 Start here for product and engineering knowledge. **One topic, one canonical file**—link instead of copying.
 
@@ -57,7 +57,7 @@ Start here for product and engineering knowledge. **One topic, one canonical fil
 | [plans/active/project-format-and-storage.md](./plans/active/project-format-and-storage.md)                         | Manifest + layout v2 validation plan                                |
 | [plans/active/project-git-strategy.md](./plans/active/project-git-strategy.md)                                     | Unified vs split Git — decision experiments                         |
 | [product/lanista-future.md](./product/lanista-future.md)                                                           | Future paid Lanista hub (concept only)                              |
-| [plans/active/006-scribo-lanista-platform.md](./plans/active/006-scribo-lanista-platform.md)                       | **Withdrawn** historical Lanista MVP track                          |
+| [plans/active/006-scribam-lanista-platform.md](./plans/active/006-scribam-lanista-platform.md)                     | **Withdrawn** historical Lanista MVP track                          |
 | [specs/lanista-platform-and-storage.md](./specs/lanista-platform-and-storage.md)                                   | Lanista detail stub (deferred)                                      |
 | [specs/project-architecture-and-storage.md](./specs/project-architecture-and-storage.md)                           | 005 audit baseline (project-root Git — paused)                      |
 | [plans/active/](./plans/active/)                                                                                   | In-flight implementation plans                                      |

@@ -5,7 +5,7 @@
 
 ## Why not MIT?
 
-MIT allows anyone to take the code, build a competing product (including hosted sync or “Scribo-like” cloud services), and never contribute improvements back. Scribo is meant to stay **writer-controlled and sustainable**: the local editor remains free and inspectable, while **official premium services** (cloud backup, sync, collaboration, and similar) fund ongoing development.
+MIT allows anyone to take the code, build a competing product (including hosted sync or “Scribam-like” cloud services), and never contribute improvements back. Scribam is meant to stay **writer-controlled and sustainable**: the local editor remains free and inspectable, while **official premium services** (cloud backup, sync, collaboration, and similar) fund ongoing development.
 
 **AGPL-3.0** fits that model better than MIT:
 
@@ -20,13 +20,13 @@ AGPL is [OSI-approved open source](https://opensource.org/license/agpl-v3). It i
 
 ## What this repository covers
 
-Everything in **this monorepo** (Scribo Prosa app, shared packages, docs, tooling) is under **GNU Affero General Public License v3.0 or later**, unless a file explicitly states otherwise.
+Everything in **this monorepo** (Scribam Prosa app, shared packages, docs, tooling) is under **GNU Affero General Public License v3.0 or later**, unless a file explicitly states otherwise.
 
 See [LICENSE](../../LICENSE) for the full text.
 
 ## Premium services (not in this repo)
 
-Planned or future **Scribo premium** offerings—for example official **cloud storage, sync, accounts, or collaboration**—are expected to be:
+Planned or future **Scribam premium** offerings—for example official **cloud storage, sync, accounts, or collaboration**—are expected to be:
 
 - **Separate products or services**, with their own terms of service and privacy policy, and
 - **Not required** to edit local manuscripts (local-first remains the default).
@@ -37,7 +37,7 @@ Do not assume premium features exist until they are shipped and documented.
 
 ## Trademarks
 
-“Scribo”, “Scribo Prosa”, and related branding are **not** granted by the AGPL. Forks must not imply they are the official product. See project naming guidelines when the repo is public.
+“Scribam”, “Scribam Prosa”, and related branding are **not** granted by the AGPL. Forks must not imply they are the official product. See project naming guidelines when the repo is public.
 
 ## Commercial / alternative licensing
 

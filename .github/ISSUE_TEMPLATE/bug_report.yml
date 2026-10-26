@@ -1,5 +1,5 @@
 name: Bug report
-description: Something broken or regressed in Scribo Prosa
+description: Something broken or regressed in Scribam Prosa
 title: "[bug]: "
 labels: ["bug"]
 body:

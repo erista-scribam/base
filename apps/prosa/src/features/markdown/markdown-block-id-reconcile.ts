@@ -1,4 +1,4 @@
-import type { ProsaBlock } from "@scribo/document-model";
+import type { ProsaBlock } from "@scribam/document-model";
 import { serializeInline } from "./markdown-inline";
 
 function blockStableFingerprint(block: ProsaBlock): string {

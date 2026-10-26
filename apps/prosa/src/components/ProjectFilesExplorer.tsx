@@ -6,7 +6,7 @@ import {
   type CSSProperties,
   type MouseEvent as ReactMouseEvent,
 } from "react";
-import type { ManuscriptSummary } from "@scribo/core";
+import type { ManuscriptSummary } from "@scribam/core";
 import type { GitChangedFile } from "../features/version-control/project-version-control";
 import { gitStatusForManuscriptPath } from "../features/version-control/git-file-status";
 import {

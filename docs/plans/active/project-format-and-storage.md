@@ -2,11 +2,11 @@
 
 **Status:** Draft — awaiting architectural review  
 **Spec:** [multi-application-project-architecture.md](../../specs/multi-application-project-architecture.md)  
-**Depends on:** Current Prosa implementation (`project.rs`, `library.rs`, `@scribo/core/project.ts`)
+**Depends on:** Current Prosa implementation (`project.rs`, `library.rs`, `@scribam/core/project.ts`)
 
 ## Objective
 
-Validate and specify the **project manifest**, **canonical content layout**, **format identification**, **schema versioning**, and **migration** from the verified v1 layout (`scribo.project.json` + `content/manuscripts/` + `.md`) to the multi-app v2 model (`contents/canon/*`, typed extensions, capabilities).
+Validate and specify the **project manifest**, **canonical content layout**, **format identification**, **schema versioning**, and **migration** from the verified v1 layout (`scribam.project.json` + `content/manuscripts/` + `.md`) to the multi-app v2 model (`contents/canon/*`, typed extensions, capabilities).
 
 **Non-goals:** Full Folia or Drama apps; mandatory migration wizard UI (auto migration on Prosa open is in scope).
 
@@ -14,14 +14,14 @@ Validate and specify the **project manifest**, **canonical content layout**, **f
 
 ## Verified baseline (v1)
 
-| Artifact        | Location                      | Symbol / note                                    |
-| --------------- | ----------------------------- | ------------------------------------------------ |
-| Manifest        | `scribo.project.json`         | `PROJECT_MANIFEST_FILE`, `ScriboProjectManifest` |
-| Manuscripts dir | `content/manuscripts`         | `CONTENT_MANUSCRIPTS_DIR`                        |
-| Layout version  | `layoutVersion: 1` or `2`     | `PROJECT_LAYOUT_VERSION` (2 for new projects)    |
-| Prose files     | `*.md`                        | `is_markdown_file` in `library.rs`               |
-| Recovery        | `.scribo/recovery/`           | `library_recovery_path`                          |
-| App catalog     | `library.json` (Prosa config) | `LibraryConfig` with `home_path`, `root_path`    |
+| Artifact        | Location                      | Symbol / note                                     |
+| --------------- | ----------------------------- | ------------------------------------------------- |
+| Manifest        | `scribam.project.json`        | `PROJECT_MANIFEST_FILE`, `ScribamProjectManifest` |
+| Manuscripts dir | `content/manuscripts`         | `CONTENT_MANUSCRIPTS_DIR`                         |
+| Layout version  | `layoutVersion: 1` or `2`     | `PROJECT_LAYOUT_VERSION` (2 for new projects)     |
+| Prose files     | `*.md`                        | `is_markdown_file` in `library.rs`                |
+| Recovery        | `.scribam/recovery/`          | `library_recovery_path`                           |
+| App catalog     | `library.json` (Prosa config) | `LibraryConfig` with `home_path`, `root_path`     |
 
 ---
 
@@ -30,9 +30,9 @@ Validate and specify the **project manifest**, **canonical content layout**, **f
 | Topic           | Proposal                                                           | Validation activity                                               |
 | --------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------- |
 | Manifest        | `projectSchemaVersion: 2`, `apps.{prosa,folia,drama}` capabilities | JSON Schema draft + fixture round-trip                            |
-| Tree            | `contents/canon/manuscripts`, `contents/shared/{research,assets}`  | Path constant table in `@scribo/project-model`                    |
-| Prosa format    | `.mdprosa` + `scribo-format-version`                               | [mdprosa-format-v1.md](../../specs/mdprosa-format-v1.md) approval |
-| Filename        | Keep `scribo.project.json` vs rename                               | ADR + migration alias read                                        |
+| Tree            | `contents/canon/manuscripts`, `contents/shared/{research,assets}`  | Path constant table in `@scribam/project-model`                   |
+| Prosa format    | `.mdprosa` + `scribam-format-version`                              | [mdprosa-format-v1.md](../../specs/mdprosa-format-v1.md) approval |
+| Filename        | Keep `scribam.project.json` vs rename                              | ADR + migration alias read                                        |
 | Unknown content | Preserve + skip                                                    | Migration fixture with extra files                                |
 
 ---
@@ -41,7 +41,7 @@ Validate and specify the **project manifest**, **canonical content layout**, **f
 
 ### PFS-1 — Manifest schema draft
 
-- Deliverable: JSON Schema + TypeScript types in `@scribo/project-model` (package may remain doc-only until approved).
+- Deliverable: JSON Schema + TypeScript types in `@scribam/project-model` (package may remain doc-only until approved).
 - Acceptance: Parses verified v1 manifest; extends with optional `apps` block; unknown fields preserved.
 
 ### PFS-2 — Layout compatibility matrix
@@ -100,4 +100,4 @@ No changes to `project.rs` / `library.rs` layout constants until **PFS-1–PFS-4
 
 - [project-git-strategy.md](./project-git-strategy.md)
 - [multi-application-architecture-roadmap.md](./multi-application-architecture-roadmap.md)
-- [006-scribo-lanista-platform.md](./006-scribo-lanista-platform.md)
+- [006-scribam-lanista-platform.md](./006-scribam-lanista-platform.md)

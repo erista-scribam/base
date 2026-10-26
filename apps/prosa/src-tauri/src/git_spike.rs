@@ -12,7 +12,7 @@ mod tests {
     use crate::atomic_io::atomic_write;
 
     fn spike_signature() -> Signature<'static> {
-        Signature::now("Scribo Spike", "spike@scribo.local").expect("valid signature")
+        Signature::now("Scribam Spike", "spike@scribam.local").expect("valid signature")
     }
 
     fn init_repo(dir: &Path) -> Repository {
@@ -217,9 +217,9 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "bench: set SCRIBO_GIT_SPIKE_BENCH=1 to run 500-file commit timing"]
+    #[ignore = "bench: set SCRIBAM_GIT_SPIKE_BENCH=1 to run 500-file commit timing"]
     fn experiment_6_many_file_commit_timing() {
-        if std::env::var("SCRIBO_GIT_SPIKE_BENCH").ok().as_deref() != Some("1") {
+        if std::env::var("SCRIBAM_GIT_SPIKE_BENCH").ok().as_deref() != Some("1") {
             return;
         }
         let tmp = TempDir::new().expect("tempdir");

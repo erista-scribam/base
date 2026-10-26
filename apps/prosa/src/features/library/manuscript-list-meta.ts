@@ -1,4 +1,4 @@
-import type { ManuscriptSummary } from "@scribo/core";
+import type { ManuscriptSummary } from "@scribam/core";
 
 const dateTimeOptions: Intl.DateTimeFormatOptions = {
   month: "short",

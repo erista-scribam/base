@@ -36,7 +36,7 @@ export function MdprosaFormatNotice({ className }: MdprosaFormatNoticeProps) {
       role="status"
     >
       <p className="mdprosa-format-notice-text">
-        Manuscripts save as <strong>.mdprosa</strong> — Scribo&apos;s plain-text prose format with
+        Manuscripts save as <strong>.mdprosa</strong> — Scribam&apos;s plain-text prose format with
         stable structure anchors. It starts from familiar text habits but is not limited to generic
         Markdown; we extend it as Prosa evolves. Existing <strong>.md</strong> files still open and
         convert on save.

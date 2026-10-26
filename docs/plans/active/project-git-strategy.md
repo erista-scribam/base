@@ -2,11 +2,11 @@
 
 **Status:** **Provisional default — Option A** (2026-10-26). Formal ADR acceptance still pending; implementation matches Option A today.  
 **Spec:** [multi-application-project-architecture.md](../../specs/multi-application-project-architecture.md) §6  
-**Conflict:** [006-scribo-lanista-platform.md](./006-scribo-lanista-platform.md) proposes **per-manuscript Git**
+**Conflict:** [006-scribam-lanista-platform.md](./006-scribam-lanista-platform.md) proposes **per-manuscript Git**
 
 ## Question
 
-For the Scribo **multi-application** project model, should version control be:
+For the Scribam **multi-application** project model, should version control be:
 
 - **Option A:** One Git repository per **project** (root `.git`).
 - **Option B:** Separate repositories per **domain** (`manuscripts`, `folia`, `drama`) or per **manuscript package**.
@@ -17,7 +17,7 @@ For the Scribo **multi-application** project model, should version control be:
 | Fact                                                | Evidence                                       |
 | --------------------------------------------------- | ---------------------------------------------- |
 | Implementation matches **Option A** at project root | `ensure_project_git(root)` in `project_git.rs` |
-| `.scribo/` ignored                                  | `DEFAULT_GITIGNORE`                            |
+| `.scribam/` ignored                                 | `DEFAULT_GITIGNORE`                            |
 | Git feature default-on                              | `Cargo.toml` `default = ["git-vcs"]`           |
 | UI + commands for branch/merge/conflict             | `SourceControlPanel`, `project_git.rs`         |
 | Spike tests exist                                   | `git_spike.rs`, `pnpm verify:git-spike`        |

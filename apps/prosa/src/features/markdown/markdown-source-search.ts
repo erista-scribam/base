@@ -168,20 +168,20 @@ function createProsaSearchPanel(view: EditorView): Panel {
 
 const prosaSearchTheme = EditorView.theme({
   ".cm-panels": {
-    backgroundColor: "var(--scribo-ui-surface)",
-    color: "var(--scribo-ui-text)",
-    borderBottom: "1px solid var(--scribo-ui-border)",
+    backgroundColor: "var(--scribam-ui-surface)",
+    color: "var(--scribam-ui-text)",
+    borderBottom: "1px solid var(--scribam-ui-border)",
   },
   ".cm-panels-top": {
-    borderBottom: "1px solid var(--scribo-ui-border)",
+    borderBottom: "1px solid var(--scribam-ui-border)",
     borderTop: "none",
   },
   ".cm-searchMatch": {
-    backgroundColor: "color-mix(in srgb, var(--scribo-ui-accent) 35%, transparent)",
-    outline: "1px solid color-mix(in srgb, var(--scribo-ui-accent) 55%, transparent)",
+    backgroundColor: "color-mix(in srgb, var(--scribam-ui-accent) 35%, transparent)",
+    outline: "1px solid color-mix(in srgb, var(--scribam-ui-accent) 55%, transparent)",
   },
   ".cm-searchMatch-selected": {
-    backgroundColor: "color-mix(in srgb, var(--scribo-ui-accent) 50%, transparent)",
+    backgroundColor: "color-mix(in srgb, var(--scribam-ui-accent) 50%, transparent)",
   },
 });
 

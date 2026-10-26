@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import type { ProjectSummary } from "@scribo/core";
+import type { ProjectSummary } from "@scribam/core";
 import { listProjects } from "../features/projects/project-catalog";
 
 export interface ProjectSwitcherProps {

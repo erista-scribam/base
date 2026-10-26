@@ -42,7 +42,7 @@ jobs:
         run: pnpm test
 
       - name: Build Prosa frontend
-        run: pnpm --filter @scribo/prosa build
+        run: pnpm --filter @scribam/prosa build
 
   rust:
     name: Rust

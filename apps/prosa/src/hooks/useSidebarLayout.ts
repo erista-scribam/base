@@ -23,7 +23,7 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function applySidebarWidthCss(widthPx: number) {
-  document.documentElement.style.setProperty("--scribo-sidebar-width", `${widthPx}px`);
+  document.documentElement.style.setProperty("--scribam-sidebar-width", `${widthPx}px`);
 }
 
 export function useSidebarLayout() {

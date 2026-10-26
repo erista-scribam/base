@@ -1,4 +1,4 @@
-import type { ProjectSummary } from "@scribo/core";
+import type { ProjectSummary } from "@scribam/core";
 import { invoke } from "@tauri-apps/api/core";
 import type { LibraryInfo } from "../persistence/tauri-manuscripts";
 

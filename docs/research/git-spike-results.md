@@ -9,7 +9,7 @@
 ```bash
 pnpm verify:git-spike
 # Optional bulk commit bench (~500 × 2KB files):
-cd apps/prosa/src-tauri && SCRIBO_GIT_SPIKE_BENCH=1 cargo test --features git-spike experiment_6 -- --ignored
+cd apps/prosa/src-tauri && SCRIBAM_GIT_SPIKE_BENCH=1 cargo test --features git-spike experiment_6 -- --ignored
 ```
 
 Requires **`git` CLI** on PATH for experiments 1 (status check) and 4 (merge with conflict markers). libgit2 handles init, commit, branch, and checkout in-process.
@@ -57,4 +57,4 @@ Requires **`git` CLI** on PATH for experiments 1 (status check) and 4 (merge wit
 1. Release build size comparison with `git2` enabled.
 2. Tauri command surface: init repo at project root, commit after successful library save (policy TBD).
 3. Writer-facing conflict UI — consume CLI or libgit2 conflict index.
-4. Default `.gitignore` for `.scribo/` when initializing project Git.
+4. Default `.gitignore` for `.scribam/` when initializing project Git.

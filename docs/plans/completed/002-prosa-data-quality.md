@@ -1,14 +1,14 @@
-# Scribo Prosa — Reliability, Data Integrity, and Crash Recovery
+# Scribam Prosa — Reliability, Data Integrity, and Crash Recovery
 
 ## Objective
 
-Harden the existing Scribo Prosa application against data loss, document corruption, editing bugs, crashes, failed saves, and performance degradation.
+Harden the existing Scribam Prosa application against data loss, document corruption, editing bugs, crashes, failed saves, and performance degradation.
 
-Scribo is a desktop writing application built with Tauri 2, Rust, React, TypeScript, and pnpm workspaces.
+Scribam is a desktop writing application built with Tauri 2, Rust, React, TypeScript, and pnpm workspaces.
 
 The application's most important responsibility is preserving the user's manuscript accurately and reliably.
 
-A writer must be able to trust Scribo with months or years of work. Data integrity and predictable editing behavior take precedence over new features, visual polish, and implementation convenience.
+A writer must be able to trust Scribam with months or years of work. Data integrity and predictable editing behavior take precedence over new features, visual polish, and implementation convenience.
 
 **Do not assume the application currently has these defects. Audit the implementation, identify actual risks, and address them systematically.**
 
@@ -174,7 +174,7 @@ If the application cannot safely open a document, offer a recovery or diagnostic
 
 ## 7. Version the Document Schema Independently
 
-The native manuscript format must have its own explicit schema version, independent of the Scribo application version and package versions.
+The native manuscript format must have its own explicit schema version, independent of the Scribam application version and package versions.
 
 Implement or verify:
 
@@ -186,13 +186,13 @@ Implement or verify:
 - Clear behavior for unsupported future schema versions.
 - Recovery from interrupted migration attempts.
 
-A document created with a newer version of Scribo must not be silently downgraded or overwritten by an older application.
+A document created with a newer version of Scribam must not be silently downgraded or overwritten by an older application.
 
 Treat migrations as data-integrity operations, not ordinary application initialization.
 
 ## 8. Handle External File Changes and Filesystem Errors
 
-Consider files modified, moved, deleted, or replaced outside Scribo.
+Consider files modified, moved, deleted, or replaced outside Scribam.
 
 Where relevant to the existing storage architecture:
 
@@ -398,7 +398,7 @@ This task is complete when:
 
 ## Final Principle
 
-Scribo is a tool entrusted with irreplaceable creative work.
+Scribam is a tool entrusted with irreplaceable creative work.
 
 **Never silently lose a manuscript, never claim a failed save succeeded, never overwrite a newer revision with an older one, and never destroy the original when recovery or migration fails.**
 

@@ -5,7 +5,7 @@
 
 ## Decision
 
-Autosave maintains recovery data separate from the primary saved artifact so crash recovery can offer newer in-memory work. Library manuscripts use `.scribo/recovery/`; legacy internal storage used `recovery.json` per manuscript.
+Autosave maintains recovery data separate from the primary saved artifact so crash recovery can offer newer in-memory work. Library manuscripts use `.scribam/recovery/`; legacy internal storage used `recovery.json` per manuscript.
 
 ## Consequences
 

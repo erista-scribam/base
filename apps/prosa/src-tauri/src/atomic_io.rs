@@ -13,7 +13,7 @@ pub fn atomic_write(path: &Path, contents: &str) -> Result<(), String> {
         .file_name()
         .and_then(|name| name.to_str())
         .ok_or_else(|| "Invalid target file name".to_string())?;
-    let temp_path = parent.join(format!(".{file_name}.scribo-tmp-{}", uuid::Uuid::new_v4()));
+    let temp_path = parent.join(format!(".{file_name}.scribam-tmp-{}", uuid::Uuid::new_v4()));
 
     {
         let mut file = fs::File::create(&temp_path).map_err(|error| error.to_string())?;

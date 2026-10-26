@@ -29,8 +29,8 @@ export interface ProjectSummary {
   isCurrent: boolean;
 }
 
-/** On-disk `scribo.project.json` (plan 005). */
-export interface ScriboProjectManifest {
+/** On-disk `scribam.project.json` (plan 005). */
+export interface ScribamProjectManifest {
   projectSchemaVersion: ProjectSchemaVersion;
   id: ProjectId;
   title: string;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createEmptyProsaDocument } from "@scribo/document-model";
+import { createEmptyProsaDocument } from "@scribam/document-model";
 import {
   markdownToProsaDocument,
   prosaDocumentToAuthorMarkdown,
@@ -73,25 +73,25 @@ Meh`;
 
   it("hides block id comments in author markdown but keeps them on disk export", () => {
     const base = createEmptyProsaDocument("Test");
-    const md = `<!-- scribo:block=blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee -->
+    const md = `<!-- scribam:block=blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee -->
 # Title
 
 Body line`;
     const doc = markdownToProsaDocument(base, md);
     const author = prosaDocumentToAuthorMarkdown(doc);
-    expect(author).not.toContain("scribo:block");
+    expect(author).not.toContain("scribam:block");
     expect(author).toContain("# Title");
     expect(prosaDocumentToMarkdown(doc)).toContain("blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
     const roundTrip = markdownToProsaDocument(doc, author);
     expect(roundTrip.blocks.map((block) => block.id)).toEqual(doc.blocks.map((block) => block.id));
   });
 
-  it("preserves block ids from scribo markdown comments", () => {
+  it("preserves block ids from scribam markdown comments", () => {
     const base = createEmptyProsaDocument("Test");
-    const md = `<!-- scribo:block=blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee -->
+    const md = `<!-- scribam:block=blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee -->
 # Title
 
-<!-- scribo:block=blk_bbbbbbbb-bbbb-cccc-dddd-eeeeeeeeeeee -->
+<!-- scribam:block=blk_bbbbbbbb-bbbb-cccc-dddd-eeeeeeeeeeee -->
 Body`;
     const doc = markdownToProsaDocument(base, md);
     expect(doc.blocks[0]?.id).toBe("blk_aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");

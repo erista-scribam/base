@@ -21,7 +21,7 @@ pub struct MergeConflictFilePreview {
     pub has_markers: bool,
 }
 
-const DEFAULT_GITIGNORE: &str = ".scribo/\n";
+const DEFAULT_GITIGNORE: &str = ".scribam/\n.scribam/\n";
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -103,8 +103,8 @@ fn map_git_error(context: &str, error: git2::Error) -> String {
     }
 }
 
-fn scribo_signature() -> Result<Signature<'static>, String> {
-    Signature::now("Scribo Prosa", "prosa@local.scribo").map_err(|error| error.to_string())
+fn scribam_signature() -> Result<Signature<'static>, String> {
+    Signature::now("Scribam Prosa", "prosa@local.scribam").map_err(|error| error.to_string())
 }
 
 fn open_repo(root: &Path) -> Result<Repository, String> {
@@ -127,7 +127,7 @@ fn index_all_and_commit(repo: &Repository, message: &str) -> Result<(), String> 
     index.write().map_err(|error| error.to_string())?;
     let tree_id = index.write_tree().map_err(|error| error.to_string())?;
     let tree = repo.find_tree(tree_id).map_err(|error| error.to_string())?;
-    let sig = scribo_signature()?;
+    let sig = scribam_signature()?;
     let parent = repo.head().ok().and_then(|h| h.peel_to_commit().ok());
     match parent {
         Some(parent) => {
@@ -142,7 +142,7 @@ fn index_all_and_commit(repo: &Repository, message: &str) -> Result<(), String> 
     Ok(())
 }
 
-/// Initialize Git at project root if missing; ensure `.scribo/` is gitignored.
+/// Initialize Git at project root if missing; ensure `.scribam/` is gitignored.
 pub fn ensure_project_git(root: &Path) -> Result<bool, String> {
     if root.join(".git").exists() {
         return Ok(false);
@@ -151,7 +151,7 @@ pub fn ensure_project_git(root: &Path) -> Result<bool, String> {
     write_default_gitignore(root)?;
     let repo = open_repo(root)?;
     if repo.head().is_err() {
-        index_all_and_commit(&repo, "Initialize Scribo project")?;
+        index_all_and_commit(&repo, "Initialize Scribam project")?;
     }
     Ok(true)
 }
@@ -469,7 +469,7 @@ pub fn merge_project_branch(
 
     let tree_id = index.write_tree().map_err(|error| error.to_string())?;
     let tree = repo.find_tree(tree_id).map_err(|error| error.to_string())?;
-    let sig = scribo_signature()?;
+    let sig = scribam_signature()?;
     let theirs = repo
         .find_commit(annotated.id())
         .map_err(|error| error.to_string())?;
@@ -674,7 +674,7 @@ pub fn complete_project_merge(
 
     let tree_id = index.write_tree().map_err(|error| error.to_string())?;
     let tree = repo.find_tree(tree_id).map_err(|error| error.to_string())?;
-    let sig = scribo_signature()?;
+    let sig = scribam_signature()?;
     let trimmed = message.unwrap_or("").trim();
     let commit_message = if trimmed.is_empty() {
         fs::read_to_string(root.join(".git/MERGE_MSG"))

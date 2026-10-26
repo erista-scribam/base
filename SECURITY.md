@@ -24,7 +24,7 @@ We aim to acknowledge reports within a few business days. We will coordinate dis
 
 ## Scope
 
-In scope: Scribo Prosa desktop app, Tauri/Rust persistence, dependencies shipped with releases, and project infrastructure (CI, release workflows).
+In scope: Scribam Prosa desktop app, Tauri/Rust persistence, dependencies shipped with releases, and project infrastructure (CI, release workflows).
 
 Out of scope: Third-party services not operated by this project, and social engineering against individuals.
 

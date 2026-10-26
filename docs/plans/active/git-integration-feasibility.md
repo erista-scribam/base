@@ -6,7 +6,7 @@
 
 ## Objective
 
-Prove or disprove **libgit2 (`git2`)** as Scribo’s embedded VCS before any product UI. **This is not a production Git layer.**
+Prove or disprove **libgit2 (`git2`)** as Scribam’s embedded VCS before any product UI. **This is not a production Git layer.**
 
 ## Scope
 

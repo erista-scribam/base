@@ -49,10 +49,10 @@ flowchart LR
 
 ## Phase R1 — Shared project types (minimal code)
 
-**Status:** **Shipped** — `@scribo/project-model` (layout, capabilities, manifest extensions).
+**Status:** **Shipped** — `@scribam/project-model` (layout, capabilities, manifest extensions).
 
-| Scope | `@scribo/project-model` or extend `@scribo/core` with manifest v2 types only |
-| Retain | Existing `ScriboProjectManifest` v1 types |
+| Scope | `@scribam/project-model` or extend `@scribam/core` with manifest v2 types only |
+| Retain | Existing `ScribamProjectManifest` v1 types |
 | Non-goals | FS writes, Git |
 
 **Acceptance:** Typecheck; v1 manifest parses unchanged.
@@ -71,7 +71,7 @@ flowchart LR
 
 ---
 
-## Phase R3 — `@scribo/mdprosa`
+## Phase R3 — `@scribam/mdprosa`
 
 **Status:** **Shipped (foundation)** — format helpers + block IDs; new saves use `.mdprosa`; dual-read `.md`.
 
@@ -84,7 +84,7 @@ flowchart LR
 
 ## Phase R4 — Capability grants (Rust)
 
-**Status:** **Shipped (Prosa)** — `grants.rs` enforces manuscript-tree writes; `ERR_SCRIBO_PATH_FORBIDDEN`.
+**Status:** **Shipped (Prosa)** — `grants.rs` enforces manuscript-tree writes; `ERR_SCRIBAM_PATH_FORBIDDEN`.
 
 | Scope | Shared crate; Prosa Tauri commands check grants |
 | Interim | Grant = manuscript trees; full project root for Prosa standalone |
@@ -119,16 +119,16 @@ flowchart LR
 
 **Status:** **Cancelled** (standalone Prosa is the shipping entry).
 
-| Former scope           | Superseded by                                        |
-| ---------------------- | ---------------------------------------------------- |
-| Lanista-only catalog   | Prosa project switcher + `library.json`              |
-| Spawn env / hub limits | Removed; optional `SCRIBO_PROJECT_ROOT` for dev only |
+| Former scope           | Superseded by                                         |
+| ---------------------- | ----------------------------------------------------- |
+| Lanista-only catalog   | Prosa project switcher + `library.json`               |
+| Spawn env / hub limits | Removed; optional `SCRIBAM_PROJECT_ROOT` for dev only |
 
 **Gate:** Revisit only when R6 product ships.
 
 ---
 
-## Phase R8 — Scribo Folia / Drama (future)
+## Phase R8 — Scribam Folia / Drama (future)
 
 **Status:** **Stub** — empty `contents/canon/folia`, `contents/canon/drama`, `contents/shared/*` created on new Prosa projects.
 
@@ -142,7 +142,7 @@ flowchart LR
 | Asset                              | Action                           |
 | ---------------------------------- | -------------------------------- |
 | Block ID comments                  | Port to `.mdprosa`               |
-| `scribo.project.json`              | Extend, don’t rename without ADR |
+| `scribam.project.json`             | Extend, don’t rename without ADR |
 | Project-root Git code              | Keep until R5 decision           |
 | Explorer, tabs, SCM UI             | Re-scope to grants + domain      |
 | Home → project subfolder migration | Prosa-owned for now              |

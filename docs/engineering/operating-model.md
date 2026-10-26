@@ -5,7 +5,7 @@
 
 ## Summary
 
-Scribo uses a **repository-first, GitHub-enabled** workflow:
+Scribam uses a **repository-first, GitHub-enabled** workflow:
 
 | Layer                                 | Role                                      |
 | ------------------------------------- | ----------------------------------------- |

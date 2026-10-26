@@ -2,7 +2,7 @@
 
 ## Remote and branches
 
-- **Remote:** `origin` → GitHub (`mikevar/scribo`)
+- **Remote:** `origin` → GitHub (`mikevar/scribam`)
 - **`development`** — active integration branch
 - **`main`** — releases and stable history
 

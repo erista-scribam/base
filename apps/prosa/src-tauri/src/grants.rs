@@ -1,6 +1,6 @@
 use std::path::{Component, Path};
 
-pub const ERR_SCRIBO_PATH_FORBIDDEN: &str = "ERR_SCRIBO_PATH_FORBIDDEN";
+pub const ERR_SCRIBAM_PATH_FORBIDDEN: &str = "ERR_SCRIBAM_PATH_FORBIDDEN";
 
 fn normalize_relative(rel: &str) -> String {
     rel.replace('\\', "/").trim_start_matches('/').to_string()
@@ -19,11 +19,11 @@ pub fn is_prosa_manuscript_relative(rel: &str) -> bool {
 
 pub fn assert_prosa_manuscript_relative(rel: &str) -> Result<(), String> {
     if rel.split('/').any(|segment| segment == "..") {
-        return Err(format!("{ERR_SCRIBO_PATH_FORBIDDEN}: invalid path"));
+        return Err(format!("{ERR_SCRIBAM_PATH_FORBIDDEN}: invalid path"));
     }
     if !is_prosa_manuscript_relative(rel) {
         return Err(format!(
-            "{ERR_SCRIBO_PATH_FORBIDDEN}: not in Prosa manuscript tree"
+            "{ERR_SCRIBAM_PATH_FORBIDDEN}: not in Prosa manuscript tree"
         ));
     }
     Ok(())
@@ -31,11 +31,11 @@ pub fn assert_prosa_manuscript_relative(rel: &str) -> Result<(), String> {
 
 pub fn assert_prosa_manuscript_absolute(root: &Path, absolute: &Path) -> Result<(), String> {
     if !absolute.starts_with(root) {
-        return Err(format!("{ERR_SCRIBO_PATH_FORBIDDEN}: outside project"));
+        return Err(format!("{ERR_SCRIBAM_PATH_FORBIDDEN}: outside project"));
     }
     for component in absolute.components() {
         if matches!(component, Component::ParentDir) {
-            return Err(format!("{ERR_SCRIBO_PATH_FORBIDDEN}: invalid path"));
+            return Err(format!("{ERR_SCRIBAM_PATH_FORBIDDEN}: invalid path"));
         }
     }
     let rel = absolute

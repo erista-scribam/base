@@ -3,7 +3,7 @@
 **Baseline date:** 2026-10-26  
 **Git commit:** `637c0d3501055590157082134eab608d72f0ac99`  
 **Branch:** `development` (synced with remote at baseline recording)  
-**App version:** `@scribo/prosa` 0.4.0 (workspace fixed group)
+**App version:** `@scribam/prosa` 0.4.0 (workspace fixed group)
 
 This snapshot marks adoption of the [operating model](./operating-model.md). The workflow applies **prospectively** from this date. Prior commits and releases remain the historical record; no retroactive issues or PRs were created for past work.
 
@@ -13,14 +13,14 @@ This snapshot marks adoption of the [operating model](./operating-model.md). The
 
 **Verified** where noted; otherwise **documented** from release notes and codebase inspection.
 
-Scribo Prosa is a local-first Tauri desktop app for prose manuscripts. Product direction: **IDE-like shell affordances**, **writing-first** scope, **not an IDE fork** (OSS libraries only), **Prosa home** containing **project folders**—see [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md).
+Scribam Prosa is a local-first Tauri desktop app for prose manuscripts. Product direction: **IDE-like shell affordances**, **writing-first** scope, **not an IDE fork** (OSS libraries only), **Prosa home** containing **project folders**—see [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md).
 
 | Area                                        | State           | Evidence                                             |
 | ------------------------------------------- | --------------- | ---------------------------------------------------- |
 | Library folder + `.md` manuscripts          | Implemented     | `library.rs`, library UI                             |
 | Classic structured editor (TipTap)          | Implemented     | `EditorWorkspace`                                    |
 | Markdown source mode + preview              | Implemented     | CodeMirror, `prosa-markdown`                         |
-| Autosave + recovery sidecars                | Implemented     | `ManuscriptPersistence`, `.scribo/recovery`          |
+| Autosave + recovery sidecars                | Implemented     | `ManuscriptPersistence`, `.scribam/recovery`         |
 | External file change warning                | Implemented     | `App.tsx`, disk revision                             |
 | Library sidebar (views, delete, timestamps) | Implemented     | Recent feature work                                  |
 | Revision history (user-facing)              | **Not started** | Spec draft only                                      |
@@ -32,7 +32,7 @@ Scribo Prosa is a local-first Tauri desktop app for prose manuscripts. Product d
 ## Architecture (verified)
 
 - pnpm monorepo: `apps/prosa`, `packages/core`, `packages/document-model`, Rust in `apps/prosa/src-tauri`.
-- Canonical model: `@scribo/document-model`; see [data-model.md](../architecture/data-model.md).
+- Canonical model: `@scribam/document-model`; see [data-model.md](../architecture/data-model.md).
 - Overview: [system-overview.md](../architecture/system-overview.md).
 - Implementation map: [implementation-audit.md](../architecture/implementation-audit.md).
 

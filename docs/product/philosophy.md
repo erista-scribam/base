@@ -1,7 +1,7 @@
-# Scribo product constitution
+# Scribam product constitution
 
 **Status:** Active product law (from [plan 003](../plans/completed/003-prosa-deep-writing-features.md)). **Execution** follows [plan 005](../plans/active/005-project-workspace-and-git.md)—see [roadmap.md](./roadmap.md).  
-**Scope:** Scribo Prosa first; principles apply to the wider Scribo family unless a product explicitly diverges.
+**Scope:** Scribam Prosa first; principles apply to the wider Scribam family unless a product explicitly diverges.
 
 This document is the **governing law** for product and engineering decisions. Detailed plans, specs, and roadmaps must not contradict it. When they conflict, update the plan or amend this document deliberately—not in code comments alone.
 
@@ -9,9 +9,13 @@ This document is the **governing law** for product and engineering decisions. De
 
 ## Central proposition
 
+**Scribam** (Latin _scribam_ — “I will write,” “let me write”) names the writer’s request: to put words down, on their terms. That is the brand’s first meaning—the moment of writing, not the machinery around it.
+
+The **product philosophy** under that name is unchanged:
+
 > **The document is the output. The writer's thinking and working process is the product.**
 
-Scribo is organized around the writer's work—not around the document editor as a visual object. The editor is one instrument in capture, research, outline, draft, revise, verify, and deliver.
+Scribam is built for the **writer**, not the **document editor** as a visual object. We are not an editing or publishing pipeline dressed as a writing app. The editor is one instrument in capture, research, outline, draft, revise, verify, and deliver—not the center of gravity.
 
 Priority order for capabilities:
 
@@ -29,11 +33,11 @@ The goal is not the smallest interface. The goal is the **least unnecessary cogn
 
 ## Shell UX: IDE affordances, writing product
 
-Scribo Prosa **borrows IDE-style layout** (sidebar, tabs, explorer, source control, diffs) because multi-manuscript projects need clear navigation and history—not because we are building a code IDE. **Writing stays first:** manuscripts, revision, and trust beat tooling for its own sake.
+Scribam Prosa **borrows IDE-style layout** (sidebar, tabs, explorer, source control, diffs) because multi-manuscript projects need clear navigation and history—not because we are building a code IDE. **Writing stays first:** manuscripts, revision, and trust beat tooling for its own sake.
 
 We **do not fork or embed** VS Code, Cursor, or any full IDE. We ship our own shell and adopt **open-source building blocks** (e.g. Git via libgit2, Markdown editor components) where they fit.
 
-**On disk:** a default **Scribo Prosa home** (e.g. under Documents) holds **project folders**; each project is a directory with `scribo.project.json` and `content/`. Details and migration: [prosa-shell-and-projects.md](./prosa-shell-and-projects.md).
+**On disk:** a default **Scribam Prosa home** (e.g. under Documents) holds **project folders**; each project is a directory with `scribam.project.json` and `content/`. Details and migration: [prosa-shell-and-projects.md](./prosa-shell-and-projects.md).
 
 ---
 
@@ -100,7 +104,7 @@ Score proposals (roughly 1–5 or yes/no) on:
 
 ## Final test
 
-> **Scribo should take responsibility for the machinery of writing so that the writer can take responsibility for the writing itself.**
+> **Scribam should take responsibility for the machinery of writing so that the writer can take responsibility for the writing itself.**
 
 If a change fails this test, it does not belong in the product.
 
