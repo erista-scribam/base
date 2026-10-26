@@ -2,7 +2,8 @@ import type { Editor } from "@tiptap/core";
 import type { ThemeMode } from "../hooks/useTheme";
 import type { EditorViewMode } from "./EditorWorkspace";
 import { editorZoomLabel } from "../hooks/useEditorZoom";
-import { FormatToolbar, MarkdownFormatReferenceBar } from "./FormatToolbar";
+import { FormatToolbar, MarkdownFormatToolbar } from "./FormatToolbar";
+import type { MarkdownFormatAction } from "../features/markdown/markdown-source-format";
 import { IconButton } from "./IconButton";
 
 export interface EditorToolbarProps {
@@ -26,6 +27,7 @@ export interface EditorToolbarProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onZoomReset: () => void;
+  onMarkdownFormat?: (action: MarkdownFormatAction) => void;
 }
 
 function IconSidebar() {
@@ -121,6 +123,7 @@ export function EditorToolbar({
   onZoomIn,
   onZoomOut,
   onZoomReset,
+  onMarkdownFormat,
 }: EditorToolbarProps) {
   const isMarkdown = viewMode === "split";
   const statusLabel =
@@ -228,7 +231,11 @@ export function EditorToolbar({
           <IconFocus />
         </IconButton>
       </header>
-      {viewMode === "classic" ? <FormatToolbar editor={editor} /> : <MarkdownFormatReferenceBar />}
+      {viewMode === "classic" ? (
+        <FormatToolbar editor={editor} />
+      ) : onMarkdownFormat ? (
+        <MarkdownFormatToolbar onFormat={onMarkdownFormat} />
+      ) : null}
     </div>
   );
 }

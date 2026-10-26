@@ -1,16 +1,18 @@
 import {
-  IA_LINE_LENGTHS,
+  MARKDOWN_LINE_LENGTH_PRESETS,
   type MarkdownWrapMode,
-  type IaLineLength,
+  type MarkdownLineLengthPresetId,
 } from "../hooks/useMarkdownRuler";
 
 export interface MarkdownRulerProps {
   mode: MarkdownWrapMode;
-  onSelectLineLength: (columns: IaLineLength) => void;
+  onSelectPreset: (presetId: MarkdownLineLengthPresetId) => void;
   onSelectFullWidth: () => void;
 }
 
-export function MarkdownRuler({ mode, onSelectLineLength, onSelectFullWidth }: MarkdownRulerProps) {
+export function MarkdownRuler({ mode, onSelectPreset, onSelectFullWidth }: MarkdownRulerProps) {
+  const value = mode.kind === "full" ? "full" : mode.presetId;
+
   return (
     <div className="markdown-guide-bar">
       <label className="markdown-guide-label" htmlFor="markdown-line-length">
@@ -19,22 +21,19 @@ export function MarkdownRuler({ mode, onSelectLineLength, onSelectFullWidth }: M
       <select
         id="markdown-line-length"
         className="markdown-guide-select"
-        value={mode.kind === "full" ? "full" : String(mode.columns)}
+        value={value}
         onChange={(event) => {
-          const value = event.target.value;
-          if (value === "full") {
+          const next = event.target.value;
+          if (next === "full") {
             onSelectFullWidth();
             return;
           }
-          const columns = Number(value) as IaLineLength;
-          if (IA_LINE_LENGTHS.includes(columns)) {
-            onSelectLineLength(columns);
-          }
+          onSelectPreset(next as MarkdownLineLengthPresetId);
         }}
       >
-        {IA_LINE_LENGTHS.map((columns) => (
-          <option key={columns} value={columns}>
-            {columns}
+        {MARKDOWN_LINE_LENGTH_PRESETS.map((preset) => (
+          <option key={preset.id} value={preset.id}>
+            {preset.label}
           </option>
         ))}
         <option value="full">Full width</option>

@@ -48,7 +48,7 @@ export function applyMarkdownColumnLayout(view: EditorView): void {
   if (bodyColumns == null) {
     stack.dataset.ruler = "full";
     stack.style.removeProperty("--md-line-width");
-    stack.style.removeProperty("--md-content-max-width");
+    stack.style.setProperty("--md-content-max-width", "min(100%, 72rem)");
     return;
   }
 

@@ -1,5 +1,6 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import type { Editor } from "@tiptap/core";
+import type { MarkdownFormatAction } from "../features/markdown/markdown-source-format";
 import { IconButton } from "./IconButton";
 
 export interface FormatToolbarProps {
@@ -144,55 +145,70 @@ function HeadingButton({
   );
 }
 
-function ReferenceChip({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint: string;
-  children: ReactNode;
-}) {
-  return (
-    <span className="format-ref-chip" title={hint} aria-label={`${label}: ${hint}`}>
-      {children}
-    </span>
-  );
+export interface MarkdownFormatToolbarProps {
+  onFormat: (action: MarkdownFormatAction) => void;
 }
 
-export function MarkdownFormatReferenceBar() {
+export function MarkdownFormatToolbar({ onFormat }: MarkdownFormatToolbarProps) {
+  const run = (action: MarkdownFormatAction) => {
+    onFormat(action);
+  };
+
   return (
-    <div
-      className="format-bar format-bar-reference"
-      role="note"
-      aria-label="Markdown syntax reference"
-    >
-      <span className="format-bar-hint">Markdown source — type syntax directly</span>
+    <div className="format-bar" role="toolbar" aria-label="Markdown formatting">
+      <div className="format-bar-group" aria-label="Character style">
+        <IconButton label="Bold" onClick={() => run("bold")}>
+          <IconBold />
+        </IconButton>
+        <IconButton label="Italic" onClick={() => run("italic")}>
+          <IconItalic />
+        </IconButton>
+        <IconButton label="Strikethrough" onClick={() => run("strike")}>
+          <IconStrike />
+        </IconButton>
+        <IconButton label="Inline code" onClick={() => run("code")}>
+          <IconCode />
+        </IconButton>
+      </div>
       <FormatDivider />
-      <ReferenceChip label="Bold" hint="**text**">
-        <IconBold />
-      </ReferenceChip>
-      <ReferenceChip label="Italic" hint="*text*">
-        <IconItalic />
-      </ReferenceChip>
-      <ReferenceChip label="Numbered list" hint="1. item">
-        <IconNumberedList />
-      </ReferenceChip>
-      <ReferenceChip label="Bullet list" hint="- item">
-        <IconBulletList />
-      </ReferenceChip>
-      <ReferenceChip label="Task" hint="- [ ] todo">
-        <IconTaskList />
-      </ReferenceChip>
-      <ReferenceChip label="Heading" hint="# heading">
-        <span className="format-text-label">H1</span>
-      </ReferenceChip>
-      <ReferenceChip label="Quote" hint="> quote">
-        <IconQuote />
-      </ReferenceChip>
-      <ReferenceChip label="Code" hint="`code`">
-        <IconCode />
-      </ReferenceChip>
+      <div className="format-bar-group" aria-label="Headings">
+        {([1, 2, 3, 4, 5] as const).map((level) => (
+          <IconButton
+            key={level}
+            label={`Heading ${level}`}
+            onClick={() => run(`heading${level}` as MarkdownFormatAction)}
+          >
+            <span className="format-text-label">H{level}</span>
+          </IconButton>
+        ))}
+        <IconButton label="Body paragraph" onClick={() => run("paragraph")}>
+          <span className="format-text-label-muted">¶</span>
+        </IconButton>
+      </div>
+      <FormatDivider />
+      <div className="format-bar-group" aria-label="Lists">
+        <IconButton label="Numbered list" onClick={() => run("numberedList")}>
+          <IconNumberedList />
+        </IconButton>
+        <IconButton label="Bullet list" onClick={() => run("bulletList")}>
+          <IconBulletList />
+        </IconButton>
+        <IconButton label="Task list" onClick={() => run("taskList")}>
+          <IconTaskList />
+        </IconButton>
+      </div>
+      <FormatDivider />
+      <div className="format-bar-group" aria-label="Blocks">
+        <IconButton label="Block quotation" onClick={() => run("quote")}>
+          <IconQuote />
+        </IconButton>
+        <IconButton label="Code block" onClick={() => run("codeBlock")}>
+          <IconCodeBlock />
+        </IconButton>
+        <IconButton label="Scene break" onClick={() => run("sceneBreak")}>
+          <IconSceneBreak />
+        </IconButton>
+      </div>
     </div>
   );
 }
