@@ -57,10 +57,11 @@ Expected behavior (deterministic, tested where feasible):
 
 ## Portability
 
-1. **Library manuscripts** — Primary artifact is human-readable `.md` under a user-chosen library root.
-2. **Extensions** — Scribo-specific sidecars (e.g. `.scribo/recovery`) must be documented and bounded.
-3. **Export** — Future export must not require mutating the canonical manuscript.
-4. **No opaque lock-in** — No storage format without a documented recovery or export path.
+1. **Scribo Prosa home** — The app has a documented default root (e.g. `Documents/Scribo Prosa/`) where **project folders** normally live. Each project is a directory with `scribo.project.json` and markdown under `content/` (see [prosa-shell-and-projects.md](./prosa-shell-and-projects.md)).
+2. **Library manuscripts** — Primary artifact is human-readable `.md` inside a project tree—not an opaque app-internal blob.
+3. **Extensions** — Scribo-specific sidecars (e.g. `.scribo/recovery`) must be documented and bounded.
+4. **Export** — Future export must not require mutating the canonical manuscript.
+5. **No opaque lock-in** — No storage format without a documented recovery or export path.
 
 ---
 

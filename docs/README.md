@@ -10,13 +10,14 @@ Start here for product and engineering knowledge. **One topic, one canonical fil
 
 ## Product
 
-| Document                                                       | Purpose                                |
-| -------------------------------------------------------------- | -------------------------------------- |
-| [product/philosophy.md](./product/philosophy.md)               | Constitution / writer-first principles |
-| [product/invariants.md](./product/invariants.md)               | Integrity and portability rules        |
-| [product/roadmap.md](./product/roadmap.md)                     | Phased delivery                        |
-| [product/known-limitations.md](./product/known-limitations.md) | Current gaps                           |
-| [product/licensing.md](./product/licensing.md)                 | Open core (AGPL) vs premium services   |
+| Document                                                                     | Purpose                                     |
+| ---------------------------------------------------------------------------- | ------------------------------------------- |
+| [product/philosophy.md](./product/philosophy.md)                             | Constitution / writer-first principles      |
+| [product/prosa-shell-and-projects.md](./product/prosa-shell-and-projects.md) | IDE-like shell, Prosa home, project folders |
+| [product/invariants.md](./product/invariants.md)                             | Integrity and portability rules             |
+| [product/roadmap.md](./product/roadmap.md)                                   | Phased delivery                             |
+| [product/known-limitations.md](./product/known-limitations.md)               | Current gaps                                |
+| [product/licensing.md](./product/licensing.md)                               | Open core (AGPL) vs premium services        |
 
 ## Engineering
 

@@ -6,6 +6,8 @@
 
 Plan 003 remains the **philosophy and capability vision** ([completed archive](../plans/completed/003-prosa-deep-writing-features.md)). **Implementation** now flows through **plan 005** (Git + project + workspace), not the old linear revision-checkpoint design.
 
+**Shell & disk:** IDE-like navigation, writing-first product, no IDE fork, **Prosa home → project folders** — [prosa-shell-and-projects.md](./prosa-shell-and-projects.md).
+
 ## Current focus
 
 1. **Review** [project-architecture-and-storage.md](../specs/project-architecture-and-storage.md).

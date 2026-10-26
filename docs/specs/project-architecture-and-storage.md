@@ -6,6 +6,8 @@
 
 **Legend:** **Verified** = inspected in repo; **Documented** = docs only; **Recommended** = proposal; **Assumption** = needs spike.
 
+**Product context:** [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md) — IDE-like UI for navigation/history; writing app first; not forking an IDE; **Scribo Prosa home** as default root with **projects as subfolders**.
+
 ---
 
 ## 1. Executive summary
@@ -17,6 +19,7 @@
 3. **SQLite:** **Rebuildable indexes only** (search, backlinks, entity occurrence lists)—never an authoritative copy of prose (**Recommended**).
 4. **Portable package:** Optional `.scribo` archive (zip or custom container) for backup/import—**not** the live editing format (**Recommended**).
 5. **Migration:** Current **library folder** (flat `.md` + app config) maps to **single-manuscript projects** or **multi-doc projects** via import tool (**Assumption**—details in roadmap).
+6. **Prosa home (Recommended):** Default `Documents/Scribo Prosa/` (or user-chosen) is the **app home**; each **writing project** is a **child folder** with its own manifest and Git root—not manuscripts scattered at the home root long term.
 
 **Principal risk:** Stable **entity IDs** across TipTap/Markdown round-trips are **not verified** today (`blockId()` regenerates UUIDs in `prosa-convert.ts`, `prosa-markdown.ts`)—Git merges and workspace references **require** ID stability first.
 
@@ -91,7 +94,19 @@ See [§2 detail table](#22-audit-table) and [implementation-audit.md](../archite
 
 ## 5. Proposed architecture
 
-### 5.1 Project directory tree (Recommended)
+### 5.1 Prosa home vs project folder (Recommended)
+
+```text
+Documents/Scribo Prosa/           # Prosa home (default; may hold many projects)
+├── My Novel/                     # Project folder (Git root + manifest)
+│   └── …                         # See tree below
+├── Essays/
+└── …
+```
+
+Legacy/transitional: app config may still point at a single folder that acts as both home and one project until migration completes.
+
+### 5.2 Project directory tree (Recommended)
 
 ```text
 MyNovel/                          # User-facing project root (also Git root)
@@ -118,7 +133,7 @@ MyNovel/                          # User-facing project root (also Git root)
     └── ui-state.json             # Panel layout, last cursor (optional)
 ```
 
-### 5.2 Component responsibilities
+### 5.3 Component responsibilities
 
 | Component                    | Owns                                      | Must not                     |
 | ---------------------------- | ----------------------------------------- | ---------------------------- |
@@ -130,7 +145,7 @@ MyNovel/                          # User-facing project root (also Git root)
 | Git                          | Content history, branches, merges         | Semantic prose understanding |
 | SQLite                       | Derived indexes                           | Authoritative prose          |
 
-### 5.3 Source-of-truth rules
+### 5.4 Source-of-truth rules
 
 | Data                       | Authority                     | Versioned in Git?    |
 | -------------------------- | ----------------------------- | -------------------- |
@@ -145,14 +160,14 @@ MyNovel/                          # User-facing project root (also Git root)
 
 **Rule:** No prose in SQLite; no Git objects without working tree files for primary content.
 
-### 5.4 Stable identity (Recommended)
+### 5.5 Stable identity (Recommended)
 
 - **ProjectId**, **ManuscriptId**, **DocumentId** — UUID in manifest (`@scribo/core`).
 - **BlockId** — stable across saves; assigned at creation, preserved in Markdown via HTML comments or `.md` front-matter map (`<!-- scribo:id=blk_... -->`) **Assumption—spike needed**.
 - **Scene/chapter** — first-class entries in `_manuscript.json` pointing to file paths.
 - Workspace references store `{ entityId, anchor? }` not line numbers alone.
 
-### 5.5 Package boundaries
+### 5.6 Package boundaries
 
 New package **`@scribo/project-model`** (Recommended) for manifest + workspace types—only when manifest stabilizes; until then types in `@scribo/core`.
 

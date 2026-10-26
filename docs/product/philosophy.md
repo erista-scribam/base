@@ -27,6 +27,16 @@ The goal is not the smallest interface. The goal is the **least unnecessary cogn
 
 ---
 
+## Shell UX: IDE affordances, writing product
+
+Scribo Prosa **borrows IDE-style layout** (sidebar, tabs, explorer, source control, diffs) because multi-manuscript projects need clear navigation and history—not because we are building a code IDE. **Writing stays first:** manuscripts, revision, and trust beat tooling for its own sake.
+
+We **do not fork or embed** VS Code, Cursor, or any full IDE. We ship our own shell and adopt **open-source building blocks** (e.g. Git via libgit2, Markdown editor components) where they fit.
+
+**On disk:** a default **Scribo Prosa home** (e.g. under Documents) holds **project folders**; each project is a directory with `scribo.project.json` and `content/`. Details and migration: [prosa-shell-and-projects.md](./prosa-shell-and-projects.md).
+
+---
+
 ## Product principles
 
 | Principle                       | Meaning                                                                             |
@@ -111,3 +121,4 @@ If a change fails this test, it does not belong in the product.
 | [../plans/active/005-project-workspace-and-git.md](../plans/active/005-project-workspace-and-git.md)           | Architecture & execution (active) |
 | [../plans/completed/003-prosa-deep-writing-features.md](../plans/completed/003-prosa-deep-writing-features.md) | Strategy essay (archive)          |
 | [../specs/project-architecture-and-storage.md](../specs/project-architecture-and-storage.md)                   | Project + Git storage spec        |
+| [prosa-shell-and-projects.md](./prosa-shell-and-projects.md)                                                   | IDE-like UX, home vs project dirs |

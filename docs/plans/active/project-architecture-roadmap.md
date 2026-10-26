@@ -31,6 +31,8 @@ flowchart TB
 | **Acceptance**   | Human sign-off on §18 open questions              |
 | **Gate**         | **You are here**                                  |
 
+**Product direction (locked for planning):** IDE-style shell affordances; **writing-first** scope; **no IDE fork**—OSS building blocks only; **Prosa home → project folders** on disk ([prosa-shell-and-projects.md](../../product/prosa-shell-and-projects.md)).
+
 ## Phase 1 — Stable identity
 
 |                |                                                                      |

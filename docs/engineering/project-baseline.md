@@ -13,7 +13,7 @@ This snapshot marks adoption of the [operating model](./operating-model.md). The
 
 **Verified** where noted; otherwise **documented** from release notes and codebase inspection.
 
-Scribo Prosa is a local-first Tauri desktop app for prose manuscripts.
+Scribo Prosa is a local-first Tauri desktop app for prose manuscripts. Product direction: **IDE-like shell affordances**, **writing-first** scope, **not an IDE fork** (OSS libraries only), **Prosa home** containing **project folders**—see [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md).
 
 | Area                                        | State           | Evidence                                             |
 | ------------------------------------------- | --------------- | ---------------------------------------------------- |

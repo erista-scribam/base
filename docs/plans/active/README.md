@@ -9,4 +9,6 @@
 
 **Architecture spec:** [specs/project-architecture-and-storage.md](../../specs/project-architecture-and-storage.md)
 
+**Shell & storage direction:** [product/prosa-shell-and-projects.md](../../product/prosa-shell-and-projects.md) (IDE-like UX, writing-first, Prosa home, not an IDE fork)
+
 **Superseded strategy:** [003](../completed/003-prosa-deep-writing-features.md) (philosophy only—features re-scoped under 005).

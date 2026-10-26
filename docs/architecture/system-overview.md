@@ -31,14 +31,14 @@ flowchart TB
 
 Future packages (`editor`, `rendering`, `design-system`, `export`) stay out of the tree until they have a concrete boundary. TipTap lives in the app for now; the canonical model remains independent of TipTap types.
 
-**Product direction:** [philosophy.md](../product/philosophy.md) and [roadmap.md](../product/roadmap.md). **Data model:** [data-model.md](./data-model.md). **Code map:** [implementation-audit.md](./implementation-audit.md).
+**Product direction:** [philosophy.md](../product/philosophy.md), [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md) (IDE-like shell, writing-first, Prosa home + project folders), and [roadmap.md](../product/roadmap.md). **Data model:** [data-model.md](./data-model.md). **Code map:** [implementation-audit.md](./implementation-audit.md).
 
 ## Document flow
 
 1. **Authoritative state** — `ProsaDocument` JSON (validated by `@scribo/document-model`).
 2. **Editing** — TipTap enforces a constrained schema; updates convert TipTap JSON → canonical model.
 3. **Presentation** — CSS variables in `manuscript.css` style semantic elements globally (no per-node font overrides in the model).
-4. **Persistence** — Library manuscripts as Markdown under a user-chosen folder; recovery under `.scribo/recovery`. Legacy internal storage may use app-data JSON (see [data-model.md](./data-model.md)).
+4. **Persistence** — Markdown manuscripts inside **project folders**; default **Scribo Prosa home** holds those projects (target layout in [prosa-shell-and-projects.md](../product/prosa-shell-and-projects.md)). Recovery under each project’s `.scribo/recovery`. Legacy internal storage may use app-data JSON (see [data-model.md](./data-model.md)).
 
 ## Toolchain (pinned in repo)
 
