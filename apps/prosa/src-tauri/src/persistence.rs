@@ -16,6 +16,8 @@ pub struct ManuscriptSummary {
     pub title: String,
     pub updated_at: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub file_path: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,
@@ -88,6 +90,7 @@ pub fn list_manuscripts(app: AppHandle) -> Result<Vec<ManuscriptSummary>, String
             id: meta.id,
             title: meta.title,
             updated_at: meta.updated_at,
+            created_at: Some(meta.created_at),
             file_path: None,
             source: Some("internal".into()),
         });
@@ -132,6 +135,7 @@ pub fn create_manuscript(
             id,
             title,
             updated_at: meta.updated_at,
+            created_at: Some(meta.created_at),
             file_path: None,
             source: Some("internal".into()),
         },
@@ -149,6 +153,7 @@ pub fn load_manuscript(app: AppHandle, id: String) -> Result<(ManuscriptSummary,
             id: meta.id,
             title: meta.title,
             updated_at: meta.updated_at,
+            created_at: Some(meta.created_at),
             file_path: None,
             source: Some("internal".into()),
         },
@@ -181,6 +186,7 @@ pub fn save_manuscript(
         id: meta.id,
         title: meta.title,
         updated_at: meta.updated_at,
+        created_at: Some(meta.created_at),
         file_path: None,
         source: Some("internal".into()),
     })

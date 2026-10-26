@@ -189,3 +189,7 @@ export async function saveRecoverySnapshot(id: string, document: ProsaDocument):
 export async function clearRecoverySnapshot(id: string): Promise<void> {
   await invoke("clear_recovery_snapshot", { id });
 }
+
+export async function deleteManuscript(id: string): Promise<void> {
+  await invoke("delete_manuscript", { id });
+}

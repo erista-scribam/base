@@ -6,8 +6,8 @@ mod recovery;
 use crate::atomic_io::atomic_write;
 use library::{
     LibraryInfo, absolute_path_for_entry, clear_library_recovery, create_library_markdown,
-    create_library_markdown_with_content, ensure_default_library, get_library_info,
-    import_external_markdown, is_library_manuscript_id, library_recovery_path,
+    create_library_markdown_with_content, delete_library_manuscript, ensure_default_library,
+    get_library_info, import_external_markdown, is_library_manuscript_id, library_recovery_path,
     list_library_manuscripts, path_key_for_manuscript_id, read_library_markdown, set_library_root,
     write_library_markdown,
 };
@@ -122,6 +122,7 @@ fn load_manuscript(app: tauri::AppHandle, id: String) -> Result<LoadedManuscript
             });
         }
         let path = absolute_path_for_entry(&app, &path_key)?;
+        let (created, modified) = library::file_created_modified(&path);
         let summary = ManuscriptSummary {
             id: id.clone(),
             title: path
@@ -129,7 +130,8 @@ fn load_manuscript(app: tauri::AppHandle, id: String) -> Result<LoadedManuscript
                 .and_then(|stem| stem.to_str())
                 .unwrap_or("Untitled")
                 .to_string(),
-            updated_at: chrono::Utc::now().to_rfc3339(),
+            updated_at: modified,
+            created_at: Some(created),
             file_path: Some(path_key),
             source: Some("library".into()),
         };
@@ -285,6 +287,16 @@ fn clear_recovery_snapshot(app: tauri::AppHandle, id: String) -> Result<(), Stri
 }
 
 #[tauri::command]
+fn delete_manuscript(app: tauri::AppHandle, id: String) -> Result<(), String> {
+    if is_library_manuscript_id(&id) {
+        delete_library_manuscript(&app, &id)
+    } else {
+        clear_internal_recovery_snapshot(&app, &id)?;
+        delete_internal_manuscript(&app, &id)
+    }
+}
+
+#[tauri::command]
 fn get_manuscript_disk_revision(app: tauri::AppHandle, id: String) -> Result<DiskRevision, String> {
     let modified_at = if is_library_manuscript_id(&id) {
         let path_key = path_key_for_manuscript_id(&id).ok_or("Invalid library manuscript id")?;
@@ -324,6 +336,7 @@ pub fn run() {
             save_recovery_snapshot,
             load_recovery_snapshot,
             clear_recovery_snapshot,
+            delete_manuscript,
             get_manuscript_disk_revision
         ])
         .run(tauri::generate_context!())

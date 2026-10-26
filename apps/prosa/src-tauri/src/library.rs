@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::{Component, Path, PathBuf};
+use std::time::SystemTime;
 
 use base64::{Engine as _, engine::general_purpose::URL_SAFE_NO_PAD};
 use chrono::Utc;
@@ -202,6 +203,25 @@ fn walk_markdown_files(
     Ok(())
 }
 
+fn rfc3339_from_system_time(time: SystemTime) -> String {
+    chrono::DateTime::<Utc>::from(time).to_rfc3339()
+}
+
+pub fn file_created_modified(path: &Path) -> (String, String) {
+    let meta = fs::metadata(path).ok();
+    let modified = meta
+        .as_ref()
+        .and_then(|m| m.modified().ok())
+        .map(rfc3339_from_system_time)
+        .unwrap_or_else(|| Utc::now().to_rfc3339());
+    let created = meta
+        .as_ref()
+        .and_then(|m| m.created().ok())
+        .map(rfc3339_from_system_time)
+        .unwrap_or_else(|| modified.clone());
+    (created, modified)
+}
+
 pub fn list_library_manuscripts(app: &AppHandle) -> Result<Vec<ManuscriptSummary>, String> {
     let Some(config) = read_config(app)? else {
         return Ok(Vec::new());
@@ -216,15 +236,12 @@ pub fn list_library_manuscripts(app: &AppHandle) -> Result<Vec<ManuscriptSummary
     let mut summaries = files
         .into_iter()
         .map(|(absolute, rel)| {
-            let modified = fs::metadata(&absolute)
-                .ok()
-                .and_then(|meta| meta.modified().ok())
-                .map(|time| chrono::DateTime::<Utc>::from(time).to_rfc3339())
-                .unwrap_or_else(|| Utc::now().to_rfc3339());
+            let (created, modified) = file_created_modified(&absolute);
             ManuscriptSummary {
                 id: manuscript_id_for_path(&rel),
                 title: title_from_path(&absolute),
                 updated_at: modified,
+                created_at: Some(created),
                 file_path: Some(rel),
                 source: Some("library".into()),
             }
@@ -325,18 +342,25 @@ pub fn write_library_markdown(
     } else {
         target_path.to_string_lossy().into_owned()
     };
-    let modified = fs::metadata(&target_path)
-        .ok()
-        .and_then(|meta| meta.modified().ok())
-        .map(|time| chrono::DateTime::<Utc>::from(time).to_rfc3339())
-        .unwrap_or_else(|| Utc::now().to_rfc3339());
+    let (created, modified) = file_created_modified(&target_path);
     Ok(ManuscriptSummary {
         id: manuscript_id_for_path(&rel),
         title: display_title.to_string(),
         updated_at: modified,
+        created_at: Some(created),
         file_path: Some(rel),
         source: Some("library".into()),
     })
+}
+
+pub fn delete_library_manuscript(app: &AppHandle, id: &str) -> Result<(), String> {
+    let path_key = path_key_for_manuscript_id(id).ok_or("Invalid library manuscript id")?;
+    clear_library_recovery(app, &path_key)?;
+    let path = absolute_path_for_entry(app, &path_key)?;
+    if path.exists() {
+        fs::remove_file(&path).map_err(|error| error.to_string())?;
+    }
+    Ok(())
 }
 
 pub fn library_recovery_path(app: &AppHandle, path_key: &str) -> Result<PathBuf, String> {
@@ -390,16 +414,13 @@ pub fn create_library_markdown_with_content(
 
     let (path, rel) = unique_markdown_path(&config.root_path, &title)?;
     atomic_write(&path, &markdown)?;
-    let modified = fs::metadata(&path)
-        .ok()
-        .and_then(|meta| meta.modified().ok())
-        .map(|time| chrono::DateTime::<Utc>::from(time).to_rfc3339())
-        .unwrap_or_else(|| Utc::now().to_rfc3339());
+    let (created, modified) = file_created_modified(&path);
     Ok((
         ManuscriptSummary {
             id: manuscript_id_for_path(&rel),
             title: title_from_path(&path),
             updated_at: modified,
+            created_at: Some(created),
             file_path: Some(rel),
             source: Some("library".into()),
         },
@@ -420,16 +441,13 @@ pub fn import_external_markdown(
     }
     let markdown = fs::read_to_string(&path).map_err(|error| error.to_string())?;
     let path_key = path.to_string_lossy().into_owned();
-    let modified = fs::metadata(&path)
-        .ok()
-        .and_then(|meta| meta.modified().ok())
-        .map(|time| chrono::DateTime::<Utc>::from(time).to_rfc3339())
-        .unwrap_or_else(|| Utc::now().to_rfc3339());
+    let (created, modified) = file_created_modified(&path);
     Ok((
         ManuscriptSummary {
             id: manuscript_id_for_path(&path_key),
             title: title_from_path(&path),
             updated_at: modified,
+            created_at: Some(created),
             file_path: Some(path_key),
             source: Some("library".into()),
         },

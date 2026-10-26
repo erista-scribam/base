@@ -22,9 +22,10 @@ import { useAppShortcuts } from "../hooks/useAppShortcuts";
 import { useEditorZoom } from "../hooks/useEditorZoom";
 import { useTheme } from "../hooks/useTheme";
 import { useViewportLayout } from "../hooks/useViewportLayout";
-import { open } from "@tauri-apps/plugin-dialog";
+import { ask, open } from "@tauri-apps/plugin-dialog";
 import {
   createManuscript,
+  deleteManuscript,
   getLibrary,
   importMarkdownFile,
   initLibrary,
@@ -39,6 +40,7 @@ import {
   revealManuscriptInFileManager,
   setLibraryRoot,
 } from "../features/persistence/tauri-manuscripts";
+import { useLibraryViewMode } from "../hooks/useLibraryViewMode";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
 
 export function App() {
@@ -59,6 +61,7 @@ export function App() {
   const [layoutKey, setLayoutKey] = useState(0);
   const [libraryPath, setLibraryPath] = useState<string | null>(null);
   const { theme, toggleTheme } = useTheme();
+  const { libraryViewMode, setLibraryViewMode } = useLibraryViewMode();
   const { markdownPreviewVisible, toggleMarkdownPreview } = useMarkdownPreviewVisible();
   const { zoom, zoomIn, zoomOut, resetZoom, canZoomIn, canZoomOut } = useEditorZoom();
 
@@ -258,7 +261,7 @@ export function App() {
     [refreshList],
   );
 
-  const { notifyDocumentChange, setDocumentRef } = useManuscriptPersistence(
+  const { notifyDocumentChange, setDocumentRef, flushNow } = useManuscriptPersistence(
     activeId,
     activeSummary,
     setSaveState,
@@ -381,6 +384,50 @@ export function App() {
     void openManuscript(activeId);
   }, [activeId, openManuscript]);
 
+  const handleDeleteManuscript = useCallback(
+    (id: string) => {
+      if (!isTauriRuntime()) {
+        return;
+      }
+      const item = manuscripts.find((entry) => entry.id === id);
+      const title = item?.title || "Untitled";
+      void (async () => {
+        const unsaved =
+          id === activeId &&
+          (saveStateRef.current === "dirty" || saveStateRef.current === "saving");
+        const message = unsaved
+          ? `"${title}" has unsaved changes. Delete anyway? The file will be removed permanently.`
+          : `Delete "${title}" permanently? This cannot be undone.`;
+        const confirmed = await ask(message, {
+          title: "Delete manuscript",
+          kind: "warning",
+          okLabel: "Delete",
+          cancelLabel: "Cancel",
+        });
+        if (!confirmed) {
+          return;
+        }
+        setError(null);
+        try {
+          if (id === activeId) {
+            await flushNow();
+          }
+          await deleteManuscript(id);
+          if (id === activeId) {
+            setActiveId(null);
+            setDocument(null);
+            setSaveState("idle");
+            setExternalChange(false);
+          }
+          await refreshList();
+        } catch (cause) {
+          setError(cause instanceof Error ? cause.message : "Failed to delete manuscript");
+        }
+      })();
+    },
+    [activeId, flushNow, manuscripts, refreshList],
+  );
+
   return (
     <div
       className="app-shell"
@@ -402,12 +449,15 @@ export function App() {
           manuscripts={manuscripts}
           activeId={activeId}
           libraryPath={libraryPath}
+          libraryViewMode={libraryViewMode}
+          onLibraryViewModeChange={setLibraryViewMode}
           onSelect={(id) => void openManuscript(id)}
           onCreate={() => void handleCreate()}
           onOpenFile={() => void handleOpenFile()}
           onChooseLibrary={() => void handleChooseLibrary()}
           onRevealLibrary={handleRevealLibrary}
           onRevealActive={handleRevealActive}
+          onDelete={handleDeleteManuscript}
         />
         <main className="app-main" data-editor-view={viewMode === "split" ? "markdown" : "classic"}>
           {document ? (

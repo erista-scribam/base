@@ -51,8 +51,40 @@
 
 .app-sidebar-actions {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--scribo-space-2);
+}
+
+.library-view-switch {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--scribo-ui-border-subtle);
+  border-radius: var(--scribo-radius-sm);
+}
+
+.library-view-btn {
+  padding: 2px 6px;
+  border: none;
+  background: transparent;
+  color: var(--scribo-ui-muted);
+  font-family: var(--scribo-font-ui);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.library-view-btn:hover {
+  background: var(--scribo-ui-hover);
+  color: var(--scribo-ui-text);
+}
+
+.library-view-btn[data-active="true"] {
+  background: var(--scribo-ui-selected);
+  color: var(--scribo-ui-text);
 }
 
 .library-folder {
@@ -134,6 +166,74 @@
   margin: 0;
 }
 
+.app-sidebar-list[data-library-view="grid"] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--scribo-space-2);
+  align-content: start;
+}
+
+.manuscript-row {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 0;
+}
+
+.app-sidebar-list[data-library-view="grid"] .manuscript-row {
+  flex-direction: column;
+}
+
+.manuscript-delete {
+  flex-shrink: 0;
+  align-self: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  opacity: 0;
+  color: var(--scribo-ui-muted);
+  transition: opacity var(--scribo-transition-fast);
+}
+
+.manuscript-row:hover .manuscript-delete,
+.manuscript-row:focus-within .manuscript-delete {
+  opacity: 1;
+}
+
+.manuscript-delete:hover {
+  color: var(--scribo-ui-danger, #c0392b);
+}
+
+.app-sidebar-list[data-library-view="grid"] .manuscript-delete {
+  align-self: flex-end;
+  opacity: 1;
+}
+
+.app-sidebar-list[data-library-view="grid"] .manuscript-item {
+  flex: 1;
+  min-height: 4.5rem;
+  border: 1px solid var(--scribo-ui-border-subtle);
+}
+
+.app-sidebar-list[data-library-view="comfortable"] .manuscript-item {
+  padding-bottom: var(--scribo-space-3);
+}
+
+.manuscript-item-details {
+  margin-top: var(--scribo-space-1);
+}
+
+.manuscript-item-meta-line {
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: var(--scribo-ui-muted);
+}
+
+.manuscript-item-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .app-sidebar-empty {
   padding: var(--scribo-space-3) var(--scribo-space-3);
   font-size: 0.8125rem;
@@ -143,6 +243,8 @@
 
 .manuscript-item {
   display: block;
+  flex: 1;
+  min-width: 0;
   width: 100%;
   margin-bottom: 1px;
   padding: var(--scribo-space-2) var(--scribo-space-3);
