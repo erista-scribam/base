@@ -59,129 +59,146 @@ export function ManuscriptNav({
   onGitOperationComplete,
 }: ManuscriptNavProps) {
   return (
-    <aside className="app-sidebar" aria-label="Library">
-      <div className="app-sidebar-header">
-        <span className="app-sidebar-label">Manuscripts</span>
-        <div className="app-sidebar-actions">
-          <div className="library-view-switch" role="group" aria-label="Library layout">
-            {(["compact", "comfortable", "grid"] as const).map((mode) => (
+    <aside className="app-sidebar" aria-label="Navigation">
+      <section className="sidebar-workspace" aria-label="Workspace">
+        <div className="sidebar-zone-header">
+          <span className="sidebar-zone-label">Workspace</span>
+          <span className="sidebar-zone-hint">Choose a project folder</span>
+        </div>
+        <ProjectSwitcher
+          currentRootPath={libraryPath}
+          projectTitle={projectTitle}
+          onOpenProject={onChooseLibrary}
+          onCreateProject={onCreateProject}
+          onSwitchProject={onSwitchProject}
+          onRevealProject={onRevealLibrary}
+        />
+      </section>
+
+      {libraryPath ? (
+        <section className="sidebar-project" aria-label="Project">
+          <div className="app-sidebar-header sidebar-project-header">
+            <span className="app-sidebar-label">Manuscripts</span>
+            <div className="app-sidebar-actions">
+              <div className="library-view-switch" role="group" aria-label="Manuscript layout">
+                {(["compact", "comfortable", "grid"] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    className="library-view-btn"
+                    data-active={libraryViewMode === mode ? "true" : undefined}
+                    aria-pressed={libraryViewMode === mode}
+                    title={`${VIEW_LABELS[mode]} view`}
+                    onClick={() => onLibraryViewModeChange(mode)}
+                  >
+                    {VIEW_LABELS[mode]}
+                  </button>
+                ))}
+              </div>
               <button
-                key={mode}
                 type="button"
-                className="library-view-btn"
-                data-active={libraryViewMode === mode ? "true" : undefined}
-                aria-pressed={libraryViewMode === mode}
-                title={`${VIEW_LABELS[mode]} view`}
-                onClick={() => onLibraryViewModeChange(mode)}
+                className="text-btn"
+                onClick={onOpenFile}
+                title="Open markdown file in this project"
               >
-                {VIEW_LABELS[mode]}
+                Open
               </button>
-            ))}
+              <button type="button" className="text-btn" onClick={onCreate}>
+                New
+              </button>
+            </div>
           </div>
-          <button
-            type="button"
-            className="text-btn"
-            onClick={onOpenFile}
-            title="Open markdown file"
-          >
-            Open
-          </button>
-          <button type="button" className="text-btn" onClick={onCreate}>
-            New
+
+          <SourceControlPanel
+            refreshKey={versionControlRefreshKey}
+            onError={onVersionControlError}
+            onBeforeGitOperation={onBeforeGitOperation}
+            onGitOperationComplete={async (result) => {
+              await onGitOperationComplete(result.workspaceUpdated === true);
+            }}
+          />
+
+          <ul className="app-sidebar-list" data-library-view={libraryViewMode}>
+            {manuscripts.length === 0 ? (
+              <li className="app-sidebar-empty">
+                Add `.md` files to your library folder or create a new manuscript.
+              </li>
+            ) : (
+              manuscripts.map((item) => (
+                <li key={item.id} className="manuscript-row">
+                  <button
+                    type="button"
+                    className="manuscript-item"
+                    data-active={activeId === item.id ? "true" : undefined}
+                    onClick={() => onSelect(item.id)}
+                  >
+                    <div className="manuscript-item-title">{item.title || "Untitled"}</div>
+                    {libraryViewMode === "compact" ? (
+                      <div className="manuscript-item-meta">{formatCompactMeta(item)}</div>
+                    ) : null}
+                    {libraryViewMode === "comfortable" ? (
+                      <div className="manuscript-item-details">
+                        <div className="manuscript-item-meta-line">
+                          Edited {formatManuscriptTimestamp(item.updatedAt)}
+                        </div>
+                        {item.createdAt ? (
+                          <div className="manuscript-item-meta-line">
+                            Created {formatManuscriptTimestamp(item.createdAt)}
+                          </div>
+                        ) : null}
+                        {formatManuscriptPath(item) ? (
+                          <div className="manuscript-item-meta-line manuscript-item-path">
+                            {formatManuscriptPath(item)}
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    {libraryViewMode === "grid" ? (
+                      <div className="manuscript-item-details">
+                        <div className="manuscript-item-meta-line">
+                          Edited {formatManuscriptEdited(item.updatedAt)}
+                        </div>
+                        {item.createdAt ? (
+                          <div className="manuscript-item-meta-line">
+                            Created {formatManuscriptEdited(item.createdAt)}
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-btn manuscript-delete"
+                    aria-label={`Delete ${item.title || "Untitled"}`}
+                    title="Delete"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDelete(item.id);
+                    }}
+                  >
+                    <IconTrash />
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+
+          {activeId ? (
+            <div className="app-sidebar-footer">
+              <button type="button" className="sidebar-footer-btn" onClick={onRevealActive}>
+                Reveal in Finder
+              </button>
+            </div>
+          ) : null}
+        </section>
+      ) : (
+        <div className="sidebar-project-placeholder">
+          <p>Open or create a project to browse manuscripts and source control.</p>
+          <button type="button" className="sc-btn sc-btn-primary" onClick={onChooseLibrary}>
+            Open project…
           </button>
         </div>
-      </div>
-
-      <ProjectSwitcher
-        currentRootPath={libraryPath}
-        projectTitle={projectTitle}
-        onOpenProject={onChooseLibrary}
-        onCreateProject={onCreateProject}
-        onSwitchProject={onSwitchProject}
-        onRevealProject={onRevealLibrary}
-      />
-
-      <SourceControlPanel
-        refreshKey={versionControlRefreshKey}
-        onError={onVersionControlError}
-        onBeforeGitOperation={onBeforeGitOperation}
-        onGitOperationComplete={async (result) => {
-          await onGitOperationComplete(result.workspaceUpdated === true);
-        }}
-      />
-
-      <ul className="app-sidebar-list" data-library-view={libraryViewMode}>
-        {manuscripts.length === 0 ? (
-          <li className="app-sidebar-empty">
-            Add `.md` files to your library folder or create a new manuscript.
-          </li>
-        ) : (
-          manuscripts.map((item) => (
-            <li key={item.id} className="manuscript-row">
-              <button
-                type="button"
-                className="manuscript-item"
-                data-active={activeId === item.id ? "true" : undefined}
-                onClick={() => onSelect(item.id)}
-              >
-                <div className="manuscript-item-title">{item.title || "Untitled"}</div>
-                {libraryViewMode === "compact" ? (
-                  <div className="manuscript-item-meta">{formatCompactMeta(item)}</div>
-                ) : null}
-                {libraryViewMode === "comfortable" ? (
-                  <div className="manuscript-item-details">
-                    <div className="manuscript-item-meta-line">
-                      Edited {formatManuscriptTimestamp(item.updatedAt)}
-                    </div>
-                    {item.createdAt ? (
-                      <div className="manuscript-item-meta-line">
-                        Created {formatManuscriptTimestamp(item.createdAt)}
-                      </div>
-                    ) : null}
-                    {formatManuscriptPath(item) ? (
-                      <div className="manuscript-item-meta-line manuscript-item-path">
-                        {formatManuscriptPath(item)}
-                      </div>
-                    ) : null}
-                  </div>
-                ) : null}
-                {libraryViewMode === "grid" ? (
-                  <div className="manuscript-item-details">
-                    <div className="manuscript-item-meta-line">
-                      Edited {formatManuscriptEdited(item.updatedAt)}
-                    </div>
-                    {item.createdAt ? (
-                      <div className="manuscript-item-meta-line">
-                        Created {formatManuscriptEdited(item.createdAt)}
-                      </div>
-                    ) : null}
-                  </div>
-                ) : null}
-              </button>
-              <button
-                type="button"
-                className="icon-btn manuscript-delete"
-                aria-label={`Delete ${item.title || "Untitled"}`}
-                title="Delete"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onDelete(item.id);
-                }}
-              >
-                <IconTrash />
-              </button>
-            </li>
-          ))
-        )}
-      </ul>
-
-      {activeId ? (
-        <div className="app-sidebar-footer">
-          <button type="button" className="sidebar-footer-btn" onClick={onRevealActive}>
-            Reveal in Finder
-          </button>
-        </div>
-      ) : null}
+      )}
     </aside>
   );
 }

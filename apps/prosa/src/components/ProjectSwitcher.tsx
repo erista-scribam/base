@@ -82,7 +82,7 @@ export function ProjectSwitcher({
         aria-controls={menuId}
         onClick={() => setOpen((value) => !value)}
       >
-        <span className="project-switcher-kicker">Project</span>
+        <span className="project-switcher-kicker">Active project</span>
         <span className="project-switcher-title">{title}</span>
         <span className="project-switcher-path" title={currentRootPath}>
           {formatProjectPath(currentRootPath)}
