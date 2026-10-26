@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type CSSProperties } from "react";
 import type { GitGraphCommit } from "../../features/version-control/project-version-control";
 import {
   GRAPH_ROW_HEIGHT,
@@ -120,24 +120,26 @@ export function CommitGraphView({ commits, currentBranch }: CommitGraphViewProps
                 ) : null}
               </svg>
               <div className="commit-graph-body">
-                {commit.branchTips.length > 0 ? (
-                  <div className="commit-graph-branches">
-                    {commit.branchTips.map((name) => (
+                <div className="commit-graph-summary-row">
+                  {commit.branchTips.map((name) => {
+                    const color = branchColor(name);
+                    return (
                       <span
                         key={name}
                         className="commit-graph-branch"
                         data-current={name === currentBranch ? "true" : undefined}
-                        style={{
-                          borderColor: branchColor(name),
-                          color: branchColor(name),
-                        }}
+                        style={
+                          {
+                            "--commit-graph-branch-color": color,
+                          } as CSSProperties
+                        }
                       >
                         {name}
                       </span>
-                    ))}
-                  </div>
-                ) : null}
-                <div className="commit-graph-summary">{commit.message || "Checkpoint"}</div>
+                    );
+                  })}
+                  <span className="commit-graph-summary">{commit.message || "Checkpoint"}</span>
+                </div>
                 <div className="commit-graph-meta">
                   <code>{commit.shortId}</code>
                   <span>{formatCommitTime(commit.committedAt)}</span>
