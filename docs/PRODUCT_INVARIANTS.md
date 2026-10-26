@@ -3,7 +3,7 @@
 **Status:** Active  
 **Authority:** [PRODUCT_CONSTITUTION.md](./PRODUCT_CONSTITUTION.md)
 
-These statements must remain true unless changed through an explicit document update and, when they affect persistence or schema, migration and tests. They combine reliability rules from [plans/002-prosa-data-quality.md](../plans/002-prosa-data-quality.md) with writer-centred data rules from plan 003.
+These statements must remain true unless changed through an explicit document update and, when they affect persistence or schema, migration and tests. They combine reliability rules from [002-prosa-data-quality.md](./plans/002-prosa-data-quality.md) with writer-centred data rules from plan 003.
 
 ---
 

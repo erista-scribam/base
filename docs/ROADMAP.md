@@ -3,7 +3,7 @@
 **Status:** Living document  
 **Constitution:** [PRODUCT_CONSTITUTION.md](./PRODUCT_CONSTITUTION.md)
 
-Dependency-oriented phases (from plan 003). Overlap is allowed when dependencies are satisfied. **Current focus** is completing Phase 0–1 evidence and specs, then **Revision History v1** (Phase 2).
+Dependency-oriented phases (from [003-prosa-deep-writing-features.md](./plans/003-prosa-deep-writing-features.md)). Overlap is allowed when dependencies are satisfied. **Current focus** is completing Phase 0–1 evidence and specs, then **Revision History v1** (Phase 2).
 
 | Phase | Name                                 | Exit condition                                               | Status                                                                        |
 | ----- | ------------------------------------ | ------------------------------------------------------------ | ----------------------------------------------------------------------------- |

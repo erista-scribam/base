@@ -18,7 +18,7 @@ These future products are part of the architectural vision, not part of the init
 
 ## 2. Core Product Philosophy
 
-For the active writer-centred constitution (principles, invariants, roadmap), see **`docs/PRODUCT_CONSTITUTION.md`** and **`docs/ROADMAP.md`**, derived from `plans/003-prosa-deep-writing-features.md`.
+For the active writer-centred constitution (principles, invariants, roadmap), see **`docs/PRODUCT_CONSTITUTION.md`** and **`docs/ROADMAP.md`**, derived from `docs/plans/003-prosa-deep-writing-features.md`.
 
 Scribo separates content, document structure, and presentation.
 

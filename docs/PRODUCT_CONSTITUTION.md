@@ -1,6 +1,6 @@
 # Scribo product constitution
 
-**Status:** Active (adopted from [plans/003-prosa-deep-writing-features.md](../plans/003-prosa-deep-writing-features.md))  
+**Status:** Active (adopted from [003-prosa-deep-writing-features.md](./plans/003-prosa-deep-writing-features.md))  
 **Scope:** Scribo Prosa first; principles apply to the wider Scribo family unless a product explicitly diverges.
 
 This document is the **governing law** for product and engineering decisions. Detailed plans, specs, and roadmaps must not contradict it. When they conflict, update the plan or amend this document deliberately—not in code comments alone.
@@ -98,12 +98,13 @@ If a change fails this test, it does not belong in the product.
 
 ## Related documents
 
-| Document                                                                                | Role                                                |
-| --------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| [PRODUCT_INVARIANTS.md](./PRODUCT_INVARIANTS.md)                                        | Must-always-be-true rules (integrity, portability)  |
-| [ROADMAP.md](./ROADMAP.md)                                                              | Phased delivery and exit conditions                 |
-| [ARCHITECTURE_AUDIT.md](./ARCHITECTURE_AUDIT.md)                                        | Current code vs target subsystems                   |
-| [specs/revision-history-v1.md](./specs/revision-history-v1.md)                          | First deep-feature spec (in progress)               |
-| [research/WRITING_FRICTION_LOG.md](./research/WRITING_FRICTION_LOG.md)                  | Evidence from real writing sessions                 |
-| [MASTERPLAN.md](../MASTERPLAN.md)                                                       | Original foundation (stack, monorepo, Prosa schema) |
-| [plans/003-prosa-deep-writing-features.md](../plans/003-prosa-deep-writing-features.md) | Full strategic plan (source essay)                  |
+| Document                                                                         | Role                                                |
+| -------------------------------------------------------------------------------- | --------------------------------------------------- |
+| [PRODUCT_INVARIANTS.md](./PRODUCT_INVARIANTS.md)                                 | Must-always-be-true rules (integrity, portability)  |
+| [ROADMAP.md](./ROADMAP.md)                                                       | Phased delivery and exit conditions                 |
+| [ARCHITECTURE_AUDIT.md](./ARCHITECTURE_AUDIT.md)                                 | Current code vs target subsystems                   |
+| [specs/revision-history-v1.md](./specs/revision-history-v1.md)                   | First deep-feature spec (in progress)               |
+| [research/WRITING_FRICTION_LOG.md](./research/WRITING_FRICTION_LOG.md)           | Evidence from real writing sessions                 |
+| [MASTERPLAN.md](../MASTERPLAN.md)                                                | Original foundation (stack, monorepo, Prosa schema) |
+| [003-prosa-deep-writing-features.md](./plans/003-prosa-deep-writing-features.md) | Full strategic plan (source essay)                  |
+| [plans/README.md](./plans/README.md)                                             | Index of numbered plans                             |
