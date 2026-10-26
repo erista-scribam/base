@@ -2,6 +2,7 @@ import type { ProsaBlock, ProsaDocument, ProsaListBlock } from "@scribo/document
 import { PROSA_SCHEMA_VERSION, tryValidateProsaDocument } from "@scribo/document-model";
 import { isSceneBreakLineRaw, stripLegacySourceIndent } from "./markdown-source-layout";
 import { parseInlineMarkdown, serializeInline } from "./markdown-inline";
+import { formatBlockIdComment, parseBlockIdComment } from "./markdown-block-ids";
 
 function blockId(): string {
   return `blk_${crypto.randomUUID()}`;
@@ -178,50 +179,61 @@ function parseHeadingLine(line: string): { level: 1 | 2 | 3 | 4 | 5 | 6; text: s
   };
 }
 
+function pushBlockWithId(lines: string[], blockId: string, contentLines: string[]): void {
+  lines.push(formatBlockIdComment(blockId));
+  lines.push(...contentLines);
+}
+
 export function prosaDocumentToMarkdown(document: ProsaDocument): string {
   const lines: string[] = [];
   for (const block of document.blocks) {
     switch (block.type) {
       case "heading":
-        lines.push(`${"#".repeat(block.level)} ${serializeInline(block.content)}`);
+        pushBlockWithId(lines, block.id, [
+          `${"#".repeat(block.level)} ${serializeInline(block.content)}`,
+        ]);
         break;
       case "paragraph": {
         const text = serializeInline(block.content);
         if (text.length) {
-          lines.push(text);
+          pushBlockWithId(lines, block.id, [text]);
         }
         break;
       }
-      case "blockquote":
+      case "blockquote": {
+        const quoteLines: string[] = [];
         for (const line of serializeInline(block.content).split("\n")) {
-          lines.push(`> ${line}`);
+          quoteLines.push(`> ${line}`);
         }
+        pushBlockWithId(lines, block.id, quoteLines);
         break;
+      }
       case "scene_break":
-        lines.push("* * *");
+        pushBlockWithId(lines, block.id, ["* * *"]);
         break;
       case "code_block": {
         const lang = block.language ?? "";
-        lines.push(`\`\`\`${lang}`.trimEnd());
-        lines.push(block.text);
-        lines.push("```");
+        pushBlockWithId(lines, block.id, [`\`\`\`${lang}`.trimEnd(), block.text, "```"]);
         break;
       }
-      case "list":
+      case "list": {
+        const listLines: string[] = [];
         block.items.forEach((item, itemIndex) => {
           const pad = "  ".repeat(item.indent ?? 0);
           const text = serializeInline(item.content);
           if (block.task) {
             const box = item.checked ? "[x]" : "[ ]";
             const marker = block.ordered ? `${itemIndex + 1}. ${box}` : `- ${box}`;
-            lines.push(`${pad}${marker} ${text}`);
+            listLines.push(`${pad}${marker} ${text}`);
           } else if (block.ordered) {
-            lines.push(`${pad}${itemIndex + 1}. ${text}`);
+            listLines.push(`${pad}${itemIndex + 1}. ${text}`);
           } else {
-            lines.push(`${pad}- ${text}`);
+            listLines.push(`${pad}- ${text}`);
           }
         });
+        pushBlockWithId(lines, block.id, listLines);
         break;
+      }
       default:
         break;
     }
@@ -233,6 +245,13 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
   const blocks: ProsaBlock[] = [];
   const lines = stripLegacySourceIndent(markdown.replace(/\r\n/g, "\n")).split("\n");
   let index = 0;
+  let pendingBlockId: string | null = null;
+
+  const takeBlockId = (): string => {
+    const id = pendingBlockId ?? blockId();
+    pendingBlockId = null;
+    return id;
+  };
 
   while (index < lines.length) {
     const line = lines[index] ?? "";
@@ -241,8 +260,15 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
       continue;
     }
 
+    const commentId = parseBlockIdComment(line);
+    if (commentId) {
+      pendingBlockId = commentId;
+      index += 1;
+      continue;
+    }
+
     if (isSceneBreakLineRaw(line.trim())) {
-      blocks.push({ type: "scene_break", id: blockId() });
+      blocks.push({ type: "scene_break", id: takeBlockId() });
       index += 1;
       continue;
     }
@@ -260,7 +286,7 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
       }
       blocks.push({
         type: "code_block",
-        id: blockId(),
+        id: takeBlockId(),
         text: codeLines.join("\n"),
         ...(language ? { language } : {}),
       });
@@ -271,7 +297,7 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
     if (heading) {
       blocks.push({
         type: "heading",
-        id: blockId(),
+        id: takeBlockId(),
         level: heading.level,
         content: parseInlineMarkdown(heading.text),
       });
@@ -294,7 +320,7 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
       }
       blocks.push({
         type: "blockquote",
-        id: blockId(),
+        id: takeBlockId(),
         content: parseInlineMarkdown(quoteLines.join("\n")),
       });
       continue;
@@ -304,7 +330,7 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
     if (firstListLine) {
       const listBlock: ProsaListBlock = {
         type: "list",
-        id: blockId(),
+        id: takeBlockId(),
         ordered: firstListLine.ordered,
         task: firstListLine.task,
         items: [
@@ -337,7 +363,7 @@ export function markdownToProsaDocument(base: ProsaDocument, markdown: string): 
 
     blocks.push({
       type: "paragraph",
-      id: blockId(),
+      id: takeBlockId(),
       content: parseInlineMarkdown(line.trim()),
     });
     index += 1;

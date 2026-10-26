@@ -10,6 +10,7 @@ use tauri::Manager;
 
 use crate::atomic_io::atomic_write;
 use crate::persistence::ManuscriptSummary;
+use crate::project::{ScriboProjectManifest, ensure_project_manifest, read_project_manifest};
 
 const LIBRARY_DIR_NAME: &str = "Scribo Prosa";
 const PATH_ID_PREFIX: &str = "ms_path_";
@@ -25,6 +26,7 @@ struct LibraryConfig {
 pub struct LibraryInfo {
     pub root_path: String,
     pub exists: bool,
+    pub project: Option<ScriboProjectManifest>,
 }
 
 fn config_path(app: &AppHandle) -> Result<PathBuf, String> {
@@ -61,57 +63,63 @@ pub fn default_library_root(app: &AppHandle) -> Result<PathBuf, String> {
     Ok(docs.join(LIBRARY_DIR_NAME))
 }
 
+fn library_info_for_root(root: PathBuf, existed_before: bool) -> Result<LibraryInfo, String> {
+    fs::create_dir_all(&root).map_err(|error| error.to_string())?;
+    let project = Some(ensure_project_manifest(&root)?);
+    Ok(LibraryInfo {
+        root_path: root.to_string_lossy().into_owned(),
+        exists: existed_before,
+        project,
+    })
+}
+
 pub fn ensure_default_library(app: &AppHandle) -> Result<LibraryInfo, String> {
     if let Some(config) = read_config(app)? {
-        let exists = config.root_path.exists();
-        fs::create_dir_all(&config.root_path).map_err(|error| error.to_string())?;
-        return Ok(LibraryInfo {
-            root_path: config.root_path.to_string_lossy().into_owned(),
-            exists,
-        });
+        let existed = config.root_path.exists();
+        return library_info_for_root(config.root_path, existed);
     }
 
     let root = default_library_root(app)?;
-    fs::create_dir_all(&root).map_err(|error| error.to_string())?;
     write_config(
         app,
         &LibraryConfig {
             root_path: root.clone(),
         },
     )?;
-    Ok(LibraryInfo {
-        root_path: root.to_string_lossy().into_owned(),
-        exists: true,
-    })
+    library_info_for_root(root, true)
 }
 
 pub fn get_library_info(app: &AppHandle) -> Result<LibraryInfo, String> {
     if let Some(config) = read_config(app)? {
+        let root = config.root_path;
+        let project = read_project_manifest(&root)?;
         return Ok(LibraryInfo {
-            root_path: config.root_path.to_string_lossy().into_owned(),
-            exists: config.root_path.exists(),
+            root_path: root.to_string_lossy().into_owned(),
+            exists: root.exists(),
+            project,
         });
     }
     let root = default_library_root(app)?;
     Ok(LibraryInfo {
         root_path: root.to_string_lossy().into_owned(),
         exists: root.exists(),
+        project: if root.exists() {
+            read_project_manifest(&root)?
+        } else {
+            None
+        },
     })
 }
 
 pub fn set_library_root(app: &AppHandle, root_path: String) -> Result<LibraryInfo, String> {
     let path = PathBuf::from(&root_path);
-    fs::create_dir_all(&path).map_err(|error| error.to_string())?;
     write_config(
         app,
         &LibraryConfig {
             root_path: path.clone(),
         },
     )?;
-    Ok(LibraryInfo {
-        root_path: path.to_string_lossy().into_owned(),
-        exists: true,
-    })
+    library_info_for_root(path, true)
 }
 
 pub fn manuscript_id_for_path(path_key: &str) -> String {

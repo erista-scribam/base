@@ -40,6 +40,7 @@ flowchart TB
 | **Non-goals**  | Git                                                      |
 | **Depends on** | Phase 0 approval                                         |
 | **Risk**       | High—touches editor core                                 |
+| **Status**     | **Shipped (2026-10-26):** comment anchors, markdown + TipTap convert   |
 
 ## Phase 2 — Project directory + legacy migration
 
@@ -49,6 +50,7 @@ flowchart TB
 | **Deliverables** | Rust project module; Tauri commands; UI “Open project”                 |
 | **Acceptance**   | Existing library imports; single-manuscript project works without Git  |
 | **Migration**    | Read-only legacy library path still supported one release              |
+| **Status**       | **Started:** manifest auto-create on library init; `content/` + UI TBD |
 
 ## Phase 3 — Git feasibility spike
 

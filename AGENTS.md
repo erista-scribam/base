@@ -12,18 +12,18 @@ Scribo Prosa is a local-first Tauri desktop writing app. Follow this file before
 
 ## Repository layout
 
-| Path                      | Purpose                                      |
-| ------------------------- | -------------------------------------------- |
-| `apps/prosa`              | React UI, editors, Tauri invoke adapters     |
-| `apps/prosa/src-tauri`    | Rust persistence, library, commands          |
-| `packages/core`           | IDs, metadata types                          |
-| `packages/document-model` | Canonical `ProsaDocument` schema             |
-| `docs/product/`           | Philosophy, roadmap, invariants              |
-| `docs/architecture/`      | System overview, ADRs, implementation audit  |
-| `docs/engineering/`       | Operating model, baseline, release, testing  |
-| `docs/specs/`             | Behavioral contracts for risky features      |
-| `docs/plans/active/`      | Approved or in-progress implementation plans |
-| `docs/issues/written/`    | Written issue bypass lists                   |
+| Path                      | Purpose                                            |
+| ------------------------- | -------------------------------------------------- |
+| `apps/prosa`              | React UI, editors, Tauri invoke adapters           |
+| `apps/prosa/src-tauri`    | Rust persistence, library, commands                |
+| `packages/core`           | IDs, metadata types                                |
+| `packages/document-model` | Canonical `ProsaDocument` schema                   |
+| `docs/product/`           | Philosophy, roadmap, invariants                    |
+| `docs/architecture/`      | System overview, ADRs, implementation audit        |
+| `docs/engineering/`       | Operating model, baseline, release, testing        |
+| `docs/specs/`             | Behavioral contracts for risky features            |
+| `docs/plans/active/`      | Approved or in-progress implementation plans       |
+| `docs/issues/written/`    | Written issue bypass lists                         |
 | GitHub Issues             | Public bugs/features — see `docs/issues/github.md` |
 
 Canonical index: [docs/README.md](docs/README.md).

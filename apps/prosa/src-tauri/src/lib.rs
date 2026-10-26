@@ -1,6 +1,7 @@
 mod atomic_io;
 mod library;
 mod persistence;
+mod project;
 mod recovery;
 
 use crate::atomic_io::atomic_write;

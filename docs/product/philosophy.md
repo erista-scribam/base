@@ -98,16 +98,16 @@ If a change fails this test, it does not belong in the product.
 
 ## Related documents
 
-| Document                                                                                                       | Role                          |
-| -------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| [invariants.md](./invariants.md)                                                                               | Must-always-be-true rules     |
-| [roadmap.md](./roadmap.md)                                                                                     | Phased delivery               |
-| [known-limitations.md](./known-limitations.md)                                                                 | Current product gaps          |
-| [licensing.md](./licensing.md)                                                                                 | AGPL open core vs premium     |
-| [../architecture/implementation-audit.md](../architecture/implementation-audit.md)                             | Code vs target subsystems     |
-| [../specs/revision-history-v1.md](../specs/revision-history-v1.md)                                             | Revision history spec         |
-| [../research/WRITING_FRICTION_LOG.md](../research/WRITING_FRICTION_LOG.md)                                     | Real-use friction log         |
-| [../../MASTERPLAN.md](../../MASTERPLAN.md)                                                                     | Stack and monorepo foundation |
-| [../plans/active/005-project-workspace-and-git.md](../plans/active/005-project-workspace-and-git.md) | Architecture & execution (active) |
-| [../plans/completed/003-prosa-deep-writing-features.md](../plans/completed/003-prosa-deep-writing-features.md) | Strategy essay (archive) |
-| [../specs/project-architecture-and-storage.md](../specs/project-architecture-and-storage.md) | Project + Git storage spec |
+| Document                                                                                                       | Role                              |
+| -------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| [invariants.md](./invariants.md)                                                                               | Must-always-be-true rules         |
+| [roadmap.md](./roadmap.md)                                                                                     | Phased delivery                   |
+| [known-limitations.md](./known-limitations.md)                                                                 | Current product gaps              |
+| [licensing.md](./licensing.md)                                                                                 | AGPL open core vs premium         |
+| [../architecture/implementation-audit.md](../architecture/implementation-audit.md)                             | Code vs target subsystems         |
+| [../specs/revision-history-v1.md](../specs/revision-history-v1.md)                                             | Revision history spec             |
+| [../research/WRITING_FRICTION_LOG.md](../research/WRITING_FRICTION_LOG.md)                                     | Real-use friction log             |
+| [../../MASTERPLAN.md](../../MASTERPLAN.md)                                                                     | Stack and monorepo foundation     |
+| [../plans/active/005-project-workspace-and-git.md](../plans/active/005-project-workspace-and-git.md)           | Architecture & execution (active) |
+| [../plans/completed/003-prosa-deep-writing-features.md](../plans/completed/003-prosa-deep-writing-features.md) | Strategy essay (archive)          |
+| [../specs/project-architecture-and-storage.md](../specs/project-architecture-and-storage.md)                   | Project + Git storage spec        |

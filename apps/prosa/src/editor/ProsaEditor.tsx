@@ -14,6 +14,7 @@ import { useEffect, useRef } from "react";
 import { ProsaCodeBlock } from "./prosa-code-block";
 import { ProsaEditingRules } from "./prosa-editing-rules";
 import { SceneBreak } from "./scene-break";
+import { ScriboBlockId } from "./scribo-block-id";
 import { prosaDocumentFromTiptapJson, tiptapJsonFromProsaDocument } from "./prosa-convert";
 
 export interface ProsaEditorProps {
@@ -52,6 +53,7 @@ export function ProsaEditor({ document, onDocumentChange, onEditorReady }: Prosa
       }),
       ProsaCodeBlock,
       ProsaEditingRules,
+      ScriboBlockId,
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
       TaskList,

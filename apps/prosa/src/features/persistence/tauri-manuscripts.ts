@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { ManuscriptSummary } from "@scribo/core";
+import type { ManuscriptSummary, ScriboProjectManifest } from "@scribo/core";
 import type { ProsaDocument } from "@scribo/document-model";
 import {
   createEmptyProsaDocument,
@@ -20,6 +20,7 @@ export interface LoadedManuscript {
 export interface LibraryInfo {
   rootPath: string;
   exists: boolean;
+  project?: ScriboProjectManifest;
 }
 
 interface LoadedManuscriptPayload {
