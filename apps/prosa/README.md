@@ -10,6 +10,8 @@ Follow [Tauri’s icon flow](https://v2.tauri.app/develop/icons/): one **1024×1
 
 After changing the brand mark: `pnpm icons` (from `apps/prosa`), then restart **`pnpm tauri dev`** or rebuild so Rust picks up `icon.icns` (`build.rs` watches `icons/`). UI favicon only: [`public/brand/prosa.svg`](./public/brand/prosa.svg).
 
+On macOS, **`pnpm tauri dev`** runs through [`scripts/macos-dev-app-runner.sh`](./scripts/macos-dev-app-runner.sh) so the Dock tooltip is **Scribam Prosa**, not the Cargo binary name `prosa`. Remove any old Dock pin to a raw `prosa` binary after updating.
+
 ## Recommended IDE Setup
 
 - [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)

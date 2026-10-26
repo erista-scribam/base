@@ -1,0 +1,6 @@
+# macOS `tauri dev` runs via `cargo run`; without a bundle, Dock shows the Cargo binary name (`prosa`).
+[target.aarch64-apple-darwin]
+runner = "../scripts/macos-dev-app-runner.sh"
+
+[target.x86_64-apple-darwin]
+runner = "../scripts/macos-dev-app-runner.sh"
