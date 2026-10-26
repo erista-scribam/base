@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 180" role="img" aria-labelledby="title">
+  <title id="title">Scribo dark-background logo</title>
+  <rect width="760" height="180" rx="20" fill="#0F172A"/>
+  <g transform="translate(10 10)">
+    <path d="M112 4 18 65 112 97 18 129 112 160 112 120 72 97 144 73 144 57 72 33 112 4Z" fill="#F8FAFC"/>
+    <path d="M112 4 18 65 72 33Z" fill="#818CF8"/>
+  </g>
+  <text x="190" y="105" font-family="Inter, 'Plus Jakarta Sans', Arial, sans-serif" font-size="88" font-weight="750" letter-spacing="-4" fill="#F8FAFC">Scribo</text>
+  <text x="194" y="145" font-family="Inter, 'Plus Jakarta Sans', Arial, sans-serif" font-size="22" font-weight="400" letter-spacing="1.1" fill="#CBD5E1">Built for Writers, Not Editors.</text>
+</svg>
