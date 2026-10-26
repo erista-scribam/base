@@ -1,12 +1,17 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
+  abortProjectMerge,
   checkoutProjectBranch,
   commitProjectCheckpoint,
+  completeProjectMerge,
   createProjectBranch,
   getProjectGitGraph,
   getProjectVersionControl,
+  mergeProjectBranch,
+  resolveProjectMergeFile,
   type GitBranchSummary,
   type GitGraphCommit,
+  type MergeConflictResolution,
   type ProjectVersionControl,
 } from "../features/version-control/project-version-control";
 import { isTauriRuntime } from "../features/persistence/is-tauri";
@@ -25,12 +30,16 @@ function BranchSwitcher({
   disabled,
   onSwitch,
   onCreate,
+  onMerge,
+  mergeDisabled,
 }: {
   branches: GitBranchSummary[];
   currentBranch: string;
   disabled?: boolean;
+  mergeDisabled?: boolean;
   onSwitch: (name: string) => void;
   onCreate: (name: string) => void;
+  onMerge: (name: string) => void;
 }) {
   const menuId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -86,7 +95,7 @@ function BranchSwitcher({
           />
           <ul className="sc-branch-list">
             {filtered.map((branch) => (
-              <li key={branch.name}>
+              <li key={branch.name} className="sc-branch-list-item">
                 <button
                   type="button"
                   role="option"
@@ -105,6 +114,21 @@ function BranchSwitcher({
                     <span className="sc-branch-check">✓</span>
                   ) : null}
                 </button>
+                {branch.name !== currentBranch ? (
+                  <button
+                    type="button"
+                    className="sc-branch-merge"
+                    disabled={mergeDisabled}
+                    title={`Merge ${branch.name} into ${currentBranch}`}
+                    onClick={() => {
+                      setOpen(false);
+                      setFilter("");
+                      onMerge(branch.name);
+                    }}
+                  >
+                    Merge in
+                  </button>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -223,9 +247,24 @@ export function SourceControlPanel({
         branches={branches}
         currentBranch={current}
         disabled={busy}
+        mergeDisabled={busy || status.merge.inProgress}
         onSwitch={(name) => void run(() => checkoutProjectBranch(name))}
         onCreate={(name) => void run(() => createProjectBranch(name))}
+        onMerge={(name) => void run(() => mergeProjectBranch(name))}
       />
+
+      {status.merge.inProgress ? (
+        <MergeConflictPanel
+          currentBranch={current}
+          merge={status.merge}
+          busy={busy}
+          onAbort={() => void run(() => abortProjectMerge())}
+          onComplete={() => void run(() => completeProjectMerge())}
+          onResolve={(path, resolution) =>
+            void run(() => resolveProjectMergeFile(path, resolution))
+          }
+        />
+      ) : null}
 
       <div className="sc-tabs" role="tablist">
         <button
@@ -273,7 +312,7 @@ export function SourceControlPanel({
           <button
             type="button"
             className="sc-btn sc-btn-primary sc-btn-block"
-            disabled={busy}
+            disabled={busy || status.merge.inProgress}
             onClick={() =>
               void run(async () => {
                 const next = await commitProjectCheckpoint(summary);
@@ -291,6 +330,86 @@ export function SourceControlPanel({
         </div>
       )}
     </section>
+  );
+}
+
+function MergeConflictPanel({
+  currentBranch,
+  merge,
+  busy,
+  onAbort,
+  onComplete,
+  onResolve,
+}: {
+  currentBranch: string;
+  merge: ProjectVersionControl["merge"];
+  busy: boolean;
+  onAbort: () => void;
+  onComplete: () => void;
+  onResolve: (path: string, resolution: MergeConflictResolution) => void;
+}) {
+  const source = merge.sourceBranch ?? "branch";
+  const pending = merge.conflictedPaths;
+
+  return (
+    <div className="sc-merge" role="region" aria-label="Merge in progress">
+      <p className="sc-merge-title">
+        Merging <strong>{source}</strong> into <strong>{currentBranch}</strong>
+      </p>
+      {pending.length > 0 ? (
+        <>
+          <p className="sc-merge-hint">Resolve conflicts in these files:</p>
+          <ul className="sc-merge-conflicts">
+            {pending.map((path) => (
+              <li key={path} className="sc-merge-conflict">
+                <code className="sc-merge-path">{path}</code>
+                <div className="sc-merge-actions">
+                  <button
+                    type="button"
+                    className="sc-btn sc-btn-compact"
+                    disabled={busy}
+                    onClick={() => onResolve(path, "ours")}
+                  >
+                    Keep {currentBranch}
+                  </button>
+                  <button
+                    type="button"
+                    className="sc-btn sc-btn-compact"
+                    disabled={busy}
+                    onClick={() => onResolve(path, "theirs")}
+                  >
+                    Keep {source}
+                  </button>
+                  <button
+                    type="button"
+                    className="sc-btn sc-btn-compact"
+                    disabled={busy}
+                    onClick={() => onResolve(path, "both")}
+                  >
+                    Keep both
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p className="sc-merge-hint sc-merge-hint-ok">All conflicts resolved on disk.</p>
+      )}
+      <div className="sc-merge-footer">
+        <button type="button" className="sc-btn" disabled={busy} onClick={onAbort}>
+          Abort merge
+        </button>
+        <button
+          type="button"
+          className="sc-btn sc-btn-primary"
+          disabled={busy || pending.length > 0}
+          onClick={onComplete}
+        >
+          Complete merge
+        </button>
+      </div>
+    </div>
   );
 }
 

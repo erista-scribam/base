@@ -2,10 +2,14 @@ use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::Path;
 
-use git2::{BranchType, IndexAddOption, Repository, Signature, Sort, StatusOptions};
+use git2::{
+    AnnotatedCommit, BranchType, IndexAddOption, MergeOptions, Repository, ResetType, Signature,
+    Sort, StatusOptions,
+};
 use serde::Serialize;
 
 use crate::library::clear_all_library_recovery_at_root;
+use crate::merge_conflicts::{ConflictResolution, resolve_conflict_markers};
 
 const DEFAULT_GITIGNORE: &str = ".scribo/\n";
 
@@ -26,12 +30,21 @@ pub struct GitBranchSummary {
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct ProjectMergeStatus {
+    pub in_progress: bool,
+    pub source_branch: Option<String>,
+    pub conflicted_paths: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ProjectVersionControl {
     pub initialized: bool,
     pub current_branch: Option<String>,
     pub dirty: bool,
     pub branches: Vec<GitBranchSummary>,
     pub recent_commits: Vec<GitCommitSummary>,
+    pub merge: ProjectMergeStatus,
     /// True when checkout updated files on disk (UI should reload manuscripts).
     #[serde(default)]
     pub workspace_updated: bool,
@@ -146,6 +159,7 @@ pub fn project_version_control(root: &Path) -> Result<ProjectVersionControl, Str
             dirty: false,
             branches: Vec::new(),
             recent_commits: Vec::new(),
+            merge: empty_merge_status(),
             workspace_updated: false,
         });
     }
@@ -189,14 +203,322 @@ pub fn project_version_control(root: &Path) -> Result<ProjectVersionControl, Str
 
     let dirty = is_worktree_dirty(root)?;
 
+    let merge = read_merge_status(root, &repo)?;
+
     Ok(ProjectVersionControl {
         initialized: true,
         current_branch,
         dirty,
         branches,
         recent_commits,
+        merge,
         workspace_updated: false,
     })
+}
+
+fn empty_merge_status() -> ProjectMergeStatus {
+    ProjectMergeStatus {
+        in_progress: false,
+        source_branch: None,
+        conflicted_paths: Vec::new(),
+    }
+}
+
+fn parse_source_branch_from_merge_msg(message: &str) -> Option<String> {
+    for line in message.lines() {
+        let trimmed = line.trim();
+        if let Some(rest) = trimmed.strip_prefix("Merge branch '")
+            && let Some(name) = rest.split('\'').next()
+        {
+            return Some(name.to_string());
+        }
+    }
+    None
+}
+
+fn read_merge_status(root: &Path, repo: &Repository) -> Result<ProjectMergeStatus, String> {
+    let merge_head = root.join(".git/MERGE_HEAD");
+    if !merge_head.exists() {
+        return Ok(empty_merge_status());
+    }
+
+    let merge_msg = fs::read_to_string(root.join(".git/MERGE_MSG")).unwrap_or_default();
+    let source_branch = parse_source_branch_from_merge_msg(&merge_msg);
+
+    let index = repo.index().map_err(|error| error.to_string())?;
+    let conflicted_paths = if index.has_conflicts() {
+        conflicted_paths_from_index(&index)?
+    } else {
+        Vec::new()
+    };
+
+    Ok(ProjectMergeStatus {
+        in_progress: true,
+        source_branch,
+        conflicted_paths,
+    })
+}
+
+fn conflicted_paths_from_index(index: &git2::Index) -> Result<Vec<String>, String> {
+    let mut paths = Vec::new();
+    for conflict in index.conflicts().map_err(|error| error.to_string())? {
+        let conflict = conflict.map_err(|error| error.to_string())?;
+        for candidate in [conflict.ancestor, conflict.our, conflict.their] {
+            if let Some(entry) = candidate
+                && let Ok(text) = std::str::from_utf8(&entry.path)
+                && !text.is_empty()
+            {
+                paths.push(text.to_string());
+            }
+        }
+    }
+    paths.sort();
+    paths.dedup();
+    Ok(paths)
+}
+
+fn annotated_branch_tip<'repo>(
+    repo: &'repo Repository,
+    branch_name: &str,
+) -> Result<AnnotatedCommit<'repo>, String> {
+    let refname = format!("refs/heads/{branch_name}");
+    let reference = repo
+        .find_reference(&refname)
+        .map_err(|error| format!("Branch '{branch_name}' not found: {}", error.message()))?;
+    repo.reference_to_annotated_commit(&reference)
+        .map_err(|error| error.to_string())
+}
+
+fn require_clean_for_operation(root: &Path, repo: &Repository) -> Result<(), String> {
+    if read_merge_status(root, repo)?.in_progress {
+        return Ok(());
+    }
+    if is_worktree_dirty(root)? {
+        return Err(
+            "Commit or discard uncheckpointed changes before switching or merging branches.".into(),
+        );
+    }
+    Ok(())
+}
+
+fn stage_all_and_write_index(repo: &Repository) -> Result<git2::Index, String> {
+    let mut index = repo.index().map_err(|error| error.to_string())?;
+    index
+        .add_all(["*"].iter(), IndexAddOption::DEFAULT, None)
+        .map_err(|error| error.to_string())?;
+    index.write().map_err(|error| error.to_string())?;
+    Ok(index)
+}
+
+fn finalize_version_control(
+    root: &Path,
+    workspace_updated: bool,
+) -> Result<ProjectVersionControl, String> {
+    let mut status = project_version_control(root)?;
+    status.workspace_updated = workspace_updated;
+    Ok(status)
+}
+
+pub fn merge_project_branch(
+    root: &Path,
+    source_branch: &str,
+) -> Result<ProjectVersionControl, String> {
+    let source = source_branch.trim();
+    validate_branch_name(source)?;
+    ensure_project_git(root)?;
+    let repo = open_repo(root)?;
+
+    let current = repo
+        .head()
+        .ok()
+        .and_then(|head| head.shorthand().map(str::to_string))
+        .ok_or_else(|| "Cannot merge without a current branch".to_string())?;
+    if current == source {
+        return Err("Cannot merge a branch into itself".into());
+    }
+
+    require_clean_for_operation(root, &repo)?;
+
+    let head_commit = repo
+        .head()
+        .map_err(|error| error.to_string())?
+        .peel_to_commit()
+        .map_err(|error| error.to_string())?;
+    let annotated = annotated_branch_tip(&repo, source)?;
+
+    let (analysis, _) = repo
+        .merge_analysis(&[&annotated])
+        .map_err(|error| error.to_string())?;
+
+    if analysis.is_up_to_date() {
+        return finalize_version_control(root, false);
+    }
+
+    if analysis.is_fast_forward() {
+        let mut reference = repo.head().map_err(|error| error.to_string())?;
+        reference
+            .set_target(
+                annotated.id(),
+                &format!("Merge branch '{source}' (fast-forward)"),
+            )
+            .map_err(|error| error.to_string())?;
+        let mut builder = git2::build::CheckoutBuilder::new();
+        builder.force();
+        repo.checkout_head(Some(&mut builder))
+            .map_err(|error| error.to_string())?;
+        finish_branch_switch(root)?;
+        return finalize_version_control(root, true);
+    }
+
+    let mut merge_opts = MergeOptions::new();
+    repo.merge(&[&annotated], Some(&mut merge_opts), None)
+        .map_err(|error| format!("Merge failed: {}", error.message()))?;
+
+    let mut index = repo.index().map_err(|error| error.to_string())?;
+    if index.has_conflicts() {
+        let mut checkout = git2::build::CheckoutBuilder::new();
+        checkout.force();
+        repo.checkout_index(Some(&mut index), Some(&mut checkout))
+            .map_err(|error| format!("Could not write conflict markers: {}", error.message()))?;
+        finish_branch_switch(root)?;
+        return finalize_version_control(root, true);
+    }
+
+    let tree_id = index.write_tree().map_err(|error| error.to_string())?;
+    let tree = repo.find_tree(tree_id).map_err(|error| error.to_string())?;
+    let sig = scribo_signature()?;
+    let theirs = repo
+        .find_commit(annotated.id())
+        .map_err(|error| error.to_string())?;
+    repo.commit(
+        Some("HEAD"),
+        &sig,
+        &sig,
+        &format!("Merge branch '{source}'"),
+        &tree,
+        &[&head_commit, &theirs],
+    )
+    .map_err(|error| error.to_string())?;
+    repo.cleanup_state().map_err(|error| error.to_string())?;
+    finish_branch_switch(root)?;
+    finalize_version_control(root, true)
+}
+
+pub fn abort_project_merge(root: &Path) -> Result<ProjectVersionControl, String> {
+    ensure_project_git(root)?;
+    let repo = open_repo(root)?;
+    if !root.join(".git/MERGE_HEAD").exists() {
+        return Err("No merge in progress".into());
+    }
+    let head_object = repo
+        .head()
+        .map_err(|error| error.to_string())?
+        .peel(git2::ObjectType::Commit)
+        .map_err(|error| error.to_string())?;
+    let mut checkout = git2::build::CheckoutBuilder::new();
+    checkout.force();
+    repo.reset(&head_object, ResetType::Hard, Some(&mut checkout))
+        .map_err(|error| format!("Could not abort merge: {}", error.message()))?;
+    repo.cleanup_state().map_err(|error| error.to_string())?;
+    finish_branch_switch(root)?;
+    finalize_version_control(root, true)
+}
+
+pub fn resolve_project_merge_file(
+    root: &Path,
+    relative_path: &str,
+    resolution: &str,
+) -> Result<ProjectVersionControl, String> {
+    let strategy = match resolution {
+        "ours" => ConflictResolution::Ours,
+        "theirs" => ConflictResolution::Theirs,
+        "both" => ConflictResolution::Both,
+        _ => return Err("Resolution must be ours, theirs, or both".into()),
+    };
+
+    ensure_project_git(root)?;
+    if !root.join(".git/MERGE_HEAD").exists() {
+        return Err("No merge in progress".into());
+    }
+
+    let path = root.join(relative_path);
+    if !path.starts_with(root) {
+        return Err("Invalid path".into());
+    }
+    let content = fs::read_to_string(&path).map_err(|error| error.to_string())?;
+    if !content.contains("<<<<<<<") {
+        return Err("File has no conflict markers".into());
+    }
+    let resolved = resolve_conflict_markers(&content, strategy)?;
+    fs::write(&path, resolved).map_err(|error| error.to_string())?;
+
+    let repo = open_repo(root)?;
+    let mut index = repo.index().map_err(|error| error.to_string())?;
+    index
+        .add_path(Path::new(relative_path))
+        .map_err(|error| error.to_string())?;
+    index.write().map_err(|error| error.to_string())?;
+
+    finalize_version_control(root, true)
+}
+
+pub fn complete_project_merge(
+    root: &Path,
+    message: Option<&str>,
+) -> Result<ProjectVersionControl, String> {
+    ensure_project_git(root)?;
+    let repo = open_repo(root)?;
+    if !root.join(".git/MERGE_HEAD").exists() {
+        return Err("No merge in progress".into());
+    }
+
+    let mut index = stage_all_and_write_index(&repo)?;
+    if index.has_conflicts() {
+        return Err("Unresolved conflicts remain. Resolve every conflicted file first.".into());
+    }
+
+    let merge_oid = fs::read_to_string(root.join(".git/MERGE_HEAD"))
+        .map_err(|error| error.to_string())?
+        .trim()
+        .to_string();
+    let merge_commit = repo
+        .find_commit(
+            merge_oid
+                .parse::<git2::Oid>()
+                .map_err(|_| "Invalid MERGE_HEAD".to_string())?,
+        )
+        .map_err(|error| error.to_string())?;
+    let head_commit = repo
+        .head()
+        .map_err(|error| error.to_string())?
+        .peel_to_commit()
+        .map_err(|error| error.to_string())?;
+
+    let tree_id = index.write_tree().map_err(|error| error.to_string())?;
+    let tree = repo.find_tree(tree_id).map_err(|error| error.to_string())?;
+    let sig = scribo_signature()?;
+    let trimmed = message.unwrap_or("").trim();
+    let commit_message = if trimmed.is_empty() {
+        fs::read_to_string(root.join(".git/MERGE_MSG"))
+            .unwrap_or_else(|_| "Merge".into())
+            .trim()
+            .to_string()
+    } else {
+        trimmed.to_string()
+    };
+
+    repo.commit(
+        Some("HEAD"),
+        &sig,
+        &sig,
+        &commit_message,
+        &tree,
+        &[&head_commit, &merge_commit],
+    )
+    .map_err(|error| error.to_string())?;
+    repo.cleanup_state().map_err(|error| error.to_string())?;
+    finish_branch_switch(root)?;
+    finalize_version_control(root, true)
 }
 
 fn checkout_local_branch(repo: &Repository, branch_name: &str) -> Result<(), String> {
@@ -257,6 +579,7 @@ pub fn checkout_project_branch(root: &Path, name: &str) -> Result<ProjectVersion
     validate_branch_name(branch_name)?;
     ensure_project_git(root)?;
     let repo = open_repo(root)?;
+    require_clean_for_operation(root, &repo)?;
     checkout_local_branch(&repo, branch_name)?;
     finish_branch_switch(root)?;
     let mut status = project_version_control(root)?;
@@ -382,5 +705,44 @@ mod tests {
         checkout_project_branch(root.path(), &main_name).expect("checkout main");
         let on_disk = fs::read_to_string(&file).expect("read");
         assert_eq!(on_disk, "main version");
+    }
+
+    #[test]
+    fn merge_reports_conflicts_and_abort_restores() {
+        let root = TempDir::new().expect("tempdir");
+        let file = root.path().join("story.md");
+        fs::write(&file, "Shared intro.\n\nBase paragraph.").expect("write");
+        ensure_project_git(root.path()).expect("init");
+        commit_project_checkpoint(root.path(), "base").expect("commit");
+
+        let main_name = project_version_control(root.path())
+            .expect("status")
+            .current_branch
+            .clone()
+            .expect("branch");
+
+        create_project_branch(root.path(), "feature").expect("feature");
+        fs::write(&file, "Shared intro.\n\nFeature paragraph.").expect("write feature");
+        commit_project_checkpoint(root.path(), "on feature").expect("commit feature");
+
+        checkout_project_branch(root.path(), &main_name).expect("back main");
+        fs::write(&file, "Shared intro.\n\nMain paragraph.").expect("write main");
+        commit_project_checkpoint(root.path(), "on main").expect("commit main");
+
+        let merged = merge_project_branch(root.path(), "feature").expect("merge");
+        assert!(merged.merge.in_progress);
+        assert!(!merged.merge.conflicted_paths.is_empty());
+
+        let on_disk = fs::read_to_string(&file).expect("read");
+        assert!(on_disk.contains("<<<<<<<"));
+
+        resolve_project_merge_file(root.path(), "story.md", "ours").expect("resolve");
+        complete_project_merge(root.path(), Some("Merged feature")).expect("complete");
+
+        let after = project_version_control(root.path()).expect("status");
+        assert!(!after.merge.in_progress);
+        let final_text = fs::read_to_string(&file).expect("read");
+        assert!(final_text.contains("Main paragraph."));
+        assert!(!final_text.contains("<<<<<<<"));
     }
 }

@@ -2,6 +2,8 @@ mod atomic_io;
 #[cfg(feature = "git-spike")]
 mod git_spike;
 mod library;
+#[cfg(feature = "git-vcs")]
+mod merge_conflicts;
 mod persistence;
 mod project;
 #[cfg(feature = "git-vcs")]
@@ -30,9 +32,13 @@ use std::process::Command;
 
 #[cfg(feature = "git-vcs")]
 use project_git::{
-    GitGraphCommit, ProjectVersionControl, checkout_project_branch as git_checkout_branch,
-    commit_project_checkpoint as git_commit_checkpoint, create_project_branch as git_create_branch,
-    project_git_graph as git_project_graph, project_version_control as git_project_status,
+    GitGraphCommit, ProjectVersionControl, abort_project_merge as git_abort_merge,
+    checkout_project_branch as git_checkout_branch,
+    commit_project_checkpoint as git_commit_checkpoint,
+    complete_project_merge as git_complete_merge, create_project_branch as git_create_branch,
+    merge_project_branch as git_merge_branch, project_git_graph as git_project_graph,
+    project_version_control as git_project_status,
+    resolve_project_merge_file as git_resolve_merge_file,
 };
 
 #[derive(Serialize)]
@@ -136,6 +142,40 @@ fn get_project_git_graph(
 ) -> Result<Vec<GitGraphCommit>, String> {
     let limit = limit.unwrap_or(40) as usize;
     git_project_graph(&library_root_path(&app)?, limit)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn merge_project_branch(
+    app: tauri::AppHandle,
+    source_branch: String,
+) -> Result<ProjectVersionControl, String> {
+    git_merge_branch(&library_root_path(&app)?, &source_branch)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn abort_project_merge(app: tauri::AppHandle) -> Result<ProjectVersionControl, String> {
+    git_abort_merge(&library_root_path(&app)?)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn resolve_project_merge_file(
+    app: tauri::AppHandle,
+    relative_path: String,
+    resolution: String,
+) -> Result<ProjectVersionControl, String> {
+    git_resolve_merge_file(&library_root_path(&app)?, &relative_path, &resolution)
+}
+
+#[cfg(feature = "git-vcs")]
+#[tauri::command]
+fn complete_project_merge(
+    app: tauri::AppHandle,
+    message: Option<String>,
+) -> Result<ProjectVersionControl, String> {
+    git_complete_merge(&library_root_path(&app)?, message.as_deref())
 }
 
 #[tauri::command]
@@ -410,7 +450,11 @@ pub fn run() {
             commit_project_checkpoint,
             create_project_branch,
             checkout_project_branch,
-            get_project_git_graph
+            get_project_git_graph,
+            merge_project_branch,
+            abort_project_merge,
+            resolve_project_merge_file,
+            complete_project_merge
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

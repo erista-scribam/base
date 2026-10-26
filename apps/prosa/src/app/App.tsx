@@ -303,7 +303,7 @@ export function App() {
       setVersionControlRefreshKey((value) => value + 1);
       if (workspaceUpdated && activeId) {
         await openManuscript(activeId, { preferDisk: true });
-        setNotice("Branch switched — manuscript reloaded from disk.");
+        setNotice("Project files on disk changed — manuscript reloaded.");
       }
     },
     [activeId, openManuscript, refreshList],

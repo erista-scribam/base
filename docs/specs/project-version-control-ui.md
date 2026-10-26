@@ -28,7 +28,7 @@ flowchart LR
 ```
 
 - **Phase 4:** Main branch history, manual checkpoints, dirty indicator; sidebar **Changes / Graph** tabs (unified row graph: colored lanes + branch tips + summary, SourceTree-style layout).
-- **Phase 5:** Named branches, switch branch, merge with conflict markers resolved in UI.
+- **Phase 5:** Named branches, switch branch, merge with conflict resolution in sidebar ([project-merge-and-conflicts.md](./project-merge-and-conflicts.md)).
 - **Phase 6+:** Workspace shell may embed the same panel; do not duplicate a second hidden Git UX.
 
 ## Acceptance (Phase 4 MVP)
