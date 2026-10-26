@@ -134,6 +134,15 @@
   border-radius: var(--scribo-radius-sm) var(--scribo-radius-sm) 0 0;
 }
 
+.sidebar-activity-btn .sidebar-activity-icon {
+  opacity: 0.72;
+}
+
+.sidebar-activity-btn:hover .sidebar-activity-icon,
+.sidebar-activity-btn[data-active="true"] .sidebar-activity-icon {
+  opacity: 1;
+}
+
 .sidebar-activity-badge {
   position: absolute;
   top: 3px;

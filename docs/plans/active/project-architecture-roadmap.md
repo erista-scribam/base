@@ -103,6 +103,15 @@ flowchart TB
 | **Scope**      | Export/import zip; optional git bundle |
 | **Depends on** | Stable project layout                  |
 
+## Phase 9 — Sync & collaboration platform (future)
+
+|                |                                                                                                                                |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **User value** | Share projects, backup, optional co-editing—without leaving the writer mental model                                            |
+| **Direction**  | **GitHub for writing**: branches, diffs, and review built for manuscripts, not generic repos                                   |
+| **Depends on** | Phases 4–8 (local Git, branches/merge, workspace entities, portable `.scribo`)                                                 |
+| **Non-goals**  | Exposing raw Git CLI; treating non-markdown files as first-class manuscripts; shipping sync before local-first invariants hold |
+
 ## Parallel work
 
 - **Friction log / Phase 0 evidence** — anytime

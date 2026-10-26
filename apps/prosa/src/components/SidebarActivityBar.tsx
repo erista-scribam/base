@@ -26,7 +26,7 @@ export function SidebarActivityBar({
         aria-label="Explorer"
         onClick={() => onSelectView("files")}
       >
-        <IconFiles />
+        <IconExplorer />
       </button>
       <button
         type="button"
@@ -51,39 +51,59 @@ export function SidebarActivityBar({
   );
 }
 
-function IconFiles() {
+/** Explorer — folder + sheet (Codicons-inspired, single-color stroke). */
+function IconExplorer() {
   return (
     <svg
-      width="16"
-      height="16"
+      className="sidebar-activity-icon"
+      width="17"
+      height="17"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
       aria-hidden
     >
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <path d="M14 2v6h6" />
+      <path
+        d="M4 7.5V19a1.5 1.5 0 001.5 1.5H18A1.5 1.5 0 0019.5 19V9.5H11.5L9.5 7.5H4z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.5 7.5V5.5A1.5 1.5 0 0111 4h7.5A1.5 1.5 0 0120 5.5V19"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
+/** Source control — branch graph (simplified Git icon). */
 function IconSourceControl() {
   return (
     <svg
-      width="16"
-      height="16"
+      className="sidebar-activity-icon"
+      width="17"
+      height="17"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
       aria-hidden
     >
-      <circle cx="6" cy="6" r="2.5" />
-      <circle cx="18" cy="6" r="2.5" />
-      <circle cx="12" cy="18" r="2.5" />
-      <path d="M6 8.5v3a4 4 0 0 0 4 4h4a4 4 0 0 1 4 4v3" />
-      <path d="M18 8.5v3a4 4 0 0 1-4 4h-1" />
+      <circle cx="7" cy="7" r="2.25" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="17" cy="11" r="2.25" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M7 9.25v4.5a3 3 0 003 3h4a3 3 0 013 3v1.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M17 13.25V9.25a3 3 0 00-3-3H9"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

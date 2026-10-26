@@ -42,3 +42,7 @@ Plan 005 adds an **ambitious architectural foundation** before feature sprints:
 - No silent loss of authored content.
 - Analysis/workspace metadata must not silently mutate manuscript files.
 - `@scribo/core` stays free of HTTP, ORM, React, Node I/O.
+
+## Future: sync and collaboration (product north star)
+
+Long-term **hosted sync / backend** is planned as a deliberate spinoff: **GitHub for writing**—same ideas writers already see in Prosa (projects, checkpoints, branches, diffs), not raw Git porcelain. On-disk Git + the Scribo project model remain canonical; cloud services mirror or federate that history for sharing, review, and backup. **Gate:** Phases 4–8 (local Git, branches, workspace, portable package) stable before any sync MVP. See [project-architecture-roadmap.md](./project-architecture-roadmap.md) Phase 9.

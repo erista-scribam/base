@@ -1,5 +1,6 @@
 import type { ManuscriptSummary } from "@scribo/core";
 import { isDiffTabId, parseDiffTabId } from "../features/editor/editor-tab-ids";
+import { displayMarkdownFileName } from "../features/projects/manuscript-file-name";
 import { splitRepoPath } from "../features/projects/project-tree";
 
 export interface EditorTabBarProps {
@@ -14,10 +15,10 @@ export interface EditorTabBarProps {
 function tabLabel(summary: ManuscriptSummary | undefined, id: string): string {
   const diffPath = parseDiffTabId(id);
   if (diffPath) {
-    return splitRepoPath(diffPath).fileName;
+    return displayMarkdownFileName(splitRepoPath(diffPath).fileName);
   }
   if (summary?.filePath) {
-    return splitRepoPath(summary.filePath.replace(/\\/g, "/")).fileName;
+    return displayMarkdownFileName(splitRepoPath(summary.filePath.replace(/\\/g, "/")).fileName);
   }
   return summary?.title?.trim() || id.slice(0, 8);
 }

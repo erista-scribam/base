@@ -181,6 +181,13 @@ fn git_file_status_label(flags: Status) -> Option<&'static str> {
     Some("modified")
 }
 
+fn is_markdown_relative_path(relative_path: &str) -> bool {
+    Path::new(relative_path)
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .is_some_and(|ext| ext.eq_ignore_ascii_case("md") || ext.eq_ignore_ascii_case("markdown"))
+}
+
 pub fn list_changed_files(root: &Path) -> Result<Vec<GitChangedFile>, String> {
     if !root.join(".git").exists() {
         return Ok(Vec::new());
@@ -202,8 +209,12 @@ pub fn list_changed_files(root: &Path) -> Result<Vec<GitChangedFile>, String> {
         let Some(status) = git_file_status_label(entry.status()) else {
             continue;
         };
+        let normalized = path.replace('\\', "/");
+        if !is_markdown_relative_path(&normalized) {
+            continue;
+        }
         files.push(GitChangedFile {
-            path: path.replace('\\', "/"),
+            path: normalized,
             status: status.to_string(),
         });
     }

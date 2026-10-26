@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { stripBlockIdComments } from "../features/markdown/markdown-block-ids";
 import { getChangedFilePreview } from "../features/version-control/project-version-control";
+import { displayMarkdownRepoPath } from "../features/projects/manuscript-file-name";
 import { SideBySideTextCompare } from "./SideBySideTextCompare";
 
 export interface GitDiffEditorTabProps {
@@ -53,7 +54,7 @@ export function GitDiffEditorTab({
   return (
     <div className="editor-diff-tab">
       <header className="editor-diff-tab-header">
-        <span className="editor-diff-tab-path">{relativePath}</span>
+        <span className="editor-diff-tab-path">{displayMarkdownRepoPath(relativePath)}</span>
         <button type="button" className="sc-btn sc-btn-primary" onClick={onOpenInEditor}>
           Open file
         </button>

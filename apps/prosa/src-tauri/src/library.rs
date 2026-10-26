@@ -619,8 +619,20 @@ fn is_forbidden_filename_char(ch: char) -> bool {
     matches!(ch, '/' | '\\' | ':' | '*' | '?' | '"' | '<' | '>' | '|') || ch.is_control()
 }
 
+fn strip_markdown_extension(title: &str) -> String {
+    let trimmed = title.trim();
+    if trimmed.len() >= 10 && trimmed.to_ascii_lowercase().ends_with(".markdown") {
+        return trimmed[..trimmed.len() - 10].trim_end().to_string();
+    }
+    if trimmed.len() >= 3 && trimmed.to_ascii_lowercase().ends_with(".md") {
+        return trimmed[..trimmed.len() - 3].trim_end().to_string();
+    }
+    trimmed.to_string()
+}
+
 /// Filesystem-safe stem: keep punctuation such as `(Draft)`; strip path separators only.
 fn sanitize_title_for_filename(title: &str) -> String {
+    let title = strip_markdown_extension(title);
     let base_name = title
         .chars()
         .map(|ch| {
@@ -844,6 +856,12 @@ pub fn absolute_path_for_entry(app: &AppHandle, path_key: &str) -> Result<PathBu
 mod tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn sanitize_title_for_filename_strips_markdown_extension() {
+        assert_eq!(sanitize_title_for_filename("Chapter One.md"), "Chapter One");
+        assert_eq!(sanitize_title_for_filename("draft.markdown"), "draft");
+    }
 
     #[test]
     fn sanitize_title_for_filename_strips_unsafe_chars() {

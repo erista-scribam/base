@@ -1,4 +1,5 @@
 import type { GitChangedFile } from "../features/version-control/project-version-control";
+import { displayMarkdownFileName } from "../features/projects/manuscript-file-name";
 import { splitRepoPath } from "../features/projects/project-tree";
 import { GitFileStatusBadge } from "./GitFileStatusBadge";
 import { gitFileStatusTitle } from "../features/version-control/git-file-status";
@@ -40,7 +41,7 @@ export function ChangedFilesList({
                 onDoubleClick={() => onOpenInEditor(file.path)}
               >
                 <GitFileStatusBadge status={file.status} />
-                <span className="changed-files-name">{fileName}</span>
+                <span className="changed-files-name">{displayMarkdownFileName(fileName)}</span>
                 {directory ? <span className="changed-files-dir">{directory}</span> : null}
               </button>
             </li>

@@ -15,6 +15,10 @@ import {
   splitRepoPath,
   type ProjectTreeNode,
 } from "../features/projects/project-tree";
+import {
+  displayMarkdownFileName,
+  normalizeNewManuscriptTitle,
+} from "../features/projects/manuscript-file-name";
 import { GitFileStatusBadge } from "./GitFileStatusBadge";
 
 const TREE_INDENT_PX = 12;
@@ -145,14 +149,18 @@ export function ProjectFilesExplorer({
         onSelectFolder(null);
       }
       setPendingCreate({ kind, parentRelative });
-      setCreateName(kind === "file" ? "untitled.md" : "new-folder");
+      setCreateName(kind === "file" ? "Untitled" : "new-folder");
     },
     [onSelectFolder],
   );
 
   const submitCreate = useCallback(() => {
-    const trimmed = createName.trim();
-    if (!trimmed || !pendingCreate) {
+    if (!pendingCreate) {
+      return;
+    }
+    const trimmed =
+      pendingCreate.kind === "file" ? normalizeNewManuscriptTitle(createName) : createName.trim();
+    if (!trimmed) {
       return;
     }
     if (pendingCreate.kind === "file") {
@@ -345,7 +353,7 @@ function InlineCreateRow({
           type="text"
           className="project-tree-create-input"
           value={createName}
-          placeholder={pendingCreate.kind === "file" ? "File name" : "Folder name"}
+          placeholder={pendingCreate.kind === "file" ? "Manuscript name" : "Folder name"}
           autoFocus
           onChange={(event) => setCreateName(event.target.value)}
           onKeyDown={(event) => {
@@ -478,7 +486,7 @@ function TreeNodeRow({
     return null;
   }
 
-  const label = node.name;
+  const label = displayMarkdownFileName(node.name);
 
   return (
     <li className="project-tree-node" role="treeitem">

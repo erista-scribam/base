@@ -46,6 +46,7 @@ import {
 } from "../features/persistence/tauri-manuscripts";
 import { manuscriptIdForPath } from "../features/persistence/manuscript-path-id";
 import { openProject } from "../features/projects/project-catalog";
+import { isMarkdownRepoPath } from "../features/projects/manuscript-file-name";
 import { GitBranchChip } from "../components/GitBranchChip";
 import { useProjectGitStatus } from "../hooks/useProjectGitStatus";
 import { useEditorTabs } from "../hooks/useEditorTabs";
@@ -343,6 +344,10 @@ export function App() {
   const handleOpenRepoPath = useCallback(
     (relativePath: string) => {
       const normalized = relativePath.replace(/\\/g, "/").replace(/^\.\//, "");
+      if (!isMarkdownRepoPath(normalized)) {
+        setNotice("Only markdown manuscripts (.md) can be opened in the editor.");
+        return;
+      }
       const match = manuscripts.find((item) => {
         const filePath = item.filePath?.replace(/\\/g, "/").replace(/^\.\//, "");
         if (!filePath) {
