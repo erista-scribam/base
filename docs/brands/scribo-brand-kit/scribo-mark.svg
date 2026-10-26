@@ -1,5 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <rect width="256" height="256" rx="52" fill="#0F172A"/>
-  <path d="M166 35 72 96 166 128 72 160 166 221 166 181 126 160 198 136 198 120 126 96 166 75Z" fill="#F8FAFC"/>
-  <path d="M166 35 72 96 126 96Z" fill="#6366F1"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Scribo">
+  <rect width="256" height="256" rx="52" fill="#0F172A" />
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path
+      stroke="#F8FAFC"
+      stroke-width="28"
+      d="M 182 82 C 182 54 150 46 122 58 C 94 70 90 94 114 104 C 138 114 166 118 174 142 C 182 166 150 182 120 174 C 90 166 76 144 88 124"
+    />
+    <path
+      stroke="#6366F1"
+      stroke-width="28"
+      d="M 182 82 C 182 54 150 46 122 58 C 94 70 90 94 114 104"
+    />
+  </g>
 </svg>
