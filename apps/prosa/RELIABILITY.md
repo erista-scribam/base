@@ -4,7 +4,7 @@
 
 The Prosa document model (`@scribam/document-model`) is the source of truth in memory.
 
-**Library folder** (default `Documents/Scribam Prosa`): each manuscript is a `.md` file you can open in Finder. **App config** (e.g. `com.scribam.prosa`) holds library settings and recovery snapshots under `.scribam/recovery/` inside the library — not your manuscript text.
+**Library folder** (default `Documents/Scribam`): each manuscript is a `.md` file you can open in Finder. **App config** (e.g. `com.scribam.prosa`) holds library settings and recovery snapshots under `.scribam/recovery/` inside the library — not your manuscript text.
 
 Legacy manuscripts that were created in app storage are **migrated automatically** to the library as `.md` on launch.
 

@@ -19,7 +19,7 @@
 3. **SQLite:** **Rebuildable indexes only** (search, backlinks, entity occurrence lists)—never an authoritative copy of prose (**Recommended**).
 4. **Portable package:** Optional `.scribam` archive (zip or custom container) for backup/import—**not** the live editing format (**Recommended**).
 5. **Migration:** Current **library folder** (flat `.md` + app config) maps to **single-manuscript projects** or **multi-doc projects** via import tool (**Assumption**—details in roadmap).
-6. **Prosa home (Recommended):** Default `Documents/Scribam Prosa/` (or user-chosen) is the **app home**; each **writing project** is a **child folder** with its own manifest and Git root—not manuscripts scattered at the home root long term.
+6. **Scribam home (Recommended):** Default `Documents/Scribam/` (or user-chosen) is the **app home**; legacy `Scribam Prosa/` and `Scribo Prosa/` folder names still resolve when present. each **writing project** is a **child folder** with its own manifest and Git root—not manuscripts scattered at the home root long term.
 
 **Principal risk:** Stable **entity IDs** across TipTap/Markdown round-trips are **not verified** today (`blockId()` regenerates UUIDs in `prosa-convert.ts`, `prosa-markdown.ts`)—Git merges and workspace references **require** ID stability first.
 
@@ -97,7 +97,7 @@ See [§2 detail table](#22-audit-table) and [implementation-audit.md](../archite
 ### 5.1 Prosa home vs project folder (Recommended)
 
 ```text
-Documents/Scribam Prosa/           # Prosa home (default; may hold many projects)
+Documents/Scribam/                 # Scribam home (default; may hold many projects)
 ├── My Novel/                     # Project folder (Git root + manifest)
 │   └── …                         # See tree below
 ├── Essays/

@@ -57,7 +57,7 @@ Expected behavior (deterministic, tested where feasible):
 
 ## Portability
 
-1. **Scribam Prosa home** — The app has a documented default root (e.g. `Documents/Scribam Prosa/`) where **project folders** normally live. Each project is a directory with `scribam.project.json` and markdown under `content/` (see [prosa-shell-and-projects.md](./prosa-shell-and-projects.md)).
+1. **Scribam home** — The app has a documented default root (e.g. `Documents/Scribam/`) where **project folders** normally live. Legacy `Documents/Scribam Prosa/` and `Documents/Scribo Prosa/` remain supported when already present. Each project is a directory with `scribam.project.json` and markdown under `content/` (see [prosa-shell-and-projects.md](./prosa-shell-and-projects.md)).
 2. **Library manuscripts** — Primary artifact is human-readable `.md` inside a project tree—not an opaque app-internal blob.
 3. **Extensions** — Scribam-specific sidecars (e.g. `.scribam/recovery`) must be documented and bounded.
 4. **Export** — Future export must not require mutating the canonical manuscript.

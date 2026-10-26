@@ -20,8 +20,9 @@ use crate::project::{
 };
 use crate::project_layout::{MANUSCRIPT_PROSE_EXTENSION, is_manuscript_prose_file};
 
-const LIBRARY_DIR_NAME: &str = "Scribam Prosa";
-const LEGACY_LIBRARY_DIR_NAME: &str = "Scribo Prosa";
+const LIBRARY_DIR_NAME: &str = "Scribam";
+/// Older defaults; still opened when present (new installs use `LIBRARY_DIR_NAME`).
+const LEGACY_LIBRARY_DIR_NAMES: &[&str] = &["Scribam Prosa", "Scribo Prosa"];
 const PATH_ID_PREFIX: &str = "ms_path_";
 
 const MAX_RECENT_PROJECTS: usize = 12;
@@ -38,7 +39,7 @@ struct RecentProjectEntry {
 struct LibraryConfig {
     /// Active project root (Git, manuscripts, explorer).
     root_path: PathBuf,
-    /// Prosa container folder (Documents/Scribam Prosa); projects live in subfolders.
+    /// Scribam home under Documents (`Documents/Scribam`); projects live in subfolders.
     #[serde(default)]
     home_path: Option<PathBuf>,
     #[serde(default)]
@@ -90,16 +91,168 @@ fn write_config(app: &AppHandle, config: &LibraryConfig) -> Result<(), String> {
     fs::write(path, raw).map_err(|error| error.to_string())
 }
 
-fn resolve_library_home(docs: &Path) -> PathBuf {
-    let preferred = docs.join(LIBRARY_DIR_NAME);
-    if preferred.is_dir() {
-        return preferred;
+/// Default home for new installs — always `Documents/Scribam` (never legacy folder names).
+fn canonical_library_home(docs: &Path) -> PathBuf {
+    docs.join(LIBRARY_DIR_NAME)
+}
+
+fn is_legacy_home_path(path: &Path) -> bool {
+    path.file_name()
+        .and_then(|name| name.to_str())
+        .is_some_and(|name| LEGACY_LIBRARY_DIR_NAMES.contains(&name))
+}
+
+fn legacy_library_homes_under(docs: &Path) -> Vec<PathBuf> {
+    LEGACY_LIBRARY_DIR_NAMES
+        .iter()
+        .map(|name| docs.join(name))
+        .filter(|path| path.is_dir())
+        .collect()
+}
+
+/// Maps `…/Documents/Scribo Prosa/foo` → `…/Documents/Scribam/foo`.
+fn remapped_path_under_scribam(path: &Path, canonical_home: &Path) -> Option<PathBuf> {
+    let components: Vec<_> = path.components().collect();
+    for (index, component) in components.iter().enumerate() {
+        let Component::Normal(name) = component else {
+            continue;
+        };
+        if name
+            .to_str()
+            .is_some_and(|segment| LEGACY_LIBRARY_DIR_NAMES.contains(&segment))
+        {
+            let suffix: PathBuf = components[index + 1..].iter().collect();
+            return Some(if suffix.as_os_str().is_empty() {
+                canonical_home.to_path_buf()
+            } else {
+                canonical_home.join(suffix)
+            });
+        }
     }
-    let legacy = docs.join(LEGACY_LIBRARY_DIR_NAME);
-    if legacy.is_dir() {
-        return legacy;
+    None
+}
+
+/// Renames or merges `Documents/Scribo Prosa` (and `Scribam Prosa`) into `Documents/Scribam`.
+fn migrate_legacy_library_folders_on_disk(docs: &Path, canonical: &Path) -> Result<(), String> {
+    fs::create_dir_all(canonical).map_err(|error| error.to_string())?;
+
+    for legacy_name in LEGACY_LIBRARY_DIR_NAMES {
+        let legacy = docs.join(legacy_name);
+        if !legacy.is_dir() || paths_equal(&legacy, canonical) {
+            continue;
+        }
+
+        if !canonical.exists() {
+            fs::rename(&legacy, canonical).map_err(|error| error.to_string())?;
+            continue;
+        }
+
+        for entry in fs::read_dir(&legacy).map_err(|error| error.to_string())? {
+            let entry = entry.map_err(|error| error.to_string())?;
+            let dest = canonical.join(entry.file_name());
+            if dest.exists() {
+                continue;
+            }
+            fs::rename(entry.path(), dest).map_err(|error| error.to_string())?;
+        }
+
+        if fs::read_dir(&legacy)
+            .map(|mut dir| dir.next().is_none())
+            .unwrap_or(false)
+        {
+            let _ = fs::remove_dir(&legacy);
+        }
     }
-    preferred
+
+    Ok(())
+}
+
+fn rewrite_config_paths_away_from_legacy(
+    config: &mut LibraryConfig,
+    canonical_home: &Path,
+) -> bool {
+    let mut changed = false;
+
+    match &config.home_path {
+        None => {
+            config.home_path = Some(canonical_home.to_path_buf());
+            changed = true;
+        }
+        Some(home) => {
+            if let Some(new_home) = remapped_path_under_scribam(home, canonical_home) {
+                if !paths_equal(home, &new_home) {
+                    config.home_path = Some(new_home);
+                    changed = true;
+                }
+            } else if is_legacy_home_path(home) {
+                config.home_path = Some(canonical_home.to_path_buf());
+                changed = true;
+            }
+        }
+    }
+
+    if let Some(new_root) = remapped_path_under_scribam(&config.root_path, canonical_home)
+        && !paths_equal(&config.root_path, &new_root)
+    {
+        config.root_path = new_root;
+        changed = true;
+    }
+
+    for entry in &mut config.recent_projects {
+        if let Some(new_path) = remapped_path_under_scribam(&entry.root_path, canonical_home)
+            && !paths_equal(&entry.root_path, &new_path)
+        {
+            entry.root_path = new_path;
+            changed = true;
+        }
+    }
+
+    changed
+}
+
+const LEGACY_APP_CONFIG_DIR_NAMES: &[&str] = &["com.scribo.prosa", "com.scribo.prosa.dev"];
+
+/// Pre-Scribam bundle ids may still hold the only copy of `library.json`.
+fn try_adopt_legacy_app_library_config(app: &AppHandle) -> Result<(), String> {
+    if read_config(app)?.is_some() {
+        return Ok(());
+    }
+
+    let home = app.path().home_dir().map_err(|error| error.to_string())?;
+    let candidates: Vec<PathBuf> = LEGACY_APP_CONFIG_DIR_NAMES
+        .iter()
+        .map(|id| {
+            home.join("Library")
+                .join("Application Support")
+                .join(id)
+                .join("library.json")
+        })
+        .collect();
+
+    #[cfg(target_os = "windows")]
+    {
+        for id in LEGACY_APP_CONFIG_DIR_NAMES {
+            candidates.push(
+                home.join("AppData")
+                    .join("Roaming")
+                    .join(id)
+                    .join("library.json"),
+            );
+        }
+    }
+
+    for legacy_file in candidates {
+        if !legacy_file.is_file() {
+            continue;
+        }
+        let raw = fs::read_to_string(&legacy_file).map_err(|error| error.to_string())?;
+        let config: LibraryConfig =
+            serde_json::from_str(&raw).map_err(|error| error.to_string())?;
+        write_config(app, &config)?;
+        return Ok(());
+    }
+
+    Ok(())
 }
 
 pub fn default_library_root(app: &AppHandle) -> Result<PathBuf, String> {
@@ -107,7 +260,7 @@ pub fn default_library_root(app: &AppHandle) -> Result<PathBuf, String> {
         .path()
         .document_dir()
         .map_err(|error| error.to_string())?;
-    Ok(resolve_library_home(&docs))
+    Ok(canonical_library_home(&docs))
 }
 
 fn touch_recent_project(config: &mut LibraryConfig, root: &Path) {
@@ -150,10 +303,10 @@ fn is_project_directory(path: &Path) -> bool {
 }
 
 fn resolve_home_path(app: &AppHandle, config: &LibraryConfig) -> Result<PathBuf, String> {
-    Ok(config
-        .home_path
-        .clone()
-        .unwrap_or_else(|| default_library_root(app).unwrap_or_else(|_| config.root_path.clone())))
+    if let Some(home) = &config.home_path {
+        return Ok(home.clone());
+    }
+    default_library_root(app)
 }
 
 fn bootstrap_first_project(home: &Path) -> Result<PathBuf, String> {
@@ -221,20 +374,23 @@ fn discover_projects_in_home(home: &Path) -> Vec<PathBuf> {
 }
 
 fn ensure_config_normalized(app: &AppHandle) -> Result<LibraryConfig, String> {
-    let default_home = default_library_root(app)?;
+    let docs = app
+        .path()
+        .document_dir()
+        .map_err(|error| error.to_string())?;
+    let canonical_home = canonical_library_home(&docs);
+    migrate_legacy_library_folders_on_disk(&docs, &canonical_home)?;
+    try_adopt_legacy_app_library_config(app)?;
+
+    let mut persist_config = false;
 
     let mut config = match read_config(app)? {
-        Some(mut existing) => {
-            if existing.home_path.is_none() {
-                existing.home_path = Some(default_home.clone());
-            }
-            existing
-        }
+        Some(existing) => existing,
         None => {
-            fs::create_dir_all(&default_home).map_err(|error| error.to_string())?;
-            let project = bootstrap_first_project(&default_home)?;
+            fs::create_dir_all(&canonical_home).map_err(|error| error.to_string())?;
+            let project = bootstrap_first_project(&canonical_home)?;
             let mut fresh = LibraryConfig {
-                home_path: Some(default_home.clone()),
+                home_path: Some(canonical_home.clone()),
                 root_path: project.clone(),
                 recent_projects: Vec::new(),
             };
@@ -244,10 +400,14 @@ fn ensure_config_normalized(app: &AppHandle) -> Result<LibraryConfig, String> {
         }
     };
 
+    if rewrite_config_paths_away_from_legacy(&mut config, &canonical_home) {
+        persist_config = true;
+    }
+
     let home = config
         .home_path
         .clone()
-        .unwrap_or_else(|| default_home.clone());
+        .unwrap_or_else(|| canonical_home.clone());
     fs::create_dir_all(&home).map_err(|error| error.to_string())?;
 
     let active_is_home = paths_equal(&config.root_path, &home);
@@ -262,6 +422,10 @@ fn ensure_config_normalized(app: &AppHandle) -> Result<LibraryConfig, String> {
         let project = bootstrap_first_project(&home)?;
         config.root_path = project.clone();
         touch_recent_project(&mut config, &project);
+        persist_config = true;
+    }
+
+    if persist_config {
         write_config(app, &config)?;
     }
 
@@ -391,6 +555,8 @@ pub fn set_library_root(app: &AppHandle, root_path: String) -> Result<LibraryInf
 
 pub fn open_project_root(app: &AppHandle, path: PathBuf) -> Result<LibraryInfo, String> {
     let mut config = ensure_config_normalized(app)?;
+    let canonical_home = default_library_root(app)?;
+    let path = remapped_path_under_scribam(&path, &canonical_home).unwrap_or(path);
     config.root_path = path.clone();
     touch_recent_project(&mut config, &path);
     write_config(app, &config)?;
@@ -455,22 +621,35 @@ pub fn list_projects(app: &AppHandle) -> Result<Vec<ProjectSummary>, String> {
         });
     }
 
-    for root in discover_projects_in_home(&home) {
-        if !seen.insert(root.clone()) {
-            continue;
+    let docs = app
+        .path()
+        .document_dir()
+        .map_err(|error| error.to_string())?;
+    let mut catalog_homes = vec![home.clone()];
+    for legacy_home in legacy_library_homes_under(&docs) {
+        if !catalog_homes.iter().any(|h| paths_equal(h, &legacy_home)) {
+            catalog_homes.push(legacy_home);
         }
-        let title = project_title_for_root(&root);
-        let id = read_project_manifest(&root)
-            .ok()
-            .flatten()
-            .map(|manifest| manifest.id);
-        entries.push(ProjectSummary {
-            root_path: root.to_string_lossy().into_owned(),
-            title,
-            id,
-            last_opened_at: Utc::now().to_rfc3339(),
-            is_current: current_root.as_deref() == Some(root.as_path()),
-        });
+    }
+
+    for catalog_home in catalog_homes {
+        for root in discover_projects_in_home(&catalog_home) {
+            if !seen.insert(root.clone()) {
+                continue;
+            }
+            let title = project_title_for_root(&root);
+            let id = read_project_manifest(&root)
+                .ok()
+                .flatten()
+                .map(|manifest| manifest.id);
+            entries.push(ProjectSummary {
+                root_path: root.to_string_lossy().into_owned(),
+                title,
+                id,
+                last_opened_at: Utc::now().to_rfc3339(),
+                is_current: current_root.as_deref() == Some(root.as_path()),
+            });
+        }
     }
 
     if let Some(current) = current_root.as_deref()
@@ -1095,6 +1274,69 @@ mod tests {
         assert!(!home.join("content").exists());
 
         fs::remove_dir_all(&home).ok();
+    }
+
+    #[test]
+    fn canonical_library_home_is_always_scribam() {
+        let docs = std::env::temp_dir().join(format!("scribam-lib-home-{}", uuid::Uuid::new_v4()));
+        fs::create_dir_all(&docs).unwrap();
+        assert_eq!(canonical_library_home(&docs), docs.join("Scribam"));
+
+        fs::create_dir_all(docs.join("Scribo Prosa")).unwrap();
+        fs::create_dir_all(docs.join("Scribam Prosa")).unwrap();
+        assert_eq!(canonical_library_home(&docs), docs.join("Scribam"));
+
+        fs::remove_dir_all(&docs).ok();
+    }
+
+    #[test]
+    fn is_legacy_home_path_detects_old_folder_names() {
+        assert!(is_legacy_home_path(Path::new(
+            "/Users/x/Documents/Scribam Prosa"
+        )));
+        assert!(is_legacy_home_path(Path::new(
+            "/Users/x/Documents/Scribo Prosa"
+        )));
+        assert!(!is_legacy_home_path(Path::new(
+            "/Users/x/Documents/Scribam"
+        )));
+    }
+
+    #[test]
+    fn remapped_path_under_scribam_rewrites_legacy_segments() {
+        let canonical = PathBuf::from("/Users/x/Documents/Scribam");
+        assert_eq!(
+            remapped_path_under_scribam(
+                Path::new("/Users/x/Documents/Scribo Prosa/My Novel"),
+                &canonical
+            ),
+            Some(PathBuf::from("/Users/x/Documents/Scribam/My Novel"))
+        );
+        assert_eq!(
+            remapped_path_under_scribam(Path::new("/Users/x/Documents/Scribo Prosa"), &canonical),
+            Some(canonical.clone())
+        );
+        assert_eq!(
+            remapped_path_under_scribam(Path::new("/Users/x/Documents/Scribam/Ok"), &canonical),
+            None
+        );
+    }
+
+    #[test]
+    fn migrate_legacy_library_folders_renames_scribo_prosa_to_scribam() {
+        let docs =
+            std::env::temp_dir().join(format!("scribam-docs-migrate-{}", uuid::Uuid::new_v4()));
+        fs::create_dir_all(&docs).unwrap();
+        let legacy = docs.join("Scribo Prosa");
+        let canonical = docs.join("Scribam");
+        fs::create_dir_all(legacy.join("My Project")).unwrap();
+
+        migrate_legacy_library_folders_on_disk(&docs, &canonical).unwrap();
+
+        assert!(!legacy.exists());
+        assert!(canonical.join("My Project").is_dir());
+
+        fs::remove_dir_all(&docs).ok();
     }
 
     #[test]

@@ -55,11 +55,11 @@ Reusable summary for anyone naming, designing, or shipping Scribam products. **C
 
 ### Marketing surfaces vs shipped apps
 
-| Surface                      | Rules                                                                                                                                                                                                                                                                    |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Marketing / export**       | Brand-kit wordmarks and lockups. Optional uppercase taglines on **SVG/marketing only** (e.g. “LET ME WRITE”, “(INSTEAD OF EDIT)”). Brand-sheet typography: Plus Jakarta Sans, Source Serif 4, JetBrains Mono, Courier Prime — see brand-kit README.                      |
-| **In-app UI**                | Restrained: product icon, **Scribam** + product name (e.g. **Prosa** in the sidebar). **Do not** paste taglines or Latin explanations into everyday chrome.                                                                                                              |
-| **Prosa reading & UI fonts** | Separate from the brand sheet: Literata for manuscripts, system UI sans, system monospace — [apps/prosa/src/styles/tokens.css](apps/prosa/src/styles/tokens.css). Product accent `--scribam-prosa` — [apps/prosa/src/styles/brand.css](apps/prosa/src/styles/brand.css). |
+| Surface                      | Rules                                                                                                                                                                                                                                                                                             |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Marketing / export**       | Horizontal lockups and taglines per [brand-sheet-v1.jpg](docs/brands/scribam-brand-kit/brand-sheet-v1.jpg) (export from design tools; repo ships `scribam-glyph.svg` + `scribam-mark.svg` only). Typography: Plus Jakarta Sans, Source Serif 4, JetBrains Mono, Courier Prime — brand-kit README. |
+| **In-app UI**                | Restrained: product icon, **Scribam** + product name (e.g. **Prosa** in the sidebar). **Do not** paste taglines or Latin explanations into everyday chrome.                                                                                                                                       |
+| **Prosa reading & UI fonts** | Separate from the brand sheet: Literata for manuscripts, system UI sans, system monospace — [apps/prosa/src/styles/tokens.css](apps/prosa/src/styles/tokens.css). Product accent `--scribam-prosa` — [apps/prosa/src/styles/brand.css](apps/prosa/src/styles/brand.css).                          |
 
 ### Palette and assets
 
@@ -67,7 +67,7 @@ Core tokens in [brand-tokens.css](docs/brands/scribam-brand-kit/brand-tokens.css
 
 ### Legacy name Scribo
 
-Users may still have **Scribo Prosa**, `scribo.project.json`, and `.scribo/`. New defaults use **Scribam Prosa**, `scribam.project.json`, and `.scribam/`. The Prosa backend **dual-reads** legacy paths ([app_paths.rs](apps/prosa/src-tauri/src/app_paths.rs), [library.rs](apps/prosa/src-tauri/src/library.rs)). Do not remove legacy support without a spec and migration.
+Users may still have **Scribo Prosa** or **Scribam Prosa** library folders, `scribo.project.json`, and `.scribo/`. New defaults use **`Documents/Scribam`**, `scribam.project.json`, and `.scribam/`. The Prosa backend **dual-reads** legacy paths ([app_paths.rs](apps/prosa/src-tauri/src/app_paths.rs), [library.rs](apps/prosa/src-tauri/src/library.rs)). Do not remove legacy support without a spec and migration.
 
 ### Checklist: new Scribam app or refresh
 

@@ -37,7 +37,7 @@ Scribam Prosa **borrows IDE-style layout** (sidebar, tabs, explorer, source cont
 
 We **do not fork or embed** VS Code, Cursor, or any full IDE. We ship our own shell and adopt **open-source building blocks** (e.g. Git via libgit2, Markdown editor components) where they fit.
 
-**On disk:** a default **Scribam Prosa home** (e.g. under Documents) holds **project folders**; each project is a directory with `scribam.project.json` and `content/`. Details and migration: [prosa-shell-and-projects.md](./prosa-shell-and-projects.md).
+**On disk:** a default **Scribam home** (`Documents/Scribam/`) holds **project folders**; each project is a directory with `scribam.project.json` and `content/`. Details and migration: [prosa-shell-and-projects.md](./prosa-shell-and-projects.md).
 
 ---
 
