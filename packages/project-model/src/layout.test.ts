@@ -14,10 +14,10 @@ describe("layout", () => {
     ).toBe("content/manuscripts");
   });
 
-  it("defaults new projects to v1 path", () => {
+  it("defaults new projects to v2 path", () => {
     expect(
       resolveManuscriptsRelativePath({ hasV2ManuscriptsDir: false, hasV1ManuscriptsDir: false }),
-    ).toBe("content/manuscripts");
+    ).toBe("contents/canon/manuscripts");
   });
 
   it("detects prosa manuscript relative paths", () => {

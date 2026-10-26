@@ -25,7 +25,7 @@ export const MANUSCRIPTS_DIR_CANDIDATES = [LAYOUT_V2_MANUSCRIPTS, LAYOUT_V1_MANU
 
 /**
  * Pick the manuscripts directory relative path for a project root.
- * Prefer v2 when that folder exists; otherwise v1 (default for new projects).
+ * Prefer v2 when that folder exists; otherwise v1; default new projects to v2.
  */
 export function resolveManuscriptsRelativePath(options: {
   hasV2ManuscriptsDir: boolean;
@@ -37,7 +37,7 @@ export function resolveManuscriptsRelativePath(options: {
   if (options.hasV1ManuscriptsDir) {
     return LAYOUT_V1_MANUSCRIPTS;
   }
-  return LAYOUT_V1_MANUSCRIPTS;
+  return LAYOUT_V2_MANUSCRIPTS;
 }
 
 export function normalizeRelativePath(path: string): string {

@@ -41,6 +41,36 @@ export function defaultProsaCapabilities(): AppCapabilityDeclaration {
   };
 }
 
+export function defaultFoliaCapabilities(): AppCapabilityDeclaration {
+  return {
+    appId: "com.scribo.folia",
+    allowedOperations: {
+      read: ["contents/canon/folia", "contents/shared", "scribo.project.json"],
+      write: ["contents/canon/folia"],
+      createDelete: ["contents/canon/folia"],
+    },
+  };
+}
+
+export function defaultDramaCapabilities(): AppCapabilityDeclaration {
+  return {
+    appId: "com.scribo.drama",
+    allowedOperations: {
+      read: ["contents/canon/drama", "contents/shared", "scribo.project.json"],
+      write: ["contents/canon/drama"],
+      createDelete: ["contents/canon/drama"],
+    },
+  };
+}
+
+export function defaultProjectAppsBlock(): ProjectAppsBlock {
+  return {
+    prosa: defaultProsaCapabilities(),
+    folia: defaultFoliaCapabilities(),
+    drama: defaultDramaCapabilities(),
+  };
+}
+
 function prefixesForOp(cap: AppCapabilityDeclaration, op: PathOperation): string[] {
   const ops = cap.allowedOperations;
   if (!ops) {

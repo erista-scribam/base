@@ -29,6 +29,42 @@ struct ProjectManifest {
     updated_at: String,
     #[serde(default)]
     layout_version: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    apps: Option<serde_json::Value>,
+}
+
+fn default_project_apps_json() -> serde_json::Value {
+    serde_json::json!({
+        "prosa": {
+            "appId": "com.scribo.prosa",
+            "allowedOperations": {
+                "read": [
+                    "content/manuscripts",
+                    "contents/canon/manuscripts",
+                    "contents/shared",
+                    "scribo.project.json"
+                ],
+                "write": ["content/manuscripts", "contents/canon/manuscripts"],
+                "createDelete": ["content/manuscripts", "contents/canon/manuscripts"]
+            }
+        },
+        "folia": {
+            "appId": "com.scribo.folia",
+            "allowedOperations": {
+                "read": ["contents/canon/folia", "contents/shared", "scribo.project.json"],
+                "write": ["contents/canon/folia"],
+                "createDelete": ["contents/canon/folia"]
+            }
+        },
+        "drama": {
+            "appId": "com.scribo.drama",
+            "allowedOperations": {
+                "read": ["contents/canon/drama", "contents/shared", "scribo.project.json"],
+                "write": ["contents/canon/drama"],
+                "createDelete": ["contents/canon/drama"]
+            }
+        }
+    })
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -135,6 +171,7 @@ fn ensure_project_layout(root: &Path, title: &str) -> Result<(), String> {
         created_at: now.clone(),
         updated_at: now,
         layout_version: 2,
+        apps: Some(default_project_apps_json()),
     };
     let raw = serde_json::to_string_pretty(&manifest).map_err(|error| error.to_string())?;
     fs::write(manifest_path, raw).map_err(|error| error.to_string())

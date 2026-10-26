@@ -13,6 +13,36 @@ const PROJECT_ID_PREFIX: &str = "proj_";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct AppPathOperations {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub read: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub write: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub create_delete: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppCapabilityDeclaration {
+    pub app_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allowed_operations: Option<AppPathOperations>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct ProjectAppsBlock {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prosa: Option<AppCapabilityDeclaration>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub folia: Option<AppCapabilityDeclaration>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub drama: Option<AppCapabilityDeclaration>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ScriboProjectManifest {
     pub project_schema_version: u32,
     pub id: String,
@@ -21,6 +51,8 @@ pub struct ScriboProjectManifest {
     pub updated_at: String,
     #[serde(default)]
     pub layout_version: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub apps: Option<ProjectAppsBlock>,
 }
 
 fn new_project_id() -> String {
@@ -65,6 +97,54 @@ fn write_manifest(root: &Path, manifest: &ScriboProjectManifest) -> Result<(), S
     atomic_write(&path, &raw)
 }
 
+fn default_project_apps() -> ProjectAppsBlock {
+    ProjectAppsBlock {
+        prosa: Some(AppCapabilityDeclaration {
+            app_id: "com.scribo.prosa".into(),
+            allowed_operations: Some(AppPathOperations {
+                read: Some(vec![
+                    "content/manuscripts".into(),
+                    "contents/canon/manuscripts".into(),
+                    "contents/shared".into(),
+                    "scribo.project.json".into(),
+                ]),
+                write: Some(vec![
+                    "content/manuscripts".into(),
+                    "contents/canon/manuscripts".into(),
+                ]),
+                create_delete: Some(vec![
+                    "content/manuscripts".into(),
+                    "contents/canon/manuscripts".into(),
+                ]),
+            }),
+        }),
+        folia: Some(AppCapabilityDeclaration {
+            app_id: "com.scribo.folia".into(),
+            allowed_operations: Some(AppPathOperations {
+                read: Some(vec![
+                    "contents/canon/folia".into(),
+                    "contents/shared".into(),
+                    "scribo.project.json".into(),
+                ]),
+                write: Some(vec!["contents/canon/folia".into()]),
+                create_delete: Some(vec!["contents/canon/folia".into()]),
+            }),
+        }),
+        drama: Some(AppCapabilityDeclaration {
+            app_id: "com.scribo.drama".into(),
+            allowed_operations: Some(AppPathOperations {
+                read: Some(vec![
+                    "contents/canon/drama".into(),
+                    "contents/shared".into(),
+                    "scribo.project.json".into(),
+                ]),
+                write: Some(vec!["contents/canon/drama".into()]),
+                create_delete: Some(vec!["contents/canon/drama".into()]),
+            }),
+        }),
+    }
+}
+
 fn new_manifest(root: &Path) -> ScriboProjectManifest {
     let now = Utc::now().to_rfc3339();
     ScriboProjectManifest {
@@ -74,6 +154,7 @@ fn new_manifest(root: &Path) -> ScriboProjectManifest {
         created_at: now.clone(),
         updated_at: now,
         layout_version: 0,
+        apps: Some(default_project_apps()),
     }
 }
 
@@ -168,6 +249,7 @@ mod tests {
         assert!(root.join(PROJECT_MANIFEST_FILE).exists());
         assert!(manuscripts_dir(&root).is_dir());
         assert!(root.join(".scribo/recovery").is_dir());
+        assert!(manifest.apps.is_some());
 
         fs::remove_dir_all(&root).ok();
     }
@@ -183,6 +265,7 @@ mod tests {
             created_at: Utc::now().to_rfc3339(),
             updated_at: Utc::now().to_rfc3339(),
             layout_version: 0,
+            apps: None,
         };
         write_manifest(&root, &legacy).unwrap();
 
