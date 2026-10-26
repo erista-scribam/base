@@ -1,14 +1,34 @@
 import { EditorSelection, type EditorState, type TransactionSpec } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
 import { lineMarkerMeta } from "./codemirror-markdown-layout";
+import { isSceneBreakLineRaw } from "./markdown-source-layout";
 
 export type MarkdownFormatAction =
-  "bold" | "italic" | "heading1" | "heading2" | "heading3" | "paragraph" | "quote" | "bulletList";
+  | "bold"
+  | "italic"
+  | "strike"
+  | "code"
+  | "heading1"
+  | "heading2"
+  | "heading3"
+  | "heading4"
+  | "heading5"
+  | "paragraph"
+  | "quote"
+  | "bulletList"
+  | "numberedList"
+  | "taskList"
+  | "codeBlock"
+  | "sceneBreak";
 
 function wrapInline(state: EditorState, left: string, right: string): TransactionSpec | null {
   const range = state.selection.main;
   if (range.empty) {
-    return null;
+    const wrapped = `${left}${right}`;
+    return {
+      changes: { from: range.from, to: range.to, insert: wrapped },
+      selection: EditorSelection.cursor(range.from + left.length),
+    };
   }
   const selected = state.sliceDoc(range.from, range.to);
   if (
@@ -57,12 +77,26 @@ function prefixDelta(lineText: string): number {
   return 0;
 }
 
+function stripLinePrefix(lineText: string): string {
+  const meta = lineMarkerMeta(lineText);
+  if (meta.kind === "heading") {
+    return lineText.replace(/^#{1,6}\s+/, "");
+  }
+  if (meta.kind === "quote") {
+    return lineText.replace(/^>\s?/, "");
+  }
+  if (meta.kind === "list") {
+    return lineText.replace(/^(\d+\.\s+\[[ xX]\]\s|[-*+]\s+\[[ xX]\]\s|\d+\.\s|[-*+]\s)/, "");
+  }
+  return lineText;
+}
+
 function setHeadingLevel(
   lineText: string,
   headOffset: number,
   level: number,
 ): { text: string; cursorOffset: number } {
-  const stripped = lineText.replace(/^#{1,6}\s+/, "");
+  const stripped = stripLinePrefix(lineText);
   const prefix = "#".repeat(level) + " ";
   const text = prefix + stripped;
   const bodyOffset = Math.max(0, headOffset - prefixDelta(lineText));
@@ -73,15 +107,7 @@ function setParagraphLine(
   lineText: string,
   headOffset: number,
 ): { text: string; cursorOffset: number } {
-  const meta = lineMarkerMeta(lineText);
-  let stripped = lineText;
-  if (meta.kind === "heading") {
-    stripped = lineText.replace(/^#{1,6}\s+/, "");
-  } else if (meta.kind === "quote") {
-    stripped = lineText.replace(/^>\s?/, "");
-  } else if (meta.kind === "list") {
-    stripped = lineText.replace(/^(\d+\.\s+\[[ xX]\]\s|[-*+]\s+\[[ xX]\]\s|\d+\.\s|[-*+]\s)/, "");
-  }
+  const stripped = stripLinePrefix(lineText);
   const bodyOffset = Math.max(0, headOffset - prefixDelta(lineText));
   return { text: stripped, cursorOffset: Math.min(stripped.length, bodyOffset) };
 }
@@ -93,8 +119,8 @@ function toggleQuote(lineText: string, headOffset: number): { text: string; curs
     const bodyOffset = Math.max(0, headOffset - meta.markerCh);
     return { text: stripped, cursorOffset: Math.min(stripped.length, bodyOffset) };
   }
-  const withoutHeading = lineText.replace(/^#{1,6}\s+/, "");
-  const text = `> ${withoutHeading}`;
+  const withoutPrefix = stripLinePrefix(lineText);
+  const text = `> ${withoutPrefix}`;
   const bodyOffset = Math.max(0, headOffset - prefixDelta(lineText));
   return { text, cursorOffset: Math.min(text.length, 2 + bodyOffset) };
 }
@@ -109,10 +135,53 @@ function toggleBullet(
     const bodyOffset = Math.max(0, headOffset - meta.markerCh);
     return { text: stripped, cursorOffset: Math.min(stripped.length, bodyOffset) };
   }
-  const body = lineText.replace(/^#{1,6}\s+/, "").replace(/^>\s?/, "");
+  const body = stripLinePrefix(lineText);
   const text = `- ${body}`;
   const bodyOffset = Math.max(0, headOffset - prefixDelta(lineText));
   return { text, cursorOffset: Math.min(text.length, 2 + bodyOffset) };
+}
+
+function toggleOrdered(
+  lineText: string,
+  headOffset: number,
+): { text: string; cursorOffset: number } {
+  const meta = lineMarkerMeta(lineText);
+  if (meta.kind === "list" && /^\d+\.\s/.test(lineText) && !/^\d+\.\s+\[/.test(lineText)) {
+    const stripped = lineText.replace(/^\d+\.\s+/, "");
+    const bodyOffset = Math.max(0, headOffset - meta.markerCh);
+    return { text: stripped, cursorOffset: Math.min(stripped.length, bodyOffset) };
+  }
+  const body = stripLinePrefix(lineText);
+  const text = `1. ${body}`;
+  const bodyOffset = Math.max(0, headOffset - prefixDelta(lineText));
+  return { text, cursorOffset: Math.min(text.length, 3 + bodyOffset) };
+}
+
+function toggleTask(lineText: string, headOffset: number): { text: string; cursorOffset: number } {
+  const meta = lineMarkerMeta(lineText);
+  if (meta.kind === "list" && /^[-*+]\s+\[[ xX]\]\s/.test(lineText)) {
+    const stripped = lineText.replace(/^[-*+]\s+\[[ xX]\]\s+/, "");
+    const bodyOffset = Math.max(0, headOffset - meta.markerCh);
+    return { text: stripped, cursorOffset: Math.min(stripped.length, bodyOffset) };
+  }
+  const body = stripLinePrefix(lineText);
+  const text = `- [ ] ${body}`;
+  const bodyOffset = Math.max(0, headOffset - prefixDelta(lineText));
+  return { text, cursorOffset: Math.min(text.length, 6 + bodyOffset) };
+}
+
+function toggleCodeBlock(lineText: string): { text: string; cursorOffset: number } {
+  const trimmed = lineText.trimStart();
+  if (trimmed.startsWith("```")) {
+    const text = stripLinePrefix(lineText);
+    return { text, cursorOffset: text.length };
+  }
+  const text = "```";
+  return { text, cursorOffset: 3 };
+}
+
+function setSceneBreak(): { text: string; cursorOffset: number } {
+  return { text: "* * *", cursorOffset: 5 };
 }
 
 export function applyMarkdownFormat(view: EditorView, action: MarkdownFormatAction): boolean {
@@ -126,6 +195,12 @@ export function applyMarkdownFormat(view: EditorView, action: MarkdownFormatActi
     case "italic":
       spec = wrapInline(state, "*", "*");
       break;
+    case "strike":
+      spec = wrapInline(state, "~~", "~~");
+      break;
+    case "code":
+      spec = wrapInline(state, "`", "`");
+      break;
     case "heading1":
       spec = replaceLinePrefix(state, (line, head) => setHeadingLevel(line, head, 1));
       break;
@@ -135,6 +210,12 @@ export function applyMarkdownFormat(view: EditorView, action: MarkdownFormatActi
     case "heading3":
       spec = replaceLinePrefix(state, (line, head) => setHeadingLevel(line, head, 3));
       break;
+    case "heading4":
+      spec = replaceLinePrefix(state, (line, head) => setHeadingLevel(line, head, 4));
+      break;
+    case "heading5":
+      spec = replaceLinePrefix(state, (line, head) => setHeadingLevel(line, head, 5));
+      break;
     case "paragraph":
       spec = replaceLinePrefix(state, (line, head) => setParagraphLine(line, head));
       break;
@@ -143,6 +224,23 @@ export function applyMarkdownFormat(view: EditorView, action: MarkdownFormatActi
       break;
     case "bulletList":
       spec = replaceLinePrefix(state, (line, head) => toggleBullet(line, head));
+      break;
+    case "numberedList":
+      spec = replaceLinePrefix(state, (line, head) => toggleOrdered(line, head));
+      break;
+    case "taskList":
+      spec = replaceLinePrefix(state, (line, head) => toggleTask(line, head));
+      break;
+    case "codeBlock":
+      spec = replaceLinePrefix(state, (line) => toggleCodeBlock(line));
+      break;
+    case "sceneBreak":
+      spec = replaceLinePrefix(state, (line) => {
+        if (isSceneBreakLineRaw(line.trim())) {
+          return setParagraphLine(line, 0);
+        }
+        return setSceneBreak();
+      });
       break;
     default:
       return false;

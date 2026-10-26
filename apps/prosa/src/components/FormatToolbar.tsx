@@ -163,29 +163,50 @@ export function MarkdownFormatToolbar({ onFormat }: MarkdownFormatToolbarProps) 
         <IconButton label="Italic" onClick={() => run("italic")}>
           <IconItalic />
         </IconButton>
+        <IconButton label="Strikethrough" onClick={() => run("strike")}>
+          <IconStrike />
+        </IconButton>
+        <IconButton label="Inline code" onClick={() => run("code")}>
+          <IconCode />
+        </IconButton>
       </div>
       <FormatDivider />
       <div className="format-bar-group" aria-label="Headings">
-        <IconButton label="Heading 1" onClick={() => run("heading1")}>
-          <span className="format-text-label">H1</span>
-        </IconButton>
-        <IconButton label="Heading 2" onClick={() => run("heading2")}>
-          <span className="format-text-label">H2</span>
-        </IconButton>
-        <IconButton label="Heading 3" onClick={() => run("heading3")}>
-          <span className="format-text-label">H3</span>
-        </IconButton>
+        {([1, 2, 3, 4, 5] as const).map((level) => (
+          <IconButton
+            key={level}
+            label={`Heading ${level}`}
+            onClick={() => run(`heading${level}` as MarkdownFormatAction)}
+          >
+            <span className="format-text-label">H{level}</span>
+          </IconButton>
+        ))}
         <IconButton label="Body paragraph" onClick={() => run("paragraph")}>
           <span className="format-text-label-muted">¶</span>
         </IconButton>
       </div>
       <FormatDivider />
-      <div className="format-bar-group" aria-label="Blocks">
+      <div className="format-bar-group" aria-label="Lists">
+        <IconButton label="Numbered list" onClick={() => run("numberedList")}>
+          <IconNumberedList />
+        </IconButton>
         <IconButton label="Bullet list" onClick={() => run("bulletList")}>
           <IconBulletList />
         </IconButton>
+        <IconButton label="Task list" onClick={() => run("taskList")}>
+          <IconTaskList />
+        </IconButton>
+      </div>
+      <FormatDivider />
+      <div className="format-bar-group" aria-label="Blocks">
         <IconButton label="Block quotation" onClick={() => run("quote")}>
           <IconQuote />
+        </IconButton>
+        <IconButton label="Code block" onClick={() => run("codeBlock")}>
+          <IconCodeBlock />
+        </IconButton>
+        <IconButton label="Scene break" onClick={() => run("sceneBreak")}>
+          <IconSceneBreak />
         </IconButton>
       </div>
     </div>

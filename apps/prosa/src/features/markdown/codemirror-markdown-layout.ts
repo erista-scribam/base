@@ -4,7 +4,9 @@ import { tags as t } from "@lezer/highlight";
 import { EditorView, ViewPlugin, Decoration, type DecorationSet } from "@codemirror/view";
 import { RangeSetBuilder } from "@codemirror/state";
 import { prosaMarkdownNavigationExtensions } from "./markdown-source-arrows";
-import { prosaMarkdownShiftEnterKeymap } from "./markdown-source-enter";
+import { prosaMarkdownEnterKeymap, prosaMarkdownShiftEnterKeymap } from "./markdown-source-enter";
+import { markdownDialogHighlightExtension } from "./markdown-dialog-highlight";
+import { prosaMarkdownSearchExtension } from "./markdown-source-search";
 import { isSceneBreakLineRaw } from "./markdown-source-layout";
 import { markdownEditorBottomSpace } from "./markdown-editor-bottom-space";
 import { markdownActiveSentenceExtension } from "./markdown-active-sentence";
@@ -162,6 +164,9 @@ const markdownSourceEditorTheme = EditorView.theme({
     backgroundColor: "color-mix(in srgb, var(--scribo-ui-accent) 14%, transparent)",
     borderRadius: "2px",
   },
+  ".cm-md-dialog": {
+    color: "var(--scribo-md-dialog-fg)",
+  },
   ".cm-md-line": {
     paddingLeft: "var(--md-marker-width, calc(6 * 0.6em))",
   },
@@ -193,8 +198,11 @@ export function markdownSourceExtensions() {
     markdownActiveSentenceExtension,
     markdownScrollMargins,
     syntaxHighlighting(prosaMarkdownHighlight, { fallback: true }),
+    markdownDialogHighlightExtension,
     EditorView.lineWrapping,
     ...prosaMarkdownNavigationExtensions,
+    ...prosaMarkdownSearchExtension,
+    prosaMarkdownEnterKeymap,
     prosaMarkdownShiftEnterKeymap,
   ];
 }

@@ -71,6 +71,7 @@
 
   /* Markdown source (iA-style: body text full contrast, markers subdued) */
   --scribo-md-marker: #9a9488;
+  --scribo-md-dialog-fg: #4d6578;
   --scribo-scene-break-fg: #8a847a;
   --scribo-md-source-bg: var(--scribo-ui-surface);
 }
@@ -106,6 +107,7 @@
   --scribo-ui-focus-ring: 0 0 0 2px var(--scribo-ui-bg), 0 0 0 4px var(--scribo-ui-accent);
 
   --scribo-md-marker: #6f6a61;
+  --scribo-md-dialog-fg: #9eb8d0;
   --scribo-scene-break-fg: #a8a299;
   --scribo-md-source-bg: var(--scribo-ui-surface);
 }

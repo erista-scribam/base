@@ -154,6 +154,7 @@ export const MarkdownSourceEditor = forwardRef<
           highlightSelectionMatches: false,
           autocompletion: false,
           indentOnInput: false,
+          searchKeymap: false,
         }}
         indentWithTab={false}
         aria-label={ariaLabel}

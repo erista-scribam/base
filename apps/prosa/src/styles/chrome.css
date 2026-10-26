@@ -826,6 +826,88 @@
   color: var(--scribo-ui-muted);
 }
 
+.prosa-search-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--scribo-space-2);
+  padding: var(--scribo-space-2) var(--scribo-ms-pad-x);
+  font-family: var(--scribo-font-ui);
+  font-size: 0.75rem;
+  color: var(--scribo-ui-text-secondary);
+  background: color-mix(in srgb, var(--scribo-md-source-bg) 55%, var(--scribo-ui-surface));
+}
+
+.prosa-search-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--scribo-space-2);
+}
+
+.prosa-search-label {
+  flex-shrink: 0;
+  min-width: 3.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--scribo-ui-muted);
+}
+
+.prosa-search-replace-row .prosa-search-input {
+  flex: 1;
+  min-width: 10rem;
+  max-width: 24rem;
+}
+
+.prosa-search-input {
+  min-width: 12rem;
+  flex: 1;
+  max-width: 24rem;
+  border: 1px solid var(--scribo-ui-border);
+  border-radius: var(--scribo-radius-sm);
+  padding: 0.25rem 0.5rem;
+  font-family: var(--scribo-font-ui);
+  font-size: 0.8125rem;
+  color: var(--scribo-ui-text);
+  background: var(--scribo-ui-canvas);
+}
+
+.prosa-search-input:focus-visible {
+  outline: none;
+  box-shadow: var(--scribo-ui-focus-ring);
+}
+
+.prosa-search-btn,
+.prosa-search-toggle {
+  border: 1px solid var(--scribo-ui-border-subtle);
+  border-radius: var(--scribo-radius-sm);
+  padding: 0.2rem 0.45rem;
+  font-family: var(--scribo-font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--scribo-ui-text-secondary);
+  background: var(--scribo-ui-canvas);
+  cursor: pointer;
+}
+
+.prosa-search-toggle[aria-pressed="true"] {
+  color: var(--scribo-ui-text);
+  background: color-mix(in srgb, var(--scribo-ui-accent) 16%, var(--scribo-ui-canvas));
+}
+
+.prosa-search-row:first-child .prosa-search-close {
+  margin-left: auto;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.prosa-search-status {
+  min-width: 4rem;
+  font-size: 0.6875rem;
+  color: var(--scribo-ui-muted);
+}
+
 .markdown-source-stack {
   position: relative;
   display: flex;
@@ -932,6 +1014,12 @@
   color: inherit !important;
   font-weight: inherit !important;
   font-style: normal !important;
+}
+
+/* Dialog in straight or curly double quotes — subtle accent text, not a highlight band */
+.markdown-source-stack .cm-content span.cm-md-dialog,
+.markdown-source-stack .cm-content span.cm-md-dialog span {
+  color: var(--scribo-md-dialog-fg) !important;
 }
 
 .editor-split-source:focus-within {
