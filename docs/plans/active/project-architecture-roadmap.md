@@ -44,21 +44,22 @@ flowchart TB
 
 ## Phase 2 — Project directory + legacy migration
 
-|                  |                                                                                                                              |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **Objective**    | Open/create `scribo.project.json` + `content/`; import current library                                                       |
-| **Deliverables** | Rust project module; Tauri commands; UI “Open project”                                                                       |
-| **Acceptance**   | Existing library imports; single-manuscript project works without Git                                                        |
-| **Migration**    | Read-only legacy library path still supported one release                                                                    |
-| **Status**       | **In progress:** manifest + `content/manuscripts/`; new docs there; legacy root `.md` still listed; project title in sidebar |
+|                  |                                                                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Objective**    | Open/create `scribo.project.json` + `content/`; import current library                                            |
+| **Deliverables** | Rust project module; Tauri commands; UI “Open project”                                                            |
+| **Acceptance**   | Existing library imports; single-manuscript project works without Git                                             |
+| **Migration**    | Read-only legacy library path still supported one release                                                         |
+| **Status**       | **Shipped (2026-10-26):** layout + auto-migrate root `.md` → `content/manuscripts/` on launch (recovery remapped) |
 
 ## Phase 3 — Git feasibility spike
 
-|                  |                                                             |
-| ---------------- | ----------------------------------------------------------- |
-| **Objective**    | Evidence for go/no-go                                       |
-| **Deliverables** | [git-spike-results.md](../../research/git-spike-results.md) |
-| **Gate**         | No Phase 4 if merge or packaging fails criteria             |
+|                  |                                                                                 |
+| ---------------- | ------------------------------------------------------------------------------- |
+| **Objective**    | Evidence for go/no-go                                                           |
+| **Deliverables** | [git-spike-results.md](../../research/git-spike-results.md)                     |
+| **Gate**         | No Phase 4 if merge or packaging fails criteria                                 |
+| **Status**       | **Done (2026-10-26):** `git-spike` feature tests; **go** pending DMG size check |
 
 ## Phase 4 — Git history MVP
 

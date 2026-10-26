@@ -113,6 +113,62 @@ pub fn get_library_info(app: &AppHandle) -> Result<LibraryInfo, String> {
     })
 }
 
+fn is_root_level_markdown(library_root: &Path, path: &Path) -> bool {
+    path.parent() == Some(library_root) && is_markdown_file(path)
+}
+
+fn relocate_library_recovery(app: &AppHandle, old_key: &str, new_key: &str) -> Result<(), String> {
+    if old_key == new_key {
+        return Ok(());
+    }
+    let old_path = library_recovery_path(app, old_key)?;
+    if !old_path.exists() {
+        return Ok(());
+    }
+    let new_path = library_recovery_path(app, new_key)?;
+    if new_path.exists() {
+        fs::remove_file(&new_path).map_err(|error| error.to_string())?;
+    }
+    fs::rename(&old_path, &new_path).map_err(|error| error.to_string())
+}
+
+/// Moves legacy `{root}/*.md` into `content/manuscripts/`, preserving recovery sidecars.
+pub fn migrate_legacy_root_markdown(app: &AppHandle) -> Result<u32, String> {
+    let config = read_config(app)?.ok_or("Library is not configured")?;
+    let root = config.root_path;
+    let _ = ensure_project_manifest(&root)?;
+    let parent = manuscripts_dir(&root);
+    fs::create_dir_all(&parent).map_err(|error| error.to_string())?;
+
+    let entries = fs::read_dir(&root).map_err(|error| error.to_string())?;
+    let mut paths = Vec::new();
+    for entry in entries {
+        let entry = entry.map_err(|error| error.to_string())?;
+        let path = entry.path();
+        if is_root_level_markdown(&root, &path) {
+            paths.push(path);
+        }
+    }
+
+    let mut moved = 0u32;
+    for path in paths {
+        let title = title_from_path(&path);
+        let (target, new_rel) = unique_markdown_path(&root, &parent, &title)?;
+        if path == target {
+            continue;
+        }
+        fs::rename(&path, &target).map_err(|error| error.to_string())?;
+        let old_rel = path
+            .strip_prefix(&root)
+            .map_err(|error| error.to_string())?
+            .to_string_lossy()
+            .into_owned();
+        relocate_library_recovery(app, &old_rel, &new_rel)?;
+        moved += 1;
+    }
+    Ok(moved)
+}
+
 pub fn set_library_root(app: &AppHandle, root_path: String) -> Result<LibraryInfo, String> {
     let path = PathBuf::from(&root_path);
     write_config(

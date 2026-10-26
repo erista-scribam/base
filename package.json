@@ -21,6 +21,7 @@
     "format:check": "prettier --check .",
     "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm --filter @scribo/prosa build",
     "verify:rust": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo check --workspace",
+    "verify:git-spike": "cargo test -p prosa --features git-spike git_spike",
     "verify:all": "pnpm verify && pnpm verify:rust",
     "hooks:install": "sh scripts/setup-git-hooks.sh",
     "changeset": "changeset",

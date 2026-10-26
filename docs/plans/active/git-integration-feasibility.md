@@ -1,6 +1,6 @@
 # Git integration feasibility spike
 
-**Status:** Draft — **Not executed**  
+**Status:** **Executed** — see [git-spike-results.md](../../research/git-spike-results.md)  
 **Parent:** [005-project-workspace-and-git.md](./005-project-workspace-and-git.md)  
 **Spec:** [project-architecture-and-storage.md](../../specs/project-architecture-and-storage.md)
 

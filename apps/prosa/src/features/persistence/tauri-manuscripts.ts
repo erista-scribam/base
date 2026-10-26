@@ -102,6 +102,10 @@ export async function migrateLegacyManuscriptToLibrary(id: string): Promise<Load
   };
 }
 
+export async function migrateLegacyRootManuscriptsToContent(): Promise<number> {
+  return invoke<number>("migrate_legacy_root_manuscripts");
+}
+
 export async function migrateAllLegacyManuscriptsToLibrary(): Promise<number> {
   const legacy = await listLegacyInternalManuscripts();
   let migrated = 0;

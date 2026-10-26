@@ -1,4 +1,6 @@
 mod atomic_io;
+#[cfg(feature = "git-spike")]
+mod git_spike;
 mod library;
 mod persistence;
 mod project;
@@ -9,8 +11,8 @@ use library::{
     LibraryInfo, absolute_path_for_entry, clear_library_recovery, create_library_markdown,
     create_library_markdown_with_content, delete_library_manuscript, ensure_default_library,
     get_library_info, import_external_markdown, is_library_manuscript_id, library_recovery_path,
-    list_library_manuscripts, path_key_for_manuscript_id, read_library_markdown, set_library_root,
-    write_library_markdown,
+    list_library_manuscripts, migrate_legacy_root_markdown, path_key_for_manuscript_id,
+    read_library_markdown, set_library_root, write_library_markdown,
 };
 use persistence::{
     ManuscriptSummary, clear_recovery_snapshot as clear_internal_recovery_snapshot,
@@ -70,6 +72,12 @@ fn get_library(app: tauri::AppHandle) -> Result<LibraryInfo, String> {
 #[tauri::command]
 fn init_library(app: tauri::AppHandle) -> Result<LibraryInfo, String> {
     ensure_default_library(&app)
+}
+
+#[tauri::command]
+fn migrate_legacy_root_manuscripts(app: tauri::AppHandle) -> Result<u32, String> {
+    ensure_default_library(&app)?;
+    migrate_legacy_root_markdown(&app)
 }
 
 #[tauri::command]
@@ -338,7 +346,8 @@ pub fn run() {
             load_recovery_snapshot,
             clear_recovery_snapshot,
             delete_manuscript,
-            get_manuscript_disk_revision
+            get_manuscript_disk_revision,
+            migrate_legacy_root_manuscripts
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

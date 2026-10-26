@@ -32,6 +32,7 @@ import {
   isLegacyInternalManuscriptId,
   listManuscripts,
   migrateAllLegacyManuscriptsToLibrary,
+  migrateLegacyRootManuscriptsToContent,
   migrateLegacyManuscriptToLibrary,
   loadManuscript,
   getManuscriptDiskRevision,
@@ -150,9 +151,14 @@ export function App() {
         }
         setLibraryPath(library.rootPath);
         setProjectTitle(library.project?.title ?? null);
-        const migrated = await migrateAllLegacyManuscriptsToLibrary().catch(() => 0);
-        if (!cancelled && migrated > 0) {
-          setNotice(`Moved ${migrated} manuscript(s) into your library folder.`);
+        const migratedInternal = await migrateAllLegacyManuscriptsToLibrary().catch(() => 0);
+        const migratedRoot = await migrateLegacyRootManuscriptsToContent().catch(() => 0);
+        if (!cancelled && migratedInternal > 0) {
+          setNotice(`Moved ${migratedInternal} manuscript(s) into your library folder.`);
+        } else if (!cancelled && migratedRoot > 0) {
+          setNotice(
+            `Moved ${migratedRoot} manuscript(s) into content/manuscripts/ (project layout).`,
+          );
         }
         const items = await listManuscripts();
         if (!cancelled) {
