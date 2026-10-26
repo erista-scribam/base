@@ -59,6 +59,11 @@ Nontrivial features: plan in `docs/plans/active/` and get approval before large 
 
 See [MASTERPLAN.md](MASTERPLAN.md) and [docs/architecture/system-overview.md](docs/architecture/system-overview.md) for stack and layering.
 
+## Issues
+
+- **Written bypass:** [docs/issues/written/](docs/issues/written/) for maintainer batch lists.
+- **GitHub Issues:** bugs and features once the repo is public ([policy](docs/issues/github.md)).
+
 ## License
 
 Contributions are licensed under **[AGPL-3.0-or-later](LICENSE)** unless otherwise agreed in writing. See [docs/product/licensing.md](docs/product/licensing.md).

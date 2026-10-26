@@ -38,6 +38,14 @@ Start here for product and engineering knowledge. **One topic, one canonical fil
 | [architecture/implementation-audit.md](./architecture/implementation-audit.md) | Code vs target subsystems  |
 | [architecture/decisions/](./architecture/decisions/)                           | ADRs                       |
 
+## Issues
+
+| Path                                           | Purpose                                      |
+| ---------------------------------------------- | -------------------------------------------- |
+| [issues/README.md](./issues/README.md)         | Written bypass vs GitHub Issues              |
+| [issues/written/](./issues/written/)           | Maintainer batch lists                       |
+| [issues/github.md](./issues/github.md)         | GitHub Issues policy (not mirrored in docs)  |
+
 ## Specs and plans
 
 | Path                                                                   | Purpose                        |

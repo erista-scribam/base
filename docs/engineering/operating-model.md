@@ -30,6 +30,8 @@ Do **not** manufacture retroactive issues or ADRs for pre-baseline work. See [pr
 | Feature contracts           | [specs/](../specs/)                                                    |
 | Agent & contributor entry   | [AGENTS.md](../../AGENTS.md), [CONTRIBUTING.md](../../CONTRIBUTING.md) |
 | Active implementation plans | [plans/active/](../plans/active/)                                      |
+| Written issue bypass        | [issues/written/](../issues/written/)                                  |
+| GitHub coordination         | GitHub Issues ([policy](../issues/github.md))                          |
 | Opening baseline snapshot   | [project-baseline.md](./project-baseline.md)                           |
 
 ## Work lifecycle (meaningful changes)

@@ -11,7 +11,7 @@ Scribo owns the **structure** of the writing; the application owns **presentatio
 - `apps/prosa` — Tauri 2 desktop app (React + TypeScript + Vite)
 - `packages/core` — Domain IDs, metadata contracts, errors
 - `packages/document-model` — Canonical Prosa document schema and validation
-- `docs/` — [Documentation index](docs/README.md): product, engineering, architecture, specs, plans
+- `docs/` — [Documentation index](docs/README.md): product, engineering, architecture, [issues](docs/issues/README.md), specs, plans
 - `AGENTS.md` — Instructions for AI coding agents
 - `MASTERPLAN.md` — Stack, monorepo, and Prosa schema foundation
 

@@ -23,6 +23,8 @@ Scribo Prosa is a local-first Tauri desktop writing app. Follow this file before
 | `docs/engineering/`       | Operating model, baseline, release, testing  |
 | `docs/specs/`             | Behavioral contracts for risky features      |
 | `docs/plans/active/`      | Approved or in-progress implementation plans |
+| `docs/issues/written/`    | Written issue bypass lists                   |
+| GitHub Issues             | Public bugs/features — see `docs/issues/github.md` |
 
 Canonical index: [docs/README.md](docs/README.md).
 
