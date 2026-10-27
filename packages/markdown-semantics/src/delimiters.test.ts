@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { markupDelimiterRangesInLine } from "./markdown-markup-delimiters";
+import { markupDelimiterRangesInLine } from "./delimiters";
 
 function slice(text: string, ranges: Array<{ from: number; to: number }>): string[] {
   return ranges.map((r) => text.slice(r.from, r.to));
@@ -27,7 +27,6 @@ describe("markupDelimiterRangesInLine", () => {
 
   it("skips list bullet at line start", () => {
     const text = "* list item";
-    const parts = slice(text, markupDelimiterRangesInLine(text));
-    expect(parts).toEqual([]);
+    expect(slice(text, markupDelimiterRangesInLine(text))).toEqual([]);
   });
 });

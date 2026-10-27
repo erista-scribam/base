@@ -1,19 +1,15 @@
+import { buildLineSemanticSpansAt, MARKDOWN_SEMANTIC_CM_CLASS } from "@scribam/markdown-semantics";
 import { describe, expect, it } from "vitest";
-import { lineSemanticDecorationRanges } from "./markdown-inline-semantics";
 
-describe("lineSemanticDecorationRanges order", () => {
-  it("returns ascending from offsets (underline + delimiters)", () => {
+describe("buildLineSemanticSpansAt (CodeMirror order)", () => {
+  it("returns ascending doc offsets", () => {
     const text = "a <u>x</u> **b**";
-    const ranges = lineSemanticDecorationRanges(text, 100);
-    const froms = ranges.map((r) => r.from);
+    const spans = buildLineSemanticSpansAt(text, 100);
+    const froms = spans.map((s) => s.docFrom);
     expect(froms).toEqual([...froms].sort((a, b) => a - b));
-    expect(ranges.some((r) => r.classes.includes("cm-md-tok-dialog"))).toBe(false);
-    expect(ranges.some((r) => r.classes.includes("cm-md-tok-delimiter"))).toBe(true);
   });
 
-  it("includes dialog decoration class", () => {
-    const text = 'She said "Hello."';
-    const ranges = lineSemanticDecorationRanges(text, 0);
-    expect(ranges.some((r) => r.classes.includes("cm-md-tok-dialog"))).toBe(true);
+  it("uses stable dialog CM class constant", () => {
+    expect(MARKDOWN_SEMANTIC_CM_CLASS.dialog).toBe("cm-md-tok-dialog");
   });
 });

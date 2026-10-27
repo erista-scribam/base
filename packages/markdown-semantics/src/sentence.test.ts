@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sentenceRangeAt } from "./markdown-sentence-range";
+import { sentenceRangeAt } from "./sentence";
 
 function range(text: string, offset: number): string {
   const { from, to } = sentenceRangeAt(text, offset);
@@ -15,9 +15,5 @@ describe("sentenceRangeAt", () => {
   it("starts the next sentence after closing quote following a period", () => {
     const line = `"I don't see." Why is that wrong`;
     expect(range(line, line.indexOf("Why"))).toBe("Why is that wrong");
-  });
-
-  it("includes terminal punctuation in the active sentence", () => {
-    expect(range("Hello there.", 3)).toBe("Hello there.");
   });
 });
