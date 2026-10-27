@@ -26,8 +26,9 @@
   --scribam-ms-pad-y: 1.5rem;
   /** Extra scroll room below the last line so the caret is not pinned to the viewport bottom. */
   --scribam-editor-pad-bottom: max(12rem, 48vh);
-  --scribam-radius-sm: 4px;
-  --scribam-radius-md: 6px;
+  --scribam-radius-sm: 5px;
+  --scribam-radius-md: 8px;
+  --scribam-radius-segment: 7px;
 
   --scribam-font-ui:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;

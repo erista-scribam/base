@@ -21,6 +21,7 @@ import { resolveRecoveryOnOpen } from "../features/persistence/recovery-policy";
 import { useAppShortcuts } from "../hooks/useAppShortcuts";
 import { useEditorZoom } from "../hooks/useEditorZoom";
 import { useTheme } from "../hooks/useTheme";
+import { syncNativeWindowTheme } from "../features/shell/sync-native-window-theme";
 import { useViewportLayout } from "../hooks/useViewportLayout";
 import { useEditorViewMode } from "../hooks/useEditorViewMode";
 import { ask, open } from "@tauri-apps/plugin-dialog";
@@ -43,7 +44,7 @@ import {
   revealManuscriptInFileManager,
 } from "../features/persistence/tauri-manuscripts";
 import { manuscriptIdForPath } from "../features/persistence/manuscript-path-id";
-import { createProject, openProject } from "../features/projects/project-catalog";
+import { createProject, openProject, renameProject } from "../features/projects/project-catalog";
 import { isMarkdownRepoPath } from "../features/projects/manuscript-file-name";
 import { GitBranchChip } from "../components/GitBranchChip";
 import { useProjectGitStatus } from "../hooks/useProjectGitStatus";
@@ -74,6 +75,11 @@ export function App() {
   const [versionControlRefreshKey, setVersionControlRefreshKey] = useState(0);
   const [explorerRefreshKey, setExplorerRefreshKey] = useState(0);
   const { theme, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    void syncNativeWindowTheme(theme);
+  }, [theme]);
+
   const { sidebarProjectView, setSidebarProjectView, showSourceControl } = useSidebarProjectView();
   const {
     initialized: gitInitialized,
@@ -547,14 +553,34 @@ export function App() {
     [applyProjectLibrary],
   );
 
-  const handleCreateProject = useCallback(async () => {
-    if (!isTauriRuntime()) {
-      return;
-    }
-    const library = await createProject(homePath ?? "", "Untitled project");
-    await applyProjectLibrary(library);
-    setNotice(`Created project “${library.project?.title ?? "Untitled"}”.`);
-  }, [applyProjectLibrary, homePath]);
+  const handleCreateProject = useCallback(
+    async (name: string) => {
+      if (!isTauriRuntime()) {
+        return;
+      }
+      const trimmed = name.trim() || "Untitled project";
+      const library = await createProject(homePath ?? "", trimmed);
+      await applyProjectLibrary(library);
+      setNotice(`Created project “${library.project?.title ?? trimmed}”.`);
+    },
+    [applyProjectLibrary, homePath],
+  );
+
+  const handleRenameProject = useCallback(
+    async (title: string) => {
+      if (!isTauriRuntime() || !libraryPath) {
+        return;
+      }
+      const trimmed = title.trim();
+      if (!trimmed) {
+        return;
+      }
+      const library = await renameProject(trimmed);
+      setProjectTitle(library.project?.title ?? trimmed);
+      setNotice(`Renamed project to “${library.project?.title ?? trimmed}”.`);
+    },
+    [libraryPath],
+  );
 
   const handleOpenFile = useCallback(async () => {
     if (!isTauriRuntime()) {
@@ -745,7 +771,8 @@ export function App() {
           onCreateFolder={(parent, name) => void handleCreateFolder(parent, name)}
           onOpenRepoPath={handleOpenRepoPath}
           onChooseLibrary={() => void handleChooseLibrary()}
-          onCreateProject={() => void handleCreateProject()}
+          onCreateProject={(name) => void handleCreateProject(name)}
+          onRenameProject={(title) => void handleRenameProject(title)}
           onSwitchProject={(path) => void handleSwitchProject(path)}
           onRevealLibrary={handleRevealLibrary}
           onRevealManuscript={(id) => handleRevealActive(id)}

@@ -196,9 +196,8 @@ const markdownSourceEditorTheme = EditorView.theme({
   ".cm-md-line.cm-md-quote": {
     color: "var(--scribam-ui-text)",
   },
-  ".cm-md-block-marker, .cm-md-block-marker *": {
+  ".cm-md-block-marker": {
     color: "var(--scribam-ui-text) !important",
-    opacity: "1 !important",
   },
   ".cm-md-line.cm-md-list": {
     paddingLeft: "calc(var(--md-marker-ch) * var(--md-char-width, 0.6em))",

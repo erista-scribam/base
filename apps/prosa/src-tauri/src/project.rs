@@ -227,6 +227,18 @@ pub fn read_project_manifest(root: &Path) -> Result<Option<ScribamProjectManifes
     serde_json::from_str(&raw).map_err(|error| error.to_string())
 }
 
+pub fn update_project_title(root: &Path, title: &str) -> Result<ScribamProjectManifest, String> {
+    let trimmed = title.trim();
+    if trimmed.is_empty() {
+        return Err("Project title is required".into());
+    }
+    let mut manifest = read_project_manifest(root)?.ok_or("Not a project folder")?;
+    manifest.title = trimmed.to_string();
+    manifest.updated_at = Utc::now().to_rfc3339();
+    write_manifest(root, &manifest)?;
+    Ok(manifest)
+}
+
 pub fn ensure_project_manifest(root: &Path) -> Result<ScribamProjectManifest, String> {
     let manifest_path = root.join(PROJECT_MANIFEST_FILE);
     let is_new = !manifest_path.exists();

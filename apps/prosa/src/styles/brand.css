@@ -11,11 +11,10 @@
 }
 
 [data-theme="dark"] {
-  --scribam-ui-accent: #34d399;
-  --scribam-ui-accent-hover: #6ee7b7;
-  --scribam-ui-on-accent: var(--scribam-ink);
-  --scribam-ui-selected: color-mix(in srgb, var(--scribam-prosa) 22%, transparent);
-  --scribam-ui-selection-bg: color-mix(in srgb, var(--scribam-prosa) 28%, transparent);
+  /* Keep macOS-like muted chrome accent (tokens.css); avoid neon “AI green” overrides. */
+  --scribam-ui-selected: color-mix(in srgb, var(--scribam-ui-accent) 18%, transparent);
+  --scribam-ui-selection-bg: color-mix(in srgb, var(--scribam-ui-accent) 32%, transparent);
+  --scribam-md-dialog-fg: #9eb8d0;
 }
 
 .prosa-brand-bar {

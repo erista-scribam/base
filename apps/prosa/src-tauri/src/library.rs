@@ -588,6 +588,15 @@ pub fn create_project_root(
     open_project_root(app, root)
 }
 
+pub fn rename_active_project(app: &AppHandle, title: String) -> Result<LibraryInfo, String> {
+    ensure_default_library(app)?;
+    let config = ensure_config_normalized(app)?;
+    let root = config.root_path.clone();
+    crate::project::update_project_title(&root, &title)?;
+    let home = resolve_home_path(app, &config)?;
+    library_info_for_root(root, home, true)
+}
+
 pub fn list_projects(app: &AppHandle) -> Result<Vec<ProjectSummary>, String> {
     let config = ensure_config_normalized(app)?;
     let current_root = Some(config.root_path.clone());

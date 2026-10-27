@@ -6,7 +6,8 @@ export interface ProjectSwitcherProps {
   currentRootPath: string | null;
   projectTitle: string | null;
   onOpenProject: () => void;
-  onCreateProject: () => void;
+  onCreateProject: (name: string) => void;
+  onRenameProject: (title: string) => void;
   onSwitchProject: (rootPath: string) => void;
   onRevealProject: () => void;
 }
@@ -24,6 +25,7 @@ export function ProjectSwitcher({
   projectTitle,
   onOpenProject,
   onCreateProject,
+  onRenameProject,
   onSwitchProject,
   onRevealProject,
 }: ProjectSwitcherProps) {
@@ -31,6 +33,8 @@ export function ProjectSwitcher({
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
+  const [draftName, setDraftName] = useState("");
+  const [nameMode, setNameMode] = useState<"create" | "rename" | null>(null);
 
   useEffect(() => {
     if (!open) {
@@ -66,11 +70,80 @@ export function ProjectSwitcher({
     return () => document.removeEventListener("mousedown", onDoc);
   }, [open]);
 
-  if (!currentRootPath) {
-    return null;
-  }
-
   const title = projectTitle ?? "Untitled project";
+
+  const submitDraftName = () => {
+    const trimmed = draftName.trim();
+    if (!trimmed) {
+      return;
+    }
+    if (nameMode === "create") {
+      onCreateProject(trimmed);
+    } else if (nameMode === "rename") {
+      onRenameProject(trimmed);
+    }
+    setDraftName("");
+    setNameMode(null);
+    setOpen(false);
+  };
+
+  const beginNameMode = (mode: "create" | "rename") => {
+    setNameMode(mode);
+    setDraftName(mode === "rename" ? title : "Untitled project");
+  };
+
+  if (!currentRootPath) {
+    return (
+      <div className="project-switcher project-switcher-empty">
+        <div className="project-switcher-menu-actions">
+          <button type="button" className="sc-btn sc-btn-block" onClick={onOpenProject}>
+            Open project folder…
+          </button>
+          {nameMode === "create" ? (
+            <form
+              className="project-switcher-name-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                submitDraftName();
+              }}
+            >
+              <input
+                type="text"
+                className="project-tree-create-input"
+                value={draftName}
+                onChange={(event) => setDraftName(event.target.value)}
+                placeholder="Project name"
+                autoFocus
+              />
+              <div className="project-switcher-name-actions">
+                <button type="submit" className="sc-btn sc-btn-primary">
+                  Create
+                </button>
+                <button
+                  type="button"
+                  className="sc-btn"
+                  onClick={() => {
+                    setNameMode(null);
+                    setDraftName("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <button
+              type="button"
+              className="sc-btn sc-btn-block"
+              onClick={() => beginNameMode("create")}
+            >
+              New project…
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="project-switcher" ref={rootRef}>
@@ -128,12 +201,57 @@ export function ProjectSwitcher({
             )}
           </ul>
           <div className="project-switcher-menu-actions">
+            <button
+              type="button"
+              className="sc-btn sc-btn-block"
+              onClick={() => beginNameMode("rename")}
+            >
+              Rename project…
+            </button>
             <button type="button" className="sc-btn sc-btn-block" onClick={onOpenProject}>
               Open project folder…
             </button>
-            <button type="button" className="sc-btn sc-btn-block" onClick={onCreateProject}>
-              New project…
-            </button>
+            {nameMode === "create" || nameMode === "rename" ? (
+              <form
+                className="project-switcher-name-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  submitDraftName();
+                }}
+              >
+                <input
+                  type="text"
+                  className="project-tree-create-input"
+                  value={draftName}
+                  onChange={(event) => setDraftName(event.target.value)}
+                  placeholder={nameMode === "rename" ? "Project title" : "Project name"}
+                  autoFocus
+                />
+                <div className="project-switcher-name-actions">
+                  <button type="submit" className="sc-btn sc-btn-primary">
+                    {nameMode === "rename" ? "Save" : "Create"}
+                  </button>
+                  <button
+                    type="button"
+                    className="sc-btn"
+                    onClick={() => {
+                      setNameMode(null);
+                      setDraftName("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <button
+                type="button"
+                className="sc-btn sc-btn-block"
+                onClick={() => beginNameMode("create")}
+              >
+                New project…
+              </button>
+            )}
           </div>
         </div>
       ) : null}
