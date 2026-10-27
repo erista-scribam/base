@@ -4,7 +4,7 @@ import { tags as t } from "@lezer/highlight";
 import { EditorView, ViewPlugin, Decoration, type DecorationSet } from "@codemirror/view";
 import { RangeSetBuilder } from "@codemirror/state";
 import { prosaMarkdownNavigationExtensions } from "./markdown-source-arrows";
-import { prosaMarkdownEnterKeymap, prosaMarkdownShiftEnterKeymap } from "./markdown-source-enter";
+import { prosaMarkdownKeyboardExtension } from "./markdown-keyboard";
 import { markdownDialogHighlightExtension } from "./markdown-dialog-highlight";
 import { prosaMarkdownSearchExtension } from "./markdown-source-search";
 import { isSceneBreakLineRaw } from "./markdown-source-layout";
@@ -19,7 +19,14 @@ export const MARKDOWN_BODY_COLUMN_CH = MARKDOWN_MARKER_COLUMNS;
 
 type LineKind = "heading" | "quote" | "list" | "break" | "body";
 
-export function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number } {
+export type LineMarkerMeta = {
+  kind: LineKind;
+  markerCh: number;
+  /** Prefix length for syntax decorations (`#`, `>`); defaults to `markerCh`. */
+  syntaxMarkerLen?: number;
+};
+
+export function lineMarkerMeta(text: string): LineMarkerMeta {
   if (isSceneBreakLineRaw(text.trim())) {
     return { kind: "break", markerCh: 0 };
   }
@@ -29,7 +36,8 @@ export function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number
   }
   const quote = /^> ?/.exec(text);
   if (quote) {
-    return { kind: "quote", markerCh: quote[0].length };
+    // Layout column is always `> ` so consecutive quote lines align in the marker gutter.
+    return { kind: "quote", markerCh: 2, syntaxMarkerLen: quote[0].length };
   }
   const ordered = /^(\d+\.\s)/.exec(text);
   if (ordered?.[1]) {
@@ -82,12 +90,13 @@ function buildLineDecorations(view: EditorView): DecorationSet {
       }),
     );
 
+    const syntaxLen = meta.syntaxMarkerLen ?? meta.markerCh;
     if (
-      meta.markerCh > 0 &&
+      syntaxLen > 0 &&
       (meta.kind === "heading" || meta.kind === "quote") &&
-      line.from + meta.markerCh <= line.to + 1
+      line.from + syntaxLen <= line.to + 1
     ) {
-      builder.add(line.from, line.from + meta.markerCh, blockMarkerMark);
+      builder.add(line.from, line.from + syntaxLen, blockMarkerMark);
     }
   }
   return builder.finish();
@@ -209,7 +218,7 @@ const markdownScrollMargins = EditorView.scrollMargins.of((view) => ({
 
 export function markdownSourceExtensions() {
   return [
-    markdown({ base: markdownLanguage }),
+    markdown({ base: markdownLanguage, addKeymap: false }),
     markdownSourceLayoutPlugin,
     markdownSourceEditorTheme,
     markdownEditorBottomSpace,
@@ -220,7 +229,6 @@ export function markdownSourceExtensions() {
     EditorView.lineWrapping,
     ...prosaMarkdownNavigationExtensions,
     ...prosaMarkdownSearchExtension,
-    prosaMarkdownEnterKeymap,
-    prosaMarkdownShiftEnterKeymap,
+    prosaMarkdownKeyboardExtension(),
   ];
 }
