@@ -2833,9 +2833,14 @@ button.git-branch-chip:hover {
   pointer-events: none;
 }
 
-/* iA-style: `#`, `>`, `**` muted; body copy uses full theme text color */
-.markdown-source-stack .cm-md-line.cm-md-heading .tok-meta,
-.markdown-source-stack .cm-md-line.cm-md-quote .tok-meta,
+/* `#` / `>` — cm-md-block-marker decoration (beats Lezer .tok-* syntax colors) */
+.markdown-source-stack .cm-md-block-marker,
+.markdown-source-stack .cm-md-block-marker * {
+  color: var(--scribam-ui-text) !important;
+  -webkit-text-fill-color: var(--scribam-ui-text) !important;
+  opacity: 1 !important;
+}
+
 .markdown-source-stack .tok-processingInstruction {
   color: var(--scribam-md-marker);
 }

@@ -53,6 +53,8 @@ export function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number
   return { kind: "body", markerCh: 0 };
 }
 
+const blockMarkerMark = Decoration.mark({ class: "cm-md-block-marker" });
+
 function buildLineDecorations(view: EditorView): DecorationSet {
   const builder = new RangeSetBuilder<Decoration>();
   let previousKind: LineKind | null = null;
@@ -68,6 +70,7 @@ function buildLineDecorations(view: EditorView): DecorationSet {
     }
 
     previousKind = meta.kind;
+
     builder.add(
       line.from,
       line.from,
@@ -78,6 +81,14 @@ function buildLineDecorations(view: EditorView): DecorationSet {
         },
       }),
     );
+
+    if (
+      meta.markerCh > 0 &&
+      (meta.kind === "heading" || meta.kind === "quote") &&
+      line.from + meta.markerCh <= line.to + 1
+    ) {
+      builder.add(line.from, line.from + meta.markerCh, blockMarkerMark);
+    }
   }
   return builder.finish();
 }
@@ -107,7 +118,7 @@ const prosaMarkdownHighlight = HighlightStyle.define([
   { tag: t.emphasis, fontStyle: "italic", color: "var(--scribam-ui-text)" },
   { tag: t.link, color: "var(--scribam-md-marker)" },
   { tag: t.url, color: "var(--scribam-md-marker)" },
-  { tag: t.quote, color: "var(--scribam-md-marker)" },
+  { tag: t.quote, color: "var(--scribam-ui-text)" },
   { tag: t.monospace, color: "var(--scribam-md-marker)" },
   { tag: t.meta, color: "var(--scribam-md-marker)" },
   { tag: t.contentSeparator, color: "var(--scribam-md-marker)" },
@@ -172,6 +183,13 @@ const markdownSourceEditorTheme = EditorView.theme({
   },
   ".cm-md-line.cm-md-heading, .cm-md-line.cm-md-quote": {
     textIndent: "calc(-1 * var(--md-marker-ch) * var(--md-char-width, 0.6em))",
+  },
+  ".cm-md-line.cm-md-quote": {
+    color: "var(--scribam-ui-text)",
+  },
+  ".cm-md-block-marker, .cm-md-block-marker *": {
+    color: "var(--scribam-ui-text) !important",
+    opacity: "1 !important",
   },
   ".cm-md-line.cm-md-list": {
     paddingLeft: "calc(var(--md-marker-ch) * var(--md-char-width, 0.6em))",
