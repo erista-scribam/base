@@ -29,7 +29,8 @@ export interface ManuscriptNavProps {
   onCreateFolder: (parentRelative: string | null, folderName: string) => void;
   onOpenRepoPath: (relativePath: string) => void;
   onChooseLibrary: () => void;
-  onCreateProject: () => void;
+  onCreateProject: (name: string) => void;
+  onRenameProject: (title: string) => void;
   onSwitchProject: (rootPath: string) => void;
   onRevealLibrary: () => void;
   onRevealManuscript: (id: string) => void;
@@ -60,6 +61,7 @@ export function ManuscriptNav({
   onOpenRepoPath,
   onChooseLibrary,
   onCreateProject,
+  onRenameProject,
   onSwitchProject,
   onRevealLibrary,
   onRevealManuscript,
@@ -99,6 +101,7 @@ export function ManuscriptNav({
           projectTitle={projectTitle}
           onOpenProject={onChooseLibrary}
           onCreateProject={onCreateProject}
+          onRenameProject={onRenameProject}
           onSwitchProject={onSwitchProject}
           onRevealProject={onRevealLibrary}
         />
@@ -152,9 +155,18 @@ export function ManuscriptNav({
       ) : (
         <div className="sidebar-project-placeholder">
           <p>Open or create a project to browse manuscripts and source control.</p>
-          <button type="button" className="sc-btn sc-btn-primary" onClick={onChooseLibrary}>
-            Open project…
-          </button>
+          <div className="sidebar-project-placeholder-actions">
+            <button type="button" className="sc-btn sc-btn-primary" onClick={onChooseLibrary}>
+              Open project…
+            </button>
+            <button
+              type="button"
+              className="sc-btn"
+              onClick={() => onCreateProject("Untitled project")}
+            >
+              New project…
+            </button>
+          </div>
         </div>
       )}
     </aside>

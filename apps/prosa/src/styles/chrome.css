@@ -45,12 +45,8 @@
 .sidebar-workspace {
   flex-shrink: 0;
   padding: var(--scribam-space-3);
-  background: color-mix(in srgb, var(--scribam-ui-canvas) 55%, var(--scribam-ui-surface));
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--scribam-ui-text) 12%, var(--scribam-ui-border-subtle));
-  box-shadow:
-    inset 0 -1px 0 color-mix(in srgb, var(--scribam-ui-text) 6%, transparent),
-    0 1px 0 color-mix(in srgb, var(--scribam-ui-bg) 80%, transparent);
+  background: var(--scribam-ui-surface);
+  border-bottom: 1px solid var(--scribam-ui-border-subtle);
 }
 
 .sidebar-zone-header {
@@ -64,9 +60,8 @@
 .sidebar-zone-label {
   font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--scribam-ui-muted);
+  letter-spacing: -0.01em;
+  color: var(--scribam-ui-text-secondary);
 }
 
 .sidebar-zone-hint {
@@ -101,9 +96,8 @@
   width: 100%;
   min-height: 2.125rem;
   padding: 0 var(--scribam-space-1);
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--scribam-ui-text) 12%, var(--scribam-ui-border-subtle));
-  background: color-mix(in srgb, var(--scribam-ui-canvas) 55%, var(--scribam-ui-surface));
+  border-bottom: 1px solid var(--scribam-ui-border-subtle);
+  background: var(--scribam-ui-surface);
 }
 
 .sidebar-activity-btn {
@@ -129,9 +123,8 @@
 
 .sidebar-activity-btn[data-active="true"] {
   color: var(--scribam-ui-text);
-  background: color-mix(in srgb, var(--scribam-ui-selected) 90%, var(--scribam-ui-surface));
-  box-shadow: inset 0 -2px 0 var(--scribam-ui-accent, #3b82f6);
-  border-radius: var(--scribam-radius-sm) var(--scribam-radius-sm) 0 0;
+  background: var(--scribam-ui-selected);
+  border-radius: var(--scribam-radius-sm);
 }
 
 .sidebar-activity-btn .sidebar-activity-icon {
@@ -150,8 +143,8 @@
   min-width: 0.875rem;
   padding: 0 0.2rem;
   border-radius: 999px;
-  background: var(--scribam-ui-accent, #3b82f6);
-  color: #fff;
+  background: var(--scribam-ui-accent);
+  color: var(--scribam-ui-on-accent);
   font-size: 0.5625rem;
   font-weight: 700;
   line-height: 0.875rem;
@@ -765,6 +758,31 @@ button.git-branch-chip:hover {
   font-size: 0.8125rem;
   color: var(--scribam-ui-muted);
   line-height: 1.45;
+}
+
+.sidebar-project-placeholder-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--scribam-space-2);
+  width: 100%;
+}
+
+.project-switcher-empty {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.project-switcher-name-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--scribam-space-2);
+  width: 100%;
+}
+
+.project-switcher-name-actions {
+  display: flex;
+  gap: var(--scribam-space-2);
 }
 
 .app-sidebar-header {
@@ -2068,9 +2086,8 @@ button.git-branch-chip:hover {
 }
 
 .editor-chrome[data-mode="minimalist"] {
-  border-bottom: 2px solid
-    color-mix(in srgb, var(--scribam-ui-accent) 55%, var(--scribam-ui-border));
-  background: color-mix(in srgb, var(--scribam-md-source-bg) 35%, var(--scribam-ui-bg));
+  border-bottom: 1px solid var(--scribam-ui-border-subtle);
+  background: var(--scribam-ui-bg);
 }
 
 .editor-chrome[data-mode="minimalist"] .editor-title {
@@ -2084,33 +2101,32 @@ button.git-branch-chip:hover {
   flex-shrink: 0;
   padding: 2px;
   border: 1px solid var(--scribam-ui-border-subtle);
-  border-radius: var(--scribam-radius-sm);
-  background: color-mix(in srgb, var(--scribam-ui-surface) 80%, transparent);
+  border-radius: var(--scribam-radius-segment);
+  background: color-mix(in srgb, var(--scribam-ui-text) 4%, var(--scribam-ui-surface));
 }
 
 .editor-mode-switch-btn {
-  padding: var(--scribam-space-1) var(--scribam-space-3);
+  padding: 0.2rem 0.65rem;
   border: none;
-  border-radius: calc(var(--scribam-radius-sm) - 2px);
+  border-radius: calc(var(--scribam-radius-segment) - 2px);
   background: transparent;
   font-family: var(--scribam-font-ui);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--scribam-ui-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--scribam-ui-text-secondary);
   cursor: pointer;
 }
 
 .editor-mode-switch-btn[data-active="true"] {
   background: var(--scribam-ui-canvas);
   color: var(--scribam-ui-text);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--scribam-ui-text) 8%, transparent);
+  box-shadow: 0 0.5px 1px color-mix(in srgb, var(--scribam-ui-text) 10%, transparent);
 }
 
 .editor-chrome[data-mode="minimalist"] .editor-mode-switch-btn[data-active="true"] {
-  background: var(--scribam-md-source-bg);
-  color: var(--scribam-ui-accent);
+  background: var(--scribam-ui-canvas);
+  color: var(--scribam-ui-text);
 }
 
 .editor-zoom {
@@ -2223,9 +2239,8 @@ button.git-branch-chip:hover {
   gap: var(--scribam-space-1);
   min-height: var(--scribam-format-bar-height);
   padding: var(--scribam-space-2) var(--scribam-space-4);
-  border-top: 1px solid var(--scribam-ui-border);
-  background: color-mix(in srgb, var(--scribam-ui-surface) 88%, var(--scribam-ui-bg));
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--scribam-ui-text) 5%, transparent);
+  border-top: 1px solid var(--scribam-ui-border-subtle);
+  background: var(--scribam-ui-bg);
 }
 
 .format-bar-group {
@@ -2239,8 +2254,8 @@ button.git-branch-chip:hover {
 }
 
 .editor-chrome[data-mode="minimalist"] .format-bar-reference {
-  background: color-mix(in srgb, var(--scribam-md-source-bg) 65%, var(--scribam-ui-bg));
-  border-top-color: color-mix(in srgb, var(--scribam-ui-accent) 25%, var(--scribam-ui-border));
+  background: var(--scribam-ui-bg);
+  border-top-color: var(--scribam-ui-border-subtle);
 }
 
 .format-bar-hint {
@@ -2302,8 +2317,8 @@ button.git-branch-chip:hover {
 
 .format-bar .icon-btn[data-active="true"] {
   background: var(--scribam-ui-selected);
-  border-color: color-mix(in srgb, var(--scribam-ui-accent) 40%, var(--scribam-ui-border));
-  color: var(--scribam-ui-accent);
+  border-color: var(--scribam-ui-border-subtle);
+  color: var(--scribam-ui-text);
 }
 
 .icon-btn {
@@ -2833,13 +2848,6 @@ button.git-branch-chip:hover {
   pointer-events: none;
 }
 
-/* iA-style: `#`, `>`, `**` muted; body copy uses full theme text color */
-.markdown-source-stack .cm-md-line.cm-md-heading .tok-meta,
-.markdown-source-stack .cm-md-line.cm-md-quote .tok-meta,
-.markdown-source-stack .tok-processingInstruction {
-  color: var(--scribam-md-marker);
-}
-
 /* Prosa markdown: one source line = one paragraph (Enter creates a new line) */
 /* Use padding (not margin) so CodeMirror vertical arrow keys see one row per source line. */
 .markdown-source-stack .cm-line.cm-md-paragraph {
@@ -2872,19 +2880,6 @@ button.git-branch-chip:hover {
   color: var(--scribam-scene-break-fg);
   padding-top: var(--ms-scene-break-gap, 1.75rem);
   padding-bottom: var(--ms-scene-break-gap, 1.75rem);
-}
-
-/* Scene breaks are plain text; keep asterisks one color (not emphasis markup). */
-.markdown-source-stack .cm-line.cm-md-break span {
-  color: inherit !important;
-  font-weight: inherit !important;
-  font-style: normal !important;
-}
-
-/* Dialog in straight or curly double quotes — subtle accent text, not a highlight band */
-.markdown-source-stack .cm-content span.cm-md-dialog,
-.markdown-source-stack .cm-content span.cm-md-dialog span {
-  color: var(--scribam-md-dialog-fg) !important;
 }
 
 .editor-split-source:focus-within {

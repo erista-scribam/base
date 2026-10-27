@@ -21,7 +21,7 @@ use library::{
     import_external_markdown, init_library as init_library_impl, is_library_manuscript_id,
     library_recovery_path, list_library_manuscripts, list_project_entries, list_projects,
     migrate_legacy_root_markdown, open_project_root, path_key_for_manuscript_id,
-    read_library_markdown, set_library_root, write_library_markdown,
+    read_library_markdown, rename_active_project, set_library_root, write_library_markdown,
 };
 use persistence::{
     ManuscriptSummary, clear_recovery_snapshot as clear_internal_recovery_snapshot,
@@ -224,6 +224,11 @@ fn create_project(
     name: String,
 ) -> Result<LibraryInfo, String> {
     create_project_root(&app, parent_path, name)
+}
+
+#[tauri::command]
+fn rename_project(app: tauri::AppHandle, title: String) -> Result<LibraryInfo, String> {
+    rename_active_project(&app, title)
 }
 
 #[tauri::command]
@@ -496,6 +501,7 @@ pub fn run() {
             list_projects_catalog,
             open_project,
             create_project,
+            rename_project,
             list_project_tree,
             create_project_folder_entry,
             create_manuscript,

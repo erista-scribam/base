@@ -15,3 +15,7 @@ export async function openProject(rootPath: string): Promise<LibraryInfo> {
 export async function createProject(parentPath: string, name: string): Promise<LibraryInfo> {
   return invoke<LibraryInfo>("create_project", { parentPath, name });
 }
+
+export async function renameProject(title: string): Promise<LibraryInfo> {
+  return invoke<LibraryInfo>("rename_project", { title });
+}

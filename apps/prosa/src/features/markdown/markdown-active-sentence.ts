@@ -6,41 +6,9 @@ import {
   type DecorationSet,
   type ViewUpdate,
 } from "@codemirror/view";
+import { sentenceRangeAt } from "./markdown-sentence-range";
 
 const activeSentenceMark = Decoration.mark({ class: "cm-md-active-sentence" });
-
-function sentenceRangeAt(text: string, offset: number): { from: number; to: number } {
-  const clamped = Math.max(0, Math.min(offset, text.length));
-  let from = clamped;
-  let to = clamped;
-
-  while (from > 0) {
-    const ch = text[from - 1];
-    if (ch === "\n" || ch === "." || ch === "!" || ch === "?") {
-      break;
-    }
-    from -= 1;
-  }
-  while (from < text.length && /\s/u.test(text[from] ?? "")) {
-    from += 1;
-  }
-
-  while (to < text.length) {
-    const ch = text[to];
-    if (ch === "\n" || ch === "." || ch === "!" || ch === "?") {
-      if (ch !== "\n") {
-        to += 1;
-      }
-      break;
-    }
-    to += 1;
-  }
-
-  if (to <= from) {
-    return { from: clamped, to: Math.min(text.length, clamped + 1) };
-  }
-  return { from, to };
-}
 
 function buildActiveSentenceDecorations(view: EditorView): DecorationSet {
   const builder = new RangeSetBuilder<Decoration>();

@@ -26,8 +26,9 @@
   --scribam-ms-pad-y: 1.5rem;
   /** Extra scroll room below the last line so the caret is not pinned to the viewport bottom. */
   --scribam-editor-pad-bottom: max(12rem, 48vh);
-  --scribam-radius-sm: 4px;
-  --scribam-radius-md: 6px;
+  --scribam-radius-sm: 5px;
+  --scribam-radius-md: 8px;
+  --scribam-radius-segment: 7px;
 
   --scribam-font-ui:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
@@ -69,9 +70,33 @@
 
   --scribam-ui-focus-ring: 0 0 0 2px var(--scribam-ui-bg), 0 0 0 4px var(--scribam-ui-accent);
 
-  /* Markdown source (iA-style: body text full contrast, markers subdued) */
-  --scribam-md-marker: #9a9488;
+  /*
+   * Markdown source semantics — see docs/specs/markdown-source-semantics.md
+   * Dialog: fixed hex only (never mix with --scribam-ui-accent / brand).
+   */
   --scribam-md-dialog-fg: #4d6578;
+  --scribam-md-inline-markup-fg: #c9c5bc;
+  --scribam-md-inline-strong-fg: var(--scribam-ui-text);
+  --scribam-md-inline-emphasis-fg: var(--scribam-ui-text);
+  --scribam-md-inline-strike-fg: color-mix(
+    in srgb,
+    var(--scribam-ui-text) 82%,
+    var(--scribam-ui-muted)
+  );
+  --scribam-md-inline-underline-fg: var(--scribam-ui-text);
+  --scribam-md-inline-quote-fg: color-mix(
+    in srgb,
+    var(--scribam-ui-text) 92%,
+    var(--scribam-ui-muted)
+  );
+  --scribam-md-inline-code-fg: color-mix(
+    in srgb,
+    var(--scribam-ui-text) 88%,
+    var(--scribam-ui-muted)
+  );
+  --scribam-md-inline-link-fg: color-mix(in srgb, var(--scribam-ui-text) 88%, #3d5266);
+  /* @deprecated use --scribam-md-inline-markup-fg */
+  --scribam-md-marker: var(--scribam-md-inline-markup-fg);
   --scribam-scene-break-fg: #8a847a;
   --scribam-md-source-bg: var(--scribam-ui-surface);
 }
@@ -106,8 +131,28 @@
 
   --scribam-ui-focus-ring: 0 0 0 2px var(--scribam-ui-bg), 0 0 0 4px var(--scribam-ui-accent);
 
-  --scribam-md-marker: #6f6a61;
   --scribam-md-dialog-fg: #9eb8d0;
+  --scribam-md-inline-markup-fg: #5e5a52;
+  --scribam-md-inline-strong-fg: var(--scribam-ui-text);
+  --scribam-md-inline-emphasis-fg: var(--scribam-ui-text);
+  --scribam-md-inline-strike-fg: color-mix(
+    in srgb,
+    var(--scribam-ui-text) 75%,
+    var(--scribam-ui-muted)
+  );
+  --scribam-md-inline-underline-fg: color-mix(
+    in srgb,
+    var(--scribam-ui-text) 88%,
+    var(--scribam-ui-muted)
+  );
+  --scribam-md-inline-quote-fg: color-mix(
+    in srgb,
+    var(--scribam-ui-text) 86%,
+    var(--scribam-ui-muted)
+  );
+  --scribam-md-inline-code-fg: color-mix(in srgb, var(--scribam-ui-text) 84%, #c4a882);
+  --scribam-md-inline-link-fg: color-mix(in srgb, var(--scribam-ui-text) 80%, #9eb8d0);
+  --scribam-md-marker: var(--scribam-md-inline-markup-fg);
   --scribam-scene-break-fg: #a8a299;
   --scribam-md-source-bg: var(--scribam-ui-surface);
 }

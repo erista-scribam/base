@@ -4,8 +4,10 @@ import { tags as t } from "@lezer/highlight";
 import { EditorView, ViewPlugin, Decoration, type DecorationSet } from "@codemirror/view";
 import { RangeSetBuilder } from "@codemirror/state";
 import { prosaMarkdownNavigationExtensions } from "./markdown-source-arrows";
-import { prosaMarkdownEnterKeymap, prosaMarkdownShiftEnterKeymap } from "./markdown-source-enter";
-import { markdownDialogHighlightExtension } from "./markdown-dialog-highlight";
+import { prosaMarkdownKeyboardExtension } from "./markdown-keyboard";
+import { markdownInlineSemanticsExtension } from "./markdown-inline-semantics";
+
+/** @see docs/specs/markdown-source-semantics.md — do not restyle dialog in layout theme */
 import { prosaMarkdownSearchExtension } from "./markdown-source-search";
 import { isSceneBreakLineRaw } from "./markdown-source-layout";
 import { markdownEditorBottomSpace } from "./markdown-editor-bottom-space";
@@ -19,7 +21,14 @@ export const MARKDOWN_BODY_COLUMN_CH = MARKDOWN_MARKER_COLUMNS;
 
 type LineKind = "heading" | "quote" | "list" | "break" | "body";
 
-export function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number } {
+export type LineMarkerMeta = {
+  kind: LineKind;
+  markerCh: number;
+  /** Prefix length for syntax decorations (`#`, `>`); defaults to `markerCh`. */
+  syntaxMarkerLen?: number;
+};
+
+export function lineMarkerMeta(text: string): LineMarkerMeta {
   if (isSceneBreakLineRaw(text.trim())) {
     return { kind: "break", markerCh: 0 };
   }
@@ -29,7 +38,8 @@ export function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number
   }
   const quote = /^> ?/.exec(text);
   if (quote) {
-    return { kind: "quote", markerCh: quote[0].length };
+    // Layout column is always `> ` so consecutive quote lines align in the marker gutter.
+    return { kind: "quote", markerCh: 2, syntaxMarkerLen: quote[0].length };
   }
   const ordered = /^(\d+\.\s)/.exec(text);
   if (ordered?.[1]) {
@@ -53,6 +63,8 @@ export function lineMarkerMeta(text: string): { kind: LineKind; markerCh: number
   return { kind: "body", markerCh: 0 };
 }
 
+const blockMarkerMark = Decoration.mark({ class: "cm-md-block-marker" });
+
 function buildLineDecorations(view: EditorView): DecorationSet {
   const builder = new RangeSetBuilder<Decoration>();
   let previousKind: LineKind | null = null;
@@ -68,6 +80,7 @@ function buildLineDecorations(view: EditorView): DecorationSet {
     }
 
     previousKind = meta.kind;
+
     builder.add(
       line.from,
       line.from,
@@ -78,6 +91,15 @@ function buildLineDecorations(view: EditorView): DecorationSet {
         },
       }),
     );
+
+    const syntaxLen = meta.syntaxMarkerLen ?? meta.markerCh;
+    if (
+      syntaxLen > 0 &&
+      (meta.kind === "heading" || meta.kind === "quote") &&
+      line.from + syntaxLen <= line.to + 1
+    ) {
+      builder.add(line.from, line.from + syntaxLen, blockMarkerMark);
+    }
   }
   return builder.finish();
 }
@@ -102,17 +124,18 @@ const markdownSourceLayoutPlugin = ViewPlugin.fromClass(
 );
 
 const prosaMarkdownHighlight = HighlightStyle.define([
-  { tag: t.heading, color: "var(--scribam-ui-text)", fontWeight: "600" },
-  { tag: t.strong, fontWeight: "600", color: "var(--scribam-ui-text)" },
-  { tag: t.emphasis, fontStyle: "italic", color: "var(--scribam-ui-text)" },
-  { tag: t.link, color: "var(--scribam-md-marker)" },
-  { tag: t.url, color: "var(--scribam-md-marker)" },
-  { tag: t.quote, color: "var(--scribam-md-marker)" },
-  { tag: t.monospace, color: "var(--scribam-md-marker)" },
-  { tag: t.meta, color: "var(--scribam-md-marker)" },
-  { tag: t.contentSeparator, color: "var(--scribam-md-marker)" },
-  { tag: t.processingInstruction, color: "var(--scribam-md-marker)" },
-  { tag: t.comment, color: "var(--scribam-md-marker)" },
+  { tag: t.heading, class: "cm-md-tok-heading" },
+  { tag: t.strong, class: "cm-md-tok-strong" },
+  { tag: t.emphasis, class: "cm-md-tok-emphasis" },
+  { tag: t.strikethrough, class: "cm-md-tok-strike" },
+  { tag: t.link, class: "cm-md-tok-link" },
+  { tag: t.url, class: "cm-md-tok-link" },
+  { tag: t.quote, class: "cm-md-tok-inline-quote" },
+  { tag: t.monospace, class: "cm-md-tok-code" },
+  { tag: t.meta, class: "cm-md-tok-markup" },
+  { tag: t.contentSeparator, class: "cm-md-tok-markup" },
+  { tag: t.processingInstruction, class: "cm-md-tok-markup" },
+  { tag: t.comment, class: "cm-md-tok-markup" },
 ]);
 
 const markdownSourceEditorTheme = EditorView.theme({
@@ -164,14 +187,17 @@ const markdownSourceEditorTheme = EditorView.theme({
     backgroundColor: "color-mix(in srgb, var(--scribam-ui-accent) 14%, transparent)",
     borderRadius: "2px",
   },
-  ".cm-md-dialog": {
-    color: "var(--scribam-md-dialog-fg)",
-  },
   ".cm-md-line": {
     paddingLeft: "var(--md-marker-width, calc(6 * 0.6em))",
   },
   ".cm-md-line.cm-md-heading, .cm-md-line.cm-md-quote": {
     textIndent: "calc(-1 * var(--md-marker-ch) * var(--md-char-width, 0.6em))",
+  },
+  ".cm-md-line.cm-md-quote": {
+    color: "var(--scribam-md-inline-quote-fg)",
+  },
+  ".cm-md-block-marker": {
+    color: "var(--scribam-ui-text) !important",
   },
   ".cm-md-line.cm-md-list": {
     paddingLeft: "calc(var(--md-marker-ch) * var(--md-char-width, 0.6em))",
@@ -191,18 +217,17 @@ const markdownScrollMargins = EditorView.scrollMargins.of((view) => ({
 
 export function markdownSourceExtensions() {
   return [
-    markdown({ base: markdownLanguage }),
+    markdown({ base: markdownLanguage, addKeymap: false }),
     markdownSourceLayoutPlugin,
     markdownSourceEditorTheme,
     markdownEditorBottomSpace,
     markdownActiveSentenceExtension,
     markdownScrollMargins,
     syntaxHighlighting(prosaMarkdownHighlight, { fallback: true }),
-    markdownDialogHighlightExtension,
+    markdownInlineSemanticsExtension,
     EditorView.lineWrapping,
     ...prosaMarkdownNavigationExtensions,
     ...prosaMarkdownSearchExtension,
-    prosaMarkdownEnterKeymap,
-    prosaMarkdownShiftEnterKeymap,
+    prosaMarkdownKeyboardExtension(),
   ];
 }
