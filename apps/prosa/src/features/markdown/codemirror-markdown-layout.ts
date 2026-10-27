@@ -5,7 +5,7 @@ import { EditorView, ViewPlugin, Decoration, type DecorationSet } from "@codemir
 import { RangeSetBuilder } from "@codemirror/state";
 import { prosaMarkdownNavigationExtensions } from "./markdown-source-arrows";
 import { prosaMarkdownKeyboardExtension } from "./markdown-keyboard";
-import { markdownDialogHighlightExtension } from "./markdown-dialog-highlight";
+import { markdownInlineSemanticsExtension } from "./markdown-inline-semantics";
 import { prosaMarkdownSearchExtension } from "./markdown-source-search";
 import { isSceneBreakLineRaw } from "./markdown-source-layout";
 import { markdownEditorBottomSpace } from "./markdown-editor-bottom-space";
@@ -122,17 +122,18 @@ const markdownSourceLayoutPlugin = ViewPlugin.fromClass(
 );
 
 const prosaMarkdownHighlight = HighlightStyle.define([
-  { tag: t.heading, color: "var(--scribam-ui-text)", fontWeight: "600" },
-  { tag: t.strong, fontWeight: "600", color: "var(--scribam-ui-text)" },
-  { tag: t.emphasis, fontStyle: "italic", color: "var(--scribam-ui-text)" },
-  { tag: t.link, color: "var(--scribam-md-marker)" },
-  { tag: t.url, color: "var(--scribam-md-marker)" },
-  { tag: t.quote, color: "var(--scribam-ui-text)" },
-  { tag: t.monospace, color: "var(--scribam-md-marker)" },
-  { tag: t.meta, color: "var(--scribam-md-marker)" },
-  { tag: t.contentSeparator, color: "var(--scribam-md-marker)" },
-  { tag: t.processingInstruction, color: "var(--scribam-md-marker)" },
-  { tag: t.comment, color: "var(--scribam-md-marker)" },
+  { tag: t.heading, class: "cm-md-tok-heading" },
+  { tag: t.strong, class: "cm-md-tok-strong" },
+  { tag: t.emphasis, class: "cm-md-tok-emphasis" },
+  { tag: t.strikethrough, class: "cm-md-tok-strike" },
+  { tag: t.link, class: "cm-md-tok-link" },
+  { tag: t.url, class: "cm-md-tok-link" },
+  { tag: t.quote, class: "cm-md-tok-inline-quote" },
+  { tag: t.monospace, class: "cm-md-tok-code" },
+  { tag: t.meta, class: "cm-md-tok-markup" },
+  { tag: t.contentSeparator, class: "cm-md-tok-markup" },
+  { tag: t.processingInstruction, class: "cm-md-tok-markup" },
+  { tag: t.comment, class: "cm-md-tok-markup" },
 ]);
 
 const markdownSourceEditorTheme = EditorView.theme({
@@ -184,9 +185,6 @@ const markdownSourceEditorTheme = EditorView.theme({
     backgroundColor: "color-mix(in srgb, var(--scribam-ui-accent) 14%, transparent)",
     borderRadius: "2px",
   },
-  ".cm-md-dialog": {
-    color: "var(--scribam-md-dialog-fg)",
-  },
   ".cm-md-line": {
     paddingLeft: "var(--md-marker-width, calc(6 * 0.6em))",
   },
@@ -194,7 +192,7 @@ const markdownSourceEditorTheme = EditorView.theme({
     textIndent: "calc(-1 * var(--md-marker-ch) * var(--md-char-width, 0.6em))",
   },
   ".cm-md-line.cm-md-quote": {
-    color: "var(--scribam-ui-text)",
+    color: "var(--scribam-md-quote-fg)",
   },
   ".cm-md-block-marker": {
     color: "var(--scribam-ui-text) !important",
@@ -224,7 +222,7 @@ export function markdownSourceExtensions() {
     markdownActiveSentenceExtension,
     markdownScrollMargins,
     syntaxHighlighting(prosaMarkdownHighlight, { fallback: true }),
-    markdownDialogHighlightExtension,
+    markdownInlineSemanticsExtension,
     EditorView.lineWrapping,
     ...prosaMarkdownNavigationExtensions,
     ...prosaMarkdownSearchExtension,

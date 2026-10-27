@@ -70,9 +70,16 @@
 
   --scribam-ui-focus-ring: 0 0 0 2px var(--scribam-ui-bg), 0 0 0 4px var(--scribam-ui-accent);
 
-  /* Markdown source (iA-style: body text full contrast, markers subdued) */
+  /* Markdown source: body = default text; semantics = code-editor-style token colors */
   --scribam-md-marker: #9a9488;
-  --scribam-md-dialog-fg: #4d6578;
+  --scribam-md-strong-fg: #5c4a38;
+  --scribam-md-emphasis-fg: #2f5c4a;
+  --scribam-md-strike-fg: #8a847a;
+  --scribam-md-underline-fg: #3d5266;
+  --scribam-md-quote-fg: #4a4844;
+  --scribam-md-code-fg: #6b5344;
+  --scribam-md-link-fg: #3d5266;
+  --scribam-md-dialog-fg: #2a5070;
   --scribam-scene-break-fg: #8a847a;
   --scribam-md-source-bg: var(--scribam-ui-surface);
 }
@@ -108,7 +115,14 @@
   --scribam-ui-focus-ring: 0 0 0 2px var(--scribam-ui-bg), 0 0 0 4px var(--scribam-ui-accent);
 
   --scribam-md-marker: #8a857c;
-  --scribam-md-dialog-fg: #9eb8d0;
+  --scribam-md-strong-fg: #d4b896;
+  --scribam-md-emphasis-fg: #8fbfb0;
+  --scribam-md-strike-fg: #8a857c;
+  --scribam-md-underline-fg: #9eb8d0;
+  --scribam-md-quote-fg: #b5b0a6;
+  --scribam-md-code-fg: #c4a882;
+  --scribam-md-link-fg: #9eb8d0;
+  --scribam-md-dialog-fg: #a8c8e8;
   --scribam-scene-break-fg: #a8a299;
   --scribam-md-source-bg: var(--scribam-ui-surface);
 }

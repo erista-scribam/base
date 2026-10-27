@@ -2854,8 +2854,54 @@ button.git-branch-chip:hover {
   -webkit-text-fill-color: var(--scribam-ui-text) !important;
 }
 
-.markdown-source-stack .tok-processingInstruction {
+/* Lezer markdown syntax tokens (bold, italic, markup delimiters, etc.) */
+.markdown-source-stack .cm-md-tok-heading,
+.markdown-source-stack .tok-heading {
+  color: var(--scribam-ui-text);
+  font-weight: 600;
+}
+
+.markdown-source-stack .cm-md-tok-strong,
+.markdown-source-stack .tok-strong {
+  color: var(--scribam-md-strong-fg);
+  font-weight: 600;
+}
+
+.markdown-source-stack .cm-md-tok-emphasis,
+.markdown-source-stack .tok-emphasis {
+  color: var(--scribam-md-emphasis-fg);
+  font-style: italic;
+}
+
+.markdown-source-stack .cm-md-tok-strike,
+.markdown-source-stack .tok-strikethrough {
+  color: var(--scribam-md-strike-fg);
+  text-decoration: line-through;
+}
+
+.markdown-source-stack .cm-md-tok-code,
+.markdown-source-stack .tok-monospace {
+  color: var(--scribam-md-code-fg);
+}
+
+.markdown-source-stack .cm-md-tok-link,
+.markdown-source-stack .tok-link,
+.markdown-source-stack .tok-url {
+  color: var(--scribam-md-link-fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.markdown-source-stack .cm-md-tok-markup,
+.markdown-source-stack .tok-processingInstruction,
+.markdown-source-stack .tok-meta,
+.markdown-source-stack .tok-comment {
   color: var(--scribam-md-marker);
+}
+
+.markdown-source-stack .cm-md-tok-inline-quote,
+.markdown-source-stack .tok-quote {
+  color: var(--scribam-md-quote-fg);
 }
 
 /* Prosa markdown: one source line = one paragraph (Enter creates a new line) */
@@ -2899,13 +2945,19 @@ button.git-branch-chip:hover {
   font-style: normal !important;
 }
 
-/* Dialog in straight or curly double quotes — subtle accent text, not a highlight band */
-.markdown-source-stack .cm-content span.cm-md-dialog,
-.markdown-source-stack .cm-content span.cm-md-dialog span,
-.markdown-source-stack .cm-md-active-sentence span.cm-md-dialog,
-.markdown-source-stack .cm-md-active-sentence span.cm-md-dialog span {
+/* Dialog `"…"` / “…” — distinct token color (not the active-sentence band) */
+.markdown-source-stack .cm-content span.cm-md-tok-dialog,
+.markdown-source-stack .cm-content span.cm-md-tok-dialog span,
+.markdown-source-stack .cm-md-active-sentence span.cm-md-tok-dialog,
+.markdown-source-stack .cm-md-active-sentence span.cm-md-tok-dialog span {
   color: var(--scribam-md-dialog-fg) !important;
   -webkit-text-fill-color: var(--scribam-md-dialog-fg) !important;
+}
+
+.markdown-source-stack .cm-md-tok-underline {
+  color: var(--scribam-md-underline-fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .editor-split-source:focus-within {
