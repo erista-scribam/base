@@ -6,6 +6,8 @@ import { RangeSetBuilder } from "@codemirror/state";
 import { prosaMarkdownNavigationExtensions } from "./markdown-source-arrows";
 import { prosaMarkdownKeyboardExtension } from "./markdown-keyboard";
 import { markdownInlineSemanticsExtension } from "./markdown-inline-semantics";
+
+/** @see docs/specs/markdown-source-semantics.md — do not restyle dialog in layout theme */
 import { prosaMarkdownSearchExtension } from "./markdown-source-search";
 import { isSceneBreakLineRaw } from "./markdown-source-layout";
 import { markdownEditorBottomSpace } from "./markdown-editor-bottom-space";
@@ -192,7 +194,7 @@ const markdownSourceEditorTheme = EditorView.theme({
     textIndent: "calc(-1 * var(--md-marker-ch) * var(--md-char-width, 0.6em))",
   },
   ".cm-md-line.cm-md-quote": {
-    color: "var(--scribam-md-quote-fg)",
+    color: "var(--scribam-md-inline-quote-fg)",
   },
   ".cm-md-block-marker": {
     color: "var(--scribam-ui-text) !important",

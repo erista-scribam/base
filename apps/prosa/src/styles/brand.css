@@ -7,14 +7,12 @@
   --scribam-ui-on-accent: var(--scribam-paper);
   --scribam-ui-selected: color-mix(in srgb, var(--scribam-prosa) 14%, transparent);
   --scribam-ui-selection-bg: color-mix(in srgb, var(--scribam-prosa) 22%, transparent);
-  --scribam-md-dialog-fg: color-mix(in srgb, var(--scribam-prosa) 55%, var(--scribam-ink));
 }
 
 [data-theme="dark"] {
   /* Keep macOS-like muted chrome accent (tokens.css); avoid neon “AI green” overrides. */
   --scribam-ui-selected: color-mix(in srgb, var(--scribam-ui-accent) 18%, transparent);
   --scribam-ui-selection-bg: color-mix(in srgb, var(--scribam-ui-accent) 32%, transparent);
-  --scribam-md-dialog-fg: #9eb8d0;
 }
 
 .prosa-brand-bar {

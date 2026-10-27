@@ -1,0 +1,156 @@
+/**
+ * Markdown source token colors — see docs/specs/markdown-source-semantics.md
+ * Do not duplicate dialog/inline rules in chrome.css or brand.css.
+ */
+
+/* `#` / `>` — prefix only (do not override dialog / inline tokens in body) */
+.markdown-source-stack .cm-md-block-marker {
+  color: var(--scribam-ui-text) !important;
+  -webkit-text-fill-color: var(--scribam-ui-text) !important;
+}
+
+.markdown-source-stack .cm-md-tok-heading,
+.markdown-source-stack .tok-heading {
+  color: var(--scribam-ui-text);
+  font-weight: 600;
+}
+
+.markdown-source-stack .cm-md-tok-strong,
+.markdown-source-stack .tok-strong {
+  color: var(--scribam-md-inline-strong-fg);
+  font-weight: 550;
+}
+
+.markdown-source-stack .cm-md-tok-emphasis,
+.markdown-source-stack .tok-emphasis {
+  color: var(--scribam-md-inline-emphasis-fg);
+  font-style: italic;
+}
+
+[data-theme="light"] .markdown-source-stack .cm-md-tok-strong,
+[data-theme="light"] .markdown-source-stack .tok-strong {
+  color: var(--scribam-ui-text);
+  font-weight: 500;
+}
+
+[data-theme="light"] .markdown-source-stack .cm-md-tok-emphasis,
+[data-theme="light"] .markdown-source-stack .tok-emphasis {
+  color: var(--scribam-ui-text);
+  font-style: italic;
+}
+
+[data-theme="dark"] .markdown-source-stack .cm-md-tok-strong,
+[data-theme="dark"] .markdown-source-stack .tok-strong {
+  color: var(--scribam-ui-text);
+  font-weight: 500;
+}
+
+[data-theme="dark"] .markdown-source-stack .cm-md-tok-emphasis,
+[data-theme="dark"] .markdown-source-stack .tok-emphasis {
+  color: var(--scribam-ui-text);
+  font-style: italic;
+}
+
+[data-theme="dark"] .markdown-source-stack .cm-md-tok-delimiter,
+[data-theme="dark"] .markdown-source-stack .cm-md-tok-markup,
+[data-theme="dark"] .markdown-source-stack .tok-processingInstruction,
+[data-theme="dark"] .markdown-source-stack .tok-meta,
+[data-theme="dark"] .markdown-source-stack .tok-comment {
+  color: var(--scribam-md-inline-markup-fg) !important;
+  -webkit-text-fill-color: var(--scribam-md-inline-markup-fg) !important;
+  font-weight: 400 !important;
+}
+
+/* Lezer fallback for markup (no opacity — it bleeds into dialog nested spans) */
+.markdown-source-stack .cm-md-tok-markup,
+.markdown-source-stack .tok-processingInstruction,
+.markdown-source-stack .tok-meta,
+.markdown-source-stack .tok-comment {
+  color: var(--scribam-md-inline-markup-fg);
+  font-weight: 400;
+  font-style: normal;
+  text-decoration: none;
+}
+
+/* Delimiter decoration (`cm-md-tok-delimiter`) — primary mute for ** * <u> */
+.markdown-source-stack .cm-md-tok-delimiter {
+  color: var(--scribam-md-inline-markup-fg) !important;
+  -webkit-text-fill-color: var(--scribam-md-inline-markup-fg) !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  text-decoration: none !important;
+}
+
+[data-theme="light"] .markdown-source-stack .cm-md-tok-delimiter {
+  color: var(--scribam-md-inline-markup-fg) !important;
+  -webkit-text-fill-color: var(--scribam-md-inline-markup-fg) !important;
+}
+
+[data-theme="light"] .markdown-source-stack .cm-md-tok-markup,
+[data-theme="light"] .markdown-source-stack .tok-processingInstruction,
+[data-theme="light"] .markdown-source-stack .tok-meta,
+[data-theme="light"] .markdown-source-stack .tok-comment {
+  color: var(--scribam-md-inline-markup-fg) !important;
+  -webkit-text-fill-color: var(--scribam-md-inline-markup-fg) !important;
+  font-weight: 400 !important;
+}
+
+.markdown-source-stack .cm-md-tok-strike,
+.markdown-source-stack .tok-strikethrough {
+  color: var(--scribam-md-inline-strike-fg);
+  text-decoration: line-through;
+}
+
+.markdown-source-stack .cm-md-tok-code,
+.markdown-source-stack .tok-monospace {
+  color: var(--scribam-md-inline-code-fg);
+}
+
+.markdown-source-stack .cm-md-tok-link,
+.markdown-source-stack .tok-link,
+.markdown-source-stack .tok-url {
+  color: var(--scribam-md-inline-link-fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.markdown-source-stack .cm-md-tok-inline-quote,
+.markdown-source-stack .tok-quote {
+  color: var(--scribam-md-inline-quote-fg);
+}
+
+.markdown-source-stack .cm-line.cm-md-break span,
+.markdown-source-stack .cm-line.cm-md-break .tok-strong,
+.markdown-source-stack .cm-line.cm-md-break .tok-emphasis,
+.markdown-source-stack .cm-line.cm-md-break .cm-md-tok-strong,
+.markdown-source-stack .cm-line.cm-md-break .cm-md-tok-emphasis {
+  color: inherit !important;
+  font-weight: inherit !important;
+  font-style: normal !important;
+  text-decoration: none !important;
+}
+
+.markdown-source-stack .cm-md-tok-underline-text {
+  color: var(--scribam-md-inline-underline-fg);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--scribam-md-inline-underline-fg) 55%, transparent);
+  text-underline-offset: 2px;
+}
+
+[data-theme="light"] .markdown-source-stack .cm-md-tok-underline-text {
+  color: var(--scribam-ui-text);
+  text-decoration-color: color-mix(in srgb, var(--scribam-ui-muted) 35%, transparent);
+}
+
+/*
+ * Dialog — LAST; wins over delimiter/markup/lezer inside the quoted span.
+ * Never use opacity on global .tok-* rules above (nested dialog text inherits it).
+ */
+.markdown-source-stack .cm-content span.cm-md-tok-dialog,
+.markdown-source-stack .cm-content span.cm-md-tok-dialog *,
+.markdown-source-stack .cm-md-active-sentence span.cm-md-tok-dialog,
+.markdown-source-stack .cm-md-active-sentence span.cm-md-tok-dialog * {
+  color: var(--scribam-md-dialog-fg) !important;
+  -webkit-text-fill-color: var(--scribam-md-dialog-fg) !important;
+  opacity: 1 !important;
+}
