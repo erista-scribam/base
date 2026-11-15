@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@scribam/core": "workspace:*",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "typescript": "~6.0.3",
